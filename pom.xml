@@ -10,6 +10,7 @@
     <name>nhb-common</name>
     <modules>
         <module>nhb-common-core</module>
+        <module>nhb-common-export</module>
     </modules>
 
     <properties>

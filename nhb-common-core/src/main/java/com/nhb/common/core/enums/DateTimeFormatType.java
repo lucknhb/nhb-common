@@ -11,7 +11,7 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-public enum DateTimeFormatEnum {
+public enum DateTimeFormatType {
     /**
      * 例如：2026年表示为"26"
      */
@@ -114,5 +114,5 @@ public enum DateTimeFormatEnum {
     /**
      * 时间格式
      */
-    private final String timeFormat;
+    private final String timeFormatType;
 }

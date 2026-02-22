@@ -9,7 +9,6 @@
 
     <artifactId>nhb-common-export</artifactId>
     <packaging>jar</packaging>
-
     <name>nhb-common-export</name>
 
     <dependencies>

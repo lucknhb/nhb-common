@@ -11,6 +11,7 @@
     <modules>
         <module>nhb-common-core</module>
         <module>nhb-common-export</module>
+        <module>nhb-common-web</module>
     </modules>
 
     <properties>

@@ -9,7 +9,7 @@ import java.lang.reflect.Method;
  * @author luck_nhb
  * @version 1.0
  * @date 2026/2/14 8:54
- * @description: 继承HUTOOL类库中的反射工具 并 实现获取getter setter
+ * @description: 继承huTool类库中的反射工具 并 实现获取getter setter
  */
 public class ReflectUtils extends ReflectUtil {
 

@@ -14,19 +14,23 @@
         <module>nhb-common-web</module>
         <module>nhb-common-ip2region</module>
         <module>nhb-common-sensitive</module>
+        <module>nhb-common-redis</module>
     </modules>
 
     <properties>
         <revision>1.0.0</revision>
         <java.version>21</java.version>
+        <fory.version>0.15.0</fory.version>
+        <lock4j.version>2.2.7</lock4j.version>
+        <redisson.version>3.52.0</redisson.version>
         <hutool.version>5.8.43</hutool.version>
         <ip2region.version>3.3.4</ip2region.version>
         <spring-boot.version>3.5.10</spring-boot.version>
-        <spring-cloud.version>2025.0.1</spring-cloud.version>
-        <spring-cloud-alibaba.version>2025.0.0.0</spring-cloud-alibaba.version>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <mapstruct-plus.version>1.5.0</mapstruct-plus.version>
+        <spring-cloud.version>2025.0.1</spring-cloud.version>
+        <spring-cloud-alibaba.version>2025.0.0.0</spring-cloud-alibaba.version>
         <maven-compiler-plugin.version>3.15.0</maven-compiler-plugin.version>
         <maven-resources-plugin.version>3.4.0</maven-resources-plugin.version>
         <flatten-maven-plugin.version>1.7.3</flatten-maven-plugin.version>
@@ -73,10 +77,27 @@
                 <artifactId>ip2region</artifactId>
                 <version>${ip2region.version}</version>
             </dependency>
+            <!--序列化工具-->
+            <dependency>
+                <groupId>org.apache.fory</groupId>
+                <artifactId>fory-core</artifactId>
+                <version>${fory.version}</version>
+            </dependency>
             <dependency>
                 <groupId>io.github.linpeilie</groupId>
                 <artifactId>mapstruct-plus-spring-boot-starter</artifactId>
                 <version>${mapstruct-plus.version}</version>
+            </dependency>
+            <!--redisson-->
+            <dependency>
+                <groupId>org.redisson</groupId>
+                <artifactId>redisson-spring-boot-starter</artifactId>
+                <version>${redisson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>lock4j-redisson-spring-boot-starter</artifactId>
+                <version>${lock4j.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

@@ -61,6 +61,10 @@ public class ResultMessage <T> implements Serializable {
         return buildResult(data, FAIL, msg);
     }
 
+    public static <T> ResultMessage<T> failed(int code, String msg) {
+        return buildResult(null, code, msg);
+    }
+
     /**
      * 构造返回结果
      * @param data  业务数据

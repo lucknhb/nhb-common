@@ -1,7 +1,6 @@
 package com.nhb.common.ip2region.properties;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 
@@ -11,8 +10,7 @@ import org.springframework.cloud.context.config.annotation.RefreshScope;
  * @date 2026/2/25 13:31
  * @description:
  */
-@Getter
-@Setter
+@Data
 @RefreshScope
 @ConfigurationProperties(prefix = Ip2RegionConfigProperties.PREFIX)
 public class Ip2RegionConfigProperties {

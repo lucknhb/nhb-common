@@ -15,6 +15,16 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.nhb</groupId>
+            <artifactId>nhb-common-core</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <!-- servlet包 -->
+        <dependency>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
         </dependency>

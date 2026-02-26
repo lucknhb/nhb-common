@@ -92,11 +92,6 @@
                     <target>${java.version}</target>
                     <encoding>${project.build.sourceEncoding}</encoding>
                     <annotationProcessorPaths>
-                        <path>
-                            <groupId>org.springframework.boot</groupId>
-                            <artifactId>spring-boot-configuration-processor</artifactId>
-                            <version>${spring-boot.version}</version>
-                        </path>
                     <!--使用mapStructUtil工具类时 需要的配置-->
                         <path>
                             <groupId>io.github.linpeilie</groupId>

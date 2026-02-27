@@ -1,0 +1,1 @@
+dubboLogFilter=com.nhb.common.dubbo.filter.DubboLogFilter

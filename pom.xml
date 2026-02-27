@@ -15,12 +15,14 @@
         <module>nhb-common-ip2region</module>
         <module>nhb-common-sensitive</module>
         <module>nhb-common-redis</module>
+        <module>nhb-common-dubbo</module>
     </modules>
 
     <properties>
         <revision>1.0.0</revision>
         <java.version>21</java.version>
         <fory.version>0.15.0</fory.version>
+        <sa-token.version>1.44.0</sa-token.version>
         <lock4j.version>2.2.7</lock4j.version>
         <redisson.version>3.52.0</redisson.version>
         <hutool.version>5.8.43</hutool.version>
@@ -28,6 +30,9 @@
         <spring-boot.version>3.5.10</spring-boot.version>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
+        <nacos.client.version>2.5.1</nacos.client.version>
+        <dubbo.version>3.3.6</dubbo.version>
+        <dubbo-extensions.version>3.3.1</dubbo-extensions.version>
         <mapstruct-plus.version>1.5.0</mapstruct-plus.version>
         <spring-cloud.version>2025.0.1</spring-cloud.version>
         <spring-cloud-alibaba.version>2025.0.0.0</spring-cloud-alibaba.version>
@@ -56,7 +61,7 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-            <!--Spring cloud alibaba 依赖配置-->
+            <!--Spring cloud alibaba 依赖配置 比较鸡肋 可以考虑慢慢剔除-->
             <dependency>
                 <groupId>com.alibaba.cloud</groupId>
                 <artifactId>spring-cloud-alibaba-dependencies</artifactId>
@@ -64,6 +69,15 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+            <!-- Apache Dubbo 配置 -->
+            <dependency>
+                <groupId>org.apache.dubbo</groupId>
+                <artifactId>dubbo-bom</artifactId>
+                <version>${dubbo.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <!-- huTool工具依赖-->
             <dependency>
                 <groupId>cn.hutool</groupId>
                 <artifactId>hutool-bom</artifactId>
@@ -83,6 +97,7 @@
                 <artifactId>fory-core</artifactId>
                 <version>${fory.version}</version>
             </dependency>
+            <!--mapStruct 加强版工具依赖-->
             <dependency>
                 <groupId>io.github.linpeilie</groupId>
                 <artifactId>mapstruct-plus-spring-boot-starter</artifactId>
@@ -99,6 +114,24 @@
                 <artifactId>lock4j-redisson-spring-boot-starter</artifactId>
                 <version>${lock4j.version}</version>
             </dependency>
+            <!--sa-token相关依赖-->
+            <dependency>
+                <groupId>cn.dev33</groupId>
+                <artifactId>sa-token-spring-boot3-starter</artifactId>
+                <version>${sa-token.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.dev33</groupId>
+                <artifactId>sa-token-dubbo3</artifactId>
+                <version>${sa-token.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.apache.dubbo</groupId>
+                        <artifactId>dubbo</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
@@ -113,7 +146,7 @@
                     <target>${java.version}</target>
                     <encoding>${project.build.sourceEncoding}</encoding>
                     <annotationProcessorPaths>
-                    <!--使用mapStructUtil工具类时 需要的配置-->
+                        <!--使用mapStructUtil工具类时 需要的配置-->
                         <path>
                             <groupId>io.github.linpeilie</groupId>
                             <artifactId>mapstruct-plus-processor</artifactId>
@@ -129,6 +162,9 @@
                             <version>${lombok-mapstruct-binding.version}</version>
                         </path>
                     </annotationProcessorPaths>
+                    <compilerArgs>
+                        <arg>-parameters</arg>
+                    </compilerArgs>
                 </configuration>
             </plugin>
             <!-- 统一版本号管理 -->

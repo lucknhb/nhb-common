@@ -1,10 +1,8 @@
 package com.nhb.common.web.config;
 
 import com.nhb.common.core.utils.SpringContextUtil;
-import io.undertow.server.DefaultByteBufferPool;
 import io.undertow.server.handlers.DisallowedMethodsHandler;
 import io.undertow.util.HttpString;
-import io.undertow.websockets.jsr.WebSocketDeploymentInfo;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.web.embedded.undertow.UndertowServletWebServerFactory;
 import org.springframework.boot.web.server.WebServerFactoryCustomizer;
@@ -34,11 +32,6 @@ public class UndertowConfig implements WebServerFactoryCustomizer<UndertowServle
     public void customize(UndertowServletWebServerFactory factory) {
         // 默认不直接分配内存 如果项目中使用了 websocket 建议直接分配
         factory.addDeploymentInfoCustomizers(deploymentInfo -> {
-            // 配置 WebSocket 部署信息，设置 WebSocket 使用的缓冲区池
-            WebSocketDeploymentInfo webSocketDeploymentInfo = new WebSocketDeploymentInfo();
-            webSocketDeploymentInfo.setBuffers(new DefaultByteBufferPool(true, 1024));
-            deploymentInfo.addServletContextAttribute("io.undertow.websockets.jsr.WebSocketDeploymentInfo", webSocketDeploymentInfo);
-
             // 如果启用了虚拟线程，配置 Undertow 使用虚拟线程池
             if (SpringContextUtil.isVirtual()) {
                 // 创建虚拟线程池，线程池前缀为 "undertow-"

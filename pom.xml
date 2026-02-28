@@ -16,6 +16,7 @@
         <module>nhb-common-sensitive</module>
         <module>nhb-common-redis</module>
         <module>nhb-common-dubbo</module>
+        <module>nhb-common-fory</module>
     </modules>
 
     <properties>

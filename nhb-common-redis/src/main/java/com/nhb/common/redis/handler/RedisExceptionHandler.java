@@ -24,6 +24,6 @@ public class RedisExceptionHandler {
     public ResultMessage<Void> handleLockFailureException(LockFailureException e, HttpServletRequest request) {
         String requestURI = request.getRequestURI();
         log.error("获取锁失败了'{}',发生Lock4j异常.", requestURI, e);
-        return ResultMessage.failed(HttpStatus.HTTP_UNAVAILABLE, "业务处理中，请稍后再试...");
+        return ResultMessage.fail(HttpStatus.HTTP_UNAVAILABLE, "业务处理中，请稍后再试...");
     }
 }

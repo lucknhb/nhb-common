@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import org.redisson.config.ReadMode;
 import org.redisson.config.SubscriptionMode;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 
 /**
  * @author luck_nhb
@@ -13,6 +14,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * @description: Redisson 配置属性
  */
 @Data
+@RefreshScope
 @ConfigurationProperties(prefix = RedissonProperties.PREFIX)
 public class RedissonProperties {
     public static final String PREFIX = "redisson";

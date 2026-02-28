@@ -11,7 +11,7 @@ import java.lang.reflect.Method;
  * @date 2026/2/14 8:54
  * @description: 继承huTool类库中的反射工具 并 实现获取getter setter
  */
-public class ReflectUtils extends ReflectUtil {
+public class ReflectSelfUtil extends ReflectUtil {
 
     private static final String SETTER_PREFIX = "set";
 

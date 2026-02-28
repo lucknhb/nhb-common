@@ -21,6 +21,6 @@ public class DubboExceptionHandler {
     @ExceptionHandler(RpcException.class)
     public ResultMessage<Void> handleDubboException(RpcException e) {
         log.error("RPC happen error: {}", e.getMessage(),e);
-        return ResultMessage.failed("服务处理异常,请联系管理员");
+        return ResultMessage.fail("服务处理异常,请联系管理员");
     }
 }

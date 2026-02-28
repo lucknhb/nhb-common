@@ -23,7 +23,7 @@ public class ResultMessage <T> implements Serializable {
     /**
      * 状态码
      */
-    private int code;
+    private Integer code;
     /**
      * 提示信息
      */
@@ -45,23 +45,23 @@ public class ResultMessage <T> implements Serializable {
         return buildResult(data, SUCCESS, msg);
     }
 
-    public static <T> ResultMessage<T> failed() {
+    public static <T> ResultMessage<T> fail() {
         return buildResult(null, FAIL, null);
     }
 
-    public static <T> ResultMessage<T> failed(String msg) {
+    public static <T> ResultMessage<T> fail(String msg) {
         return buildResult(null, FAIL, msg);
     }
 
-    public static <T> ResultMessage<T> failed(T data) {
+    public static <T> ResultMessage<T> fail(T data) {
         return buildResult(data, FAIL, null);
     }
 
-    public static <T> ResultMessage<T> failed(T data, String msg) {
+    public static <T> ResultMessage<T> fail(T data, String msg) {
         return buildResult(data, FAIL, msg);
     }
 
-    public static <T> ResultMessage<T> failed(int code, String msg) {
+    public static <T> ResultMessage<T> fail(Integer code, String msg) {
         return buildResult(null, code, msg);
     }
 
@@ -73,7 +73,7 @@ public class ResultMessage <T> implements Serializable {
      * @return
      * @param <T>   返回结果
      */
-    private static <T> ResultMessage<T> buildResult(T data, int code, String msg) {
+    private static <T> ResultMessage<T> buildResult(T data, Integer code, String msg) {
         ResultMessage<T> apiResult = new ResultMessage<>();
         apiResult.setCode(code);
         apiResult.setData(data);

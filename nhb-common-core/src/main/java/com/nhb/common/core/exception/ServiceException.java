@@ -1,6 +1,7 @@
 package com.nhb.common.core.exception;
 
 import cn.hutool.core.text.StrFormatter;
+import lombok.Getter;
 
 /**
  * @author luck_nhb
@@ -8,6 +9,7 @@ import cn.hutool.core.text.StrFormatter;
  * @date 2026/2/25 11:14
  * @description: 内部业务异常
  */
+@Getter
 public class ServiceException extends RuntimeException {
     /**
      * 错误码

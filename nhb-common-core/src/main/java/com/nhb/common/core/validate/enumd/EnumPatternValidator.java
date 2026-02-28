@@ -1,6 +1,6 @@
 package com.nhb.common.core.validate.enumd;
 
-import com.nhb.common.core.utils.ReflectUtils;
+import com.nhb.common.core.utils.ReflectSelfUtil;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import org.apache.commons.lang3.StringUtils;
@@ -26,7 +26,7 @@ public class EnumPatternValidator implements ConstraintValidator<EnumPattern, St
         if (StringUtils.isNotBlank(value)) {
             String fieldName = annotation.fieldName();
             for (Object e : annotation.type().getEnumConstants()) {
-                if (value.equals(ReflectUtils.invokeGetter(e, fieldName))) {
+                if (value.equals(ReflectSelfUtil.invokeGetter(e, fieldName))) {
                     return true;
                 }
             }

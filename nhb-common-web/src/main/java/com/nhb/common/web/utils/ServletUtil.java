@@ -4,6 +4,8 @@ import cn.hutool.core.convert.Convert;
 import cn.hutool.extra.servlet.JakartaServletUtil;
 import cn.hutool.http.HttpStatus;
 import com.nhb.common.core.utils.StringUtil;
+import jakarta.servlet.ReadListener;
+import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -14,10 +16,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.MediaType;
 import org.springframework.util.LinkedCaseInsensitiveMap;
+import org.springframework.util.StreamUtils;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -257,5 +261,44 @@ public class ServletUtil extends JakartaServletUtil {
      */
     public static String urlDecode(String str) {
         return URLDecoder.decode(str, StandardCharsets.UTF_8);
+    }
+
+    /**
+     * 获取请求体
+     *
+     * @param request 请求对象
+     */
+    public static byte[] getRequestBody(HttpServletRequest request) throws IOException {
+        return StreamUtils.copyToByteArray(request.getInputStream());
+    }
+
+    /**
+     * 获取流
+     *
+     * @param requestBody 请求体
+     */
+    public static ServletInputStream getInputStream(byte[] requestBody) {
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(requestBody);
+        return new ServletInputStream() {
+            @Override
+            public int read() {
+                return inputStream.read();
+            }
+
+            @Override
+            public boolean isFinished() {
+                return false;
+            }
+
+            @Override
+            public boolean isReady() {
+                return false;
+            }
+
+            @Override
+            public void setReadListener(ReadListener readListener) {
+                throw new UnsupportedOperationException();
+            }
+        };
     }
 }

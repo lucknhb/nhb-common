@@ -43,33 +43,33 @@ public class RedissonConfig {
             if (SpringContextUtil.isVirtual()) {
                 config.setNettyExecutor(new VirtualThreadTaskExecutor("redisson-"));
             }
-            RedissonProperties.SingleServerProperties singleServerProperties = redissonProperties.getSingleServer();
-            if (ObjectUtil.isNotNull(singleServerProperties)) {
+            RedissonProperties.SingleServerConfig singleServerConfig = redissonProperties.getSingleServerConfig();
+            if (ObjectUtil.isNotNull(singleServerConfig)) {
                 // 使用单机模式
                 config.useSingleServer()
                         .setNameMapper(new KeyPrefixHandler(redissonProperties.getKeyPrefix())) //设置redis key前缀
-                        .setTimeout(singleServerProperties.getTimeout())
-                        .setClientName(singleServerProperties.getClientName())
-                        .setIdleConnectionTimeout(singleServerProperties.getIdleConnectionTimeout())
-                        .setSubscriptionConnectionPoolSize(singleServerProperties.getSubscriptionConnectionPoolSize())
-                        .setConnectionMinimumIdleSize(singleServerProperties.getConnectionMinimumIdleSize())
-                        .setConnectionPoolSize(singleServerProperties.getConnectionPoolSize());
+                        .setTimeout(singleServerConfig.getTimeout())
+                        .setClientName(singleServerConfig.getClientName())
+                        .setIdleConnectionTimeout(singleServerConfig.getIdleConnectionTimeout())
+                        .setSubscriptionConnectionPoolSize(singleServerConfig.getSubscriptionConnectionPoolSize())
+                        .setConnectionMinimumIdleSize(singleServerConfig.getConnectionMinimumIdleSize())
+                        .setConnectionPoolSize(singleServerConfig.getConnectionPoolSize());
             }
             // 集群配置方式
-            RedissonProperties.ClusterServerProperties clusterServerProperties = redissonProperties.getClusterServer();
-            if (ObjectUtil.isNotNull(clusterServerProperties)) {
+            RedissonProperties.ClusterServersConfig clusterServersConfig = redissonProperties.getClusterServersConfig();
+            if (ObjectUtil.isNotNull(clusterServersConfig)) {
                 config.useClusterServers()
                         .setNameMapper(new KeyPrefixHandler(redissonProperties.getKeyPrefix())) //设置redis key前缀
-                        .setTimeout(clusterServerProperties.getTimeout())
-                        .setClientName(clusterServerProperties.getClientName())
-                        .setIdleConnectionTimeout(clusterServerProperties.getIdleConnectionTimeout())
-                        .setSubscriptionConnectionPoolSize(clusterServerProperties.getSubscriptionConnectionPoolSize())
-                        .setMasterConnectionMinimumIdleSize(clusterServerProperties.getMasterConnectionMinimumIdleSize())
-                        .setMasterConnectionPoolSize(clusterServerProperties.getMasterConnectionPoolSize())
-                        .setSlaveConnectionMinimumIdleSize(clusterServerProperties.getSlaveConnectionMinimumIdleSize())
-                        .setSlaveConnectionPoolSize(clusterServerProperties.getSlaveConnectionPoolSize())
-                        .setReadMode(clusterServerProperties.getReadMode())
-                        .setSubscriptionMode(clusterServerProperties.getSubscriptionMode());
+                        .setTimeout(clusterServersConfig.getTimeout())
+                        .setClientName(clusterServersConfig.getClientName())
+                        .setIdleConnectionTimeout(clusterServersConfig.getIdleConnectionTimeout())
+                        .setSubscriptionConnectionPoolSize(clusterServersConfig.getSubscriptionConnectionPoolSize())
+                        .setMasterConnectionMinimumIdleSize(clusterServersConfig.getMasterConnectionMinimumIdleSize())
+                        .setMasterConnectionPoolSize(clusterServersConfig.getMasterConnectionPoolSize())
+                        .setSlaveConnectionMinimumIdleSize(clusterServersConfig.getSlaveConnectionMinimumIdleSize())
+                        .setSlaveConnectionPoolSize(clusterServersConfig.getSlaveConnectionPoolSize())
+                        .setReadMode(clusterServersConfig.getReadMode())
+                        .setSubscriptionMode(clusterServersConfig.getSubscriptionMode());
             }
             log.info(">>>>>>>> End config redisson <<<<<<<<");
         };

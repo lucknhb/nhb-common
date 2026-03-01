@@ -38,17 +38,17 @@ public class RedissonProperties {
      * 单机服务配置<BR/>
      * ★★ 单机与集群只能配置一种 ★★
      */
-    private SingleServerProperties singleServer;
+    private SingleServerConfig singleServerConfig;
 
     /**
      * 集群服务配置<BR/>
      * ★★ 单机与集群只能配置一种 ★★
      */
-    private ClusterServerProperties clusterServer;
+    private ClusterServersConfig clusterServersConfig;
 
     @Data
     @NoArgsConstructor
-    public static class SingleServerProperties {
+    public static class SingleServerConfig {
 
         /**
          * 客户端名称
@@ -84,7 +84,7 @@ public class RedissonProperties {
 
     @Data
     @NoArgsConstructor
-    public static class ClusterServerProperties {
+    public static class ClusterServersConfig {
 
         /**
          * 客户端名称

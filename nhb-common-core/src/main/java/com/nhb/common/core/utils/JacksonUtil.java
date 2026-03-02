@@ -10,6 +10,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
+import com.fasterxml.jackson.databind.type.MapType;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author luck_nhb
@@ -170,6 +172,33 @@ public class JacksonUtil {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * Map转对象.
+     * @param obj 对象
+     * @param keyClass 键类
+     * @param valueClass 值类
+     * @param <K> 键泛型
+     * @param <T> 泛型
+     * @param <V> 值泛型
+     * @return 对象
+     */
+    public static <T, K, V> T toMap(Object obj, Class<K> keyClass, Class<V> valueClass) {
+        return OBJECT_MAPPER.convertValue(obj, mapType(keyClass, valueClass));
+    }
+
+
+    /**
+     * 创建mapType.
+     * @param keyClass 键类
+     * @param valueClass 值类
+     * @param <K> 键泛型
+     * @param <V> 值泛型
+     * @return MapType
+     */
+    private static <K, V> MapType mapType(Class<K> keyClass, Class<V> valueClass) {
+        return OBJECT_MAPPER.getTypeFactory().constructMapType(Map.class, keyClass, valueClass);
     }
 
     /**

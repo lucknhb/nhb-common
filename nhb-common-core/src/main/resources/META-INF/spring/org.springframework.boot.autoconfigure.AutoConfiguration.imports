@@ -1,3 +1,4 @@
 com.nhb.common.core.config.ThreadPoolConfig
 com.nhb.common.core.config.ValidatorConfig
 com.nhb.common.core.config.JacksonConfig
+com.nhb.common.core.config.ApplicationConfig

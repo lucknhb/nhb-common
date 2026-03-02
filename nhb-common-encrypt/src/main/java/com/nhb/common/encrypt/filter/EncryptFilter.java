@@ -50,7 +50,7 @@ public class EncryptFilter implements Filter {
         } else {
             // 是否有注解，有就报错，没有放行
             if (ObjectUtil.isNotNull(apiEncrypt)) {
-                HandlerExceptionResolver exceptionResolver = SpringContextUtil.getBean(HandlerExceptionResolver.class);
+                HandlerExceptionResolver exceptionResolver = SpringContextUtil.getBean("handlerExceptionResolver",HandlerExceptionResolver.class);
                 exceptionResolver.resolveException(
                         servletRequest, servletResponse, null,
                         new ServiceException("没有访问权限，请联系授权", HttpStatus.METHOD_NOT_ALLOWED));
@@ -80,7 +80,7 @@ public class EncryptFilter implements Filter {
      * 获取 ApiEncrypt 注解
      */
     private ApiEncrypt getApiEncryptAnnotation(HttpServletRequest servletRequest) {
-        RequestMappingHandlerMapping handlerMapping = SpringContextUtil.getBean(RequestMappingHandlerMapping.class);
+        RequestMappingHandlerMapping handlerMapping = SpringContextUtil.getBean("requestMappingHandlerMapping", RequestMappingHandlerMapping.class);
         // 获取注解
         try {
             HandlerExecutionChain mappingHandler = handlerMapping.getHandler(servletRequest);

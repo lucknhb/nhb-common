@@ -19,6 +19,7 @@
         <module>nhb-common-fory</module>
         <module>nhb-common-api</module>
         <module>nhb-common-encrypt</module>
+        <module>nhb-common-signature</module>
     </modules>
 
     <properties>

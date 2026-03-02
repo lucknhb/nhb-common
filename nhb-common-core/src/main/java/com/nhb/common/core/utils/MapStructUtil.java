@@ -20,7 +20,7 @@ import java.util.Map;
  */
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class MapstructUtil {
+public class MapStructUtil {
     private final static Converter CONVERTER = SpringContextUtil.getBean(Converter.class);
 
     /**

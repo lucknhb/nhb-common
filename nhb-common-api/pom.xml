@@ -8,6 +8,8 @@
         <artifactId>nhb-common</artifactId>
         <version>${revision}</version>
     </parent>
+    <packaging>jar</packaging>
+    <name>nhb-common-api</name>
     <artifactId>nhb-common-api</artifactId>
 
 <dependencies>

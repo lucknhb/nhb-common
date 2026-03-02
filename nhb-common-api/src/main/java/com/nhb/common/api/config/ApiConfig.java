@@ -96,17 +96,28 @@ public class ApiConfig {
      * 对已经生成好的 OpenApi 进行自定义操作
      */
     @Bean
-    public OpenApiCustomizer openApiCustomizer() {
-        return openApi -> {
+    public OpenApiCustomizer openApiCustomizer(ApiProperties properties) {
+        String finalContextPath;
+        //判断是否是单体应用 既无微服务架构时的api获取路径
+        if (Boolean.TRUE.equals(properties.getSingleFlag())){
+            String contextPath = serverProperties.getServlet().getContextPath();
+            if (StringUtils.isBlank(contextPath) || "/".equals(contextPath)) {
+                finalContextPath = "";
+            } else {
+                finalContextPath = contextPath;
+            }
+        }else {
             HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
             // 从请求头获取gateway转发的服务前缀
-            String prefix = StringUtils.defaultIfBlank(request.getHeader("X-Forwarded-Prefix"), "");
+            finalContextPath = StringUtils.defaultIfBlank(request.getHeader("X-Forwarded-Prefix"), "");
+        }
+        return openApi -> {
             Paths oldPaths = openApi.getPaths();
             if (oldPaths instanceof PlusPaths) {
                 return;
             }
             PlusPaths newPaths = new PlusPaths();
-            oldPaths.forEach((k, v) -> newPaths.addPathItem(prefix + k, v));
+            oldPaths.forEach((k, v) -> newPaths.addPathItem(finalContextPath + k, v));
             openApi.setPaths(newPaths);
         };
     }

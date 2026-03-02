@@ -27,6 +27,12 @@ public class ApiProperties {
      * @see org.springdoc.core.properties.SpringDocConfigProperties
      */
     public static final String PREFIX = "springdoc";
+
+    /**
+     * 是否单体应用
+     */
+    private Boolean singleFlag;
+
     /**
      * 文档基本信息
      */

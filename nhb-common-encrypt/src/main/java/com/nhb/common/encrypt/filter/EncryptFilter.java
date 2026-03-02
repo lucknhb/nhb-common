@@ -37,22 +37,23 @@ public class EncryptFilter implements Filter {
         // 获取加密注解
         ApiEncrypt apiEncrypt = this.getApiEncryptAnnotation(servletRequest);
         boolean responseFlag = apiEncrypt != null && apiEncrypt.response();
+        boolean requestFlag = apiEncrypt != null && apiEncrypt.request();
         ServletRequest requestWrapper = null;
         ServletResponse responseWrapper = null;
         EncryptResponseBodyWrapper responseBodyWrapper = null;
         // 是否存在加密标头
         String headerValue = servletRequest.getHeader(apiEncryptProperties.getHeaderFlag());
         //判断是否请求 还是 响应
-        if (StringUtils.isNotBlank(headerValue)) {
+        if (StringUtils.isNotBlank(headerValue) && requestFlag) {
             // 请求解密
             requestWrapper = new EncryptRequestBodyWrapper(servletRequest, apiEncryptProperties.getPrivateKey(), apiEncryptProperties.getHeaderFlag());
         } else {
             // 是否有注解，有就报错，没有放行
             if (ObjectUtil.isNotNull(apiEncrypt)) {
-                HandlerExceptionResolver exceptionResolver = SpringContextUtil.getBean("handlerExceptionResolver", HandlerExceptionResolver.class);
+                HandlerExceptionResolver exceptionResolver = SpringContextUtil.getBean(HandlerExceptionResolver.class);
                 exceptionResolver.resolveException(
                         servletRequest, servletResponse, null,
-                        new ServiceException("没有访问权限，请联系管理员授权", HttpStatus.FORBIDDEN));
+                        new ServiceException("没有访问权限，请联系授权", HttpStatus.METHOD_NOT_ALLOWED));
                 return;
             }
         }
@@ -79,7 +80,7 @@ public class EncryptFilter implements Filter {
      * 获取 ApiEncrypt 注解
      */
     private ApiEncrypt getApiEncryptAnnotation(HttpServletRequest servletRequest) {
-        RequestMappingHandlerMapping handlerMapping = SpringContextUtil.getBean("requestMappingHandlerMapping", RequestMappingHandlerMapping.class);
+        RequestMappingHandlerMapping handlerMapping = SpringContextUtil.getBean(RequestMappingHandlerMapping.class);
         // 获取注解
         try {
             HandlerExecutionChain mappingHandler = handlerMapping.getHandler(servletRequest);

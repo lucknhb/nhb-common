@@ -18,6 +18,7 @@
         <module>nhb-common-dubbo</module>
         <module>nhb-common-fory</module>
         <module>nhb-common-api</module>
+        <module>nhb-common-encrypt</module>
     </modules>
 
     <properties>
@@ -33,6 +34,7 @@
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <nacos.client.version>2.5.1</nacos.client.version>
+        <bouncycastle.version>1.80</bouncycastle.version>
         <dubbo.version>3.3.6</dubbo.version>
         <dubbo-extensions.version>3.3.1</dubbo-extensions.version>
         <mapstruct-plus.version>1.5.0</mapstruct-plus.version>
@@ -89,6 +91,12 @@
                 <version>${hutool.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <!-- 加密包引入 -->
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcprov-jdk15to18</artifactId>
+                <version>${bouncycastle.version}</version>
             </dependency>
             <!-- 离线IP地址定位库 -->
             <dependency>

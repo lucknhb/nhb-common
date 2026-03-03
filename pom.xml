@@ -21,6 +21,7 @@
         <module>nhb-common-encrypt</module>
         <module>nhb-common-signature</module>
         <module>nhb-common-limiter</module>
+        <module>nhb-common-idempotent</module>
     </modules>
 
     <properties>
@@ -146,6 +147,11 @@
                 <version>${therapi-javadoc.version}</version>
             </dependency>
             <!--sa-token相关依赖-->
+            <dependency>
+                <groupId>cn.dev33</groupId>
+                <artifactId>sa-token-core</artifactId>
+                <version>${sa-token.version}</version>
+            </dependency>
             <dependency>
                 <groupId>cn.dev33</groupId>
                 <artifactId>sa-token-spring-boot3-starter</artifactId>

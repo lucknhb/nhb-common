@@ -4,7 +4,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.nhb.common.core.utils.SpringContextUtil;
 import com.nhb.common.redis.handler.KeyPrefixHandler;
 import com.nhb.common.redis.handler.RedisExceptionHandler;
-import com.nhb.common.redis.properties.RedissonProperties;
+import com.nhb.common.redis.properties.RedissonConfigProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.fory.logging.LoggerFactory;
 import org.redisson.client.codec.StringCodec;
@@ -24,11 +24,11 @@ import org.springframework.core.task.VirtualThreadTaskExecutor;
  */
 @Slf4j
 @AutoConfiguration
-@EnableConfigurationProperties(RedissonProperties.class)
-public class RedissonConfig {
+@EnableConfigurationProperties(RedissonConfigProperties.class)
+public class RedissonAutoConfiguration {
 
     @Bean
-    public RedissonAutoConfigurationCustomizer redissonCustomizer(RedissonProperties redissonProperties) {
+    public RedissonAutoConfigurationCustomizer redissonCustomizer(RedissonConfigProperties redissonConfigProperties) {
         return config -> {
             log.info(">>>>>>>> Start config redisson <<<<<<<<");
             //使用fory作为序列化工具
@@ -36,18 +36,18 @@ public class RedissonConfig {
             ForyCodec foryCodec = new ForyCodec();
             CompositeCodec codec = new CompositeCodec(StringCodec.INSTANCE, foryCodec, foryCodec);
 
-            config.setThreads(redissonProperties.getThreads())
-                    .setNettyThreads(redissonProperties.getNettyThreads())
+            config.setThreads(redissonConfigProperties.getThreads())
+                    .setNettyThreads(redissonConfigProperties.getNettyThreads())
                     .setUseScriptCache(true) //缓存 Lua 脚本 减少网络传输(redisson 大部分的功能都是基于 Lua 脚本实现)
                     .setCodec(codec);
             if (SpringContextUtil.isVirtual()) {
                 config.setNettyExecutor(new VirtualThreadTaskExecutor("redisson-"));
             }
-            RedissonProperties.SingleServerConfig singleServerConfig = redissonProperties.getSingleServerConfig();
+            RedissonConfigProperties.SingleServerConfig singleServerConfig = redissonConfigProperties.getSingleServerConfig();
             if (ObjectUtil.isNotNull(singleServerConfig)) {
                 // 使用单机模式
                 config.useSingleServer()
-                        .setNameMapper(new KeyPrefixHandler(redissonProperties.getKeyPrefix())) //设置redis key前缀
+                        .setNameMapper(new KeyPrefixHandler(redissonConfigProperties.getKeyPrefix())) //设置redis key前缀
                         .setTimeout(singleServerConfig.getTimeout())
                         .setClientName(singleServerConfig.getClientName())
                         .setIdleConnectionTimeout(singleServerConfig.getIdleConnectionTimeout())
@@ -56,10 +56,10 @@ public class RedissonConfig {
                         .setConnectionPoolSize(singleServerConfig.getConnectionPoolSize());
             }
             // 集群配置方式
-            RedissonProperties.ClusterServersConfig clusterServersConfig = redissonProperties.getClusterServersConfig();
+            RedissonConfigProperties.ClusterServersConfig clusterServersConfig = redissonConfigProperties.getClusterServersConfig();
             if (ObjectUtil.isNotNull(clusterServersConfig)) {
                 config.useClusterServers()
-                        .setNameMapper(new KeyPrefixHandler(redissonProperties.getKeyPrefix())) //设置redis key前缀
+                        .setNameMapper(new KeyPrefixHandler(redissonConfigProperties.getKeyPrefix())) //设置redis key前缀
                         .setTimeout(clusterServersConfig.getTimeout())
                         .setClientName(clusterServersConfig.getClientName())
                         .setIdleConnectionTimeout(clusterServersConfig.getIdleConnectionTimeout())

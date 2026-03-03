@@ -19,7 +19,7 @@ import org.springframework.context.annotation.Bean;
 @AutoConfiguration
 @EnableConfigurationProperties(XssProperties.class)
 @ConditionalOnBooleanProperty(prefix = XssProperties.PREFIX, value = "enabled", havingValue = true)
-public class XssConfig {
+public class XssAutoConfiguration {
 
     @Bean
     @FilterRegistration(

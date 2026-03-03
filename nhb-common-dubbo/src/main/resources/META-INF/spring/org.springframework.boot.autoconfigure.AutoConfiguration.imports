@@ -1,1 +1,1 @@
-com.nhb.common.dubbo.config.DubboConfig
+com.nhb.common.dubbo.config.DubboAutoConfiguration

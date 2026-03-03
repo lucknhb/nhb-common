@@ -1,1 +1,1 @@
-com.nhb.common.encrypt.config.ApiEncryptConfig
+com.nhb.common.encrypt.config.ApiEncryptAutoConfiguration

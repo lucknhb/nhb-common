@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
  */
 @EnableCaching
 @AutoConfiguration
-public class CacheConfig {
+public class CacheAutoConfiguration {
     /**
      * caffeine 本地缓存处理器
      */

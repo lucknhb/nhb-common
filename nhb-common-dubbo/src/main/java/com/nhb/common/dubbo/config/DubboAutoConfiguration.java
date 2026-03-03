@@ -15,7 +15,7 @@ import org.springframework.context.annotation.Bean;
  */
 @AutoConfiguration
 @EnableConfigurationProperties(DubboCustomProperties.class)
-public class DubboConfig {
+public class DubboAutoConfiguration {
 
     @Bean
     public CustomDubboBeanFactoryPostProcessor customDubboBeanFactoryPostProcessor(){

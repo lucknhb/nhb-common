@@ -12,7 +12,6 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 
 import java.math.BigInteger;
@@ -28,8 +27,8 @@ import java.time.format.DateTimeFormatter;
  * @description: 时间序列化配置
  */
 @Slf4j
-@AutoConfigureBefore(JacksonAutoConfiguration.class)
-public class JacksonConfig {
+@AutoConfigureBefore(org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration.class)
+public class JacksonAutoConfiguration {
     /**
      * 全局配置序列化返回 JSON 处理
      * @return

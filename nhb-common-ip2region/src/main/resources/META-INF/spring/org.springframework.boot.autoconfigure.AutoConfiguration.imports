@@ -1,1 +1,1 @@
-com.nhb.common.ip2region.config.Ip2RegionConfig
+com.nhb.common.ip2region.config.Ip2RegionAutoConfiguration

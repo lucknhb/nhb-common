@@ -1,1 +1,1 @@
-com.nhb.common.api.config.ApiConfig
+com.nhb.common.api.config.ApiAutoConfiguration

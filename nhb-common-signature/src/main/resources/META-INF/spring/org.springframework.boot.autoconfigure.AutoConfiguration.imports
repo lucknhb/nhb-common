@@ -1,1 +1,1 @@
-com.nhb.common.signature.config.ApiSignatureConfig
+com.nhb.common.signature.config.ApiSignatureAutoConfiguration

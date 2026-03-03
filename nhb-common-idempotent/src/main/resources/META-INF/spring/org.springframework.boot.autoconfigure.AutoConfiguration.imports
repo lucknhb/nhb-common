@@ -1,1 +1,1 @@
-com.nhb.common.idempotent.config.ApiRepeatSubmitConfig
+com.nhb.common.idempotent.config.ApiRepeatSubmitAutoConfiguration

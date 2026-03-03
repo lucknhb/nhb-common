@@ -15,8 +15,8 @@ import org.springframework.cloud.context.config.annotation.RefreshScope;
  */
 @Data
 @RefreshScope
-@ConfigurationProperties(prefix = RedissonProperties.PREFIX)
-public class RedissonProperties {
+@ConfigurationProperties(prefix = RedissonConfigProperties.PREFIX)
+public class RedissonConfigProperties {
     public static final String PREFIX = "redisson";
 
     /**

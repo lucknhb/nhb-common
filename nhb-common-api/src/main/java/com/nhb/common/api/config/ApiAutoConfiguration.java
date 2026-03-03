@@ -41,7 +41,7 @@ import java.util.Set;
 @AutoConfigureBefore(SpringDocConfigProperties.class)
 @EnableConfigurationProperties(ApiProperties.class)
 @ConditionalOnBooleanProperty(prefix = ApiProperties.PREFIX, name = "api-docs.enabled", havingValue = true, matchIfMissing = true)
-public class ApiConfig {
+public class ApiAutoConfiguration {
     private final ServerProperties serverProperties;
 
     @Bean

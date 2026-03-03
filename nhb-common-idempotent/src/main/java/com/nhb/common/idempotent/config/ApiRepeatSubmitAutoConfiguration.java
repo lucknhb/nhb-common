@@ -1,7 +1,7 @@
 package com.nhb.common.idempotent.config;
 
 import com.nhb.common.idempotent.aspectj.ApiRepeatSubmitAspect;
-import com.nhb.common.redis.config.RedissonConfig;
+import com.nhb.common.redis.config.RedissonAutoConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.context.annotation.Bean;
 
@@ -11,8 +11,8 @@ import org.springframework.context.annotation.Bean;
  * @date 2026/3/3 13:59
  * @description:
  */
-@AutoConfigureAfter(RedissonConfig.class)
-public class ApiRepeatSubmitConfig {
+@AutoConfigureAfter(RedissonAutoConfiguration.class)
+public class ApiRepeatSubmitAutoConfiguration {
 
     @Bean
     public ApiRepeatSubmitAspect apiRepeatSubmitAspect(){

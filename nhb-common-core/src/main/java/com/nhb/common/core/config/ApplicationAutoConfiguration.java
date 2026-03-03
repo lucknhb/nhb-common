@@ -13,5 +13,5 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @AutoConfiguration
 @EnableAspectJAutoProxy
 @EnableAsync(proxyTargetClass = true)
-public class ApplicationConfig {
+public class ApplicationAutoConfiguration {
 }

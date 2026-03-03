@@ -23,7 +23,7 @@ import java.util.TimeZone;
 @Slf4j
 @AutoConfiguration
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
-public class WebMvcConfig {
+public class WebMvcAutoConfiguration {
 
     /**
      * 设置中国时区

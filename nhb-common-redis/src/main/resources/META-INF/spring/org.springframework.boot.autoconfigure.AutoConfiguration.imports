@@ -1,2 +1,2 @@
-com.nhb.common.redis.config.RedissonConfig
-com.nhb.common.redis.config.CacheConfig
+com.nhb.common.redis.config.RedissonAutoConfiguration
+com.nhb.common.redis.config.CacheAutoConfiguration

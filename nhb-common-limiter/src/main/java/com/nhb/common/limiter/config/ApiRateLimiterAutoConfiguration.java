@@ -1,7 +1,7 @@
 package com.nhb.common.limiter.config;
 
 import com.nhb.common.limiter.aspectj.ApiRateLimiterAspect;
-import com.nhb.common.redis.config.RedissonConfig;
+import com.nhb.common.redis.config.RedissonAutoConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.context.annotation.Bean;
 
@@ -11,8 +11,8 @@ import org.springframework.context.annotation.Bean;
  * @date 2026/3/3 10:46
  * @description:
  */
-@AutoConfigureAfter(RedissonConfig.class)
-public class ApiRateLimiterConfig {
+@AutoConfigureAfter(RedissonAutoConfiguration.class)
+public class ApiRateLimiterAutoConfiguration {
 
     @Bean
     public ApiRateLimiterAspect apiRateLimiterAspect() {

@@ -17,7 +17,7 @@ import org.springframework.context.annotation.Bean;
  */
 @AutoConfiguration
 @EnableConfigurationProperties(ApiEncryptProperties.class)
-public class ApiEncryptConfig {
+public class ApiEncryptAutoConfiguration {
 
     @Bean
     @FilterRegistration(

@@ -20,7 +20,7 @@ import java.util.concurrent.*;
 @Slf4j
 @Import(SpringContextUtil.class)
 @AutoConfiguration
-public class ThreadPoolConfig {
+public class ThreadPoolAutoConfiguration {
     /**
      * 核心线程数 = cpu 核心数 + 1
      */

@@ -27,7 +27,7 @@ import java.util.Objects;
 @AutoConfiguration
 @EnableConfigurationProperties(Ip2RegionConfigProperties.class)
 @ConditionalOnBooleanProperty(prefix = Ip2RegionConfigProperties.PREFIX, value = "enabled", havingValue = true, matchIfMissing = true)
-public class Ip2RegionConfig {
+public class Ip2RegionAutoConfiguration {
 
     private Ip2Region ip2Region;
 

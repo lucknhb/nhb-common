@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Bean;
  * @description
  */
 @AutoConfiguration
-public class ApiSignatureConfig {
+public class ApiSignatureAutoConfiguration {
 
     @Bean
     public ApiSignatureAspect apiSignatureAop() {

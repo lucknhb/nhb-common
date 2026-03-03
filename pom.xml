@@ -22,6 +22,7 @@
         <module>nhb-common-signature</module>
         <module>nhb-common-limiter</module>
         <module>nhb-common-idempotent</module>
+        <module>nhb-common-job</module>
     </modules>
 
     <properties>
@@ -30,6 +31,7 @@
         <fory.version>0.15.0</fory.version>
         <sa-token.version>1.44.0</sa-token.version>
         <lock4j.version>2.2.7</lock4j.version>
+        <xxl-job.version>3.3.2</xxl-job.version>
         <redisson.version>3.52.0</redisson.version>
         <hutool.version>5.8.43</hutool.version>
         <ip2region.version>3.3.4</ip2region.version>
@@ -94,6 +96,12 @@
                 <version>${hutool.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <!--XXL_JOB-->
+            <dependency>
+                <groupId>com.xuxueli</groupId>
+                <artifactId>xxl-job-core</artifactId>
+                <version>${xxl-job.version}</version>
             </dependency>
             <!-- 加密包引入 -->
             <dependency>

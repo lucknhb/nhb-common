@@ -1,1 +1,1 @@
-com.nhb.common.limiter.config.ApiRateLimiterConfig
+com.nhb.common.limiter.config.ApiRateLimiterAutoConfiguration

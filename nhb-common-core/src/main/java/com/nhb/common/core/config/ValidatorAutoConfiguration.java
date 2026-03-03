@@ -17,7 +17,7 @@ import java.util.Properties;
  * @description: 用于手动校验
  */
 @AutoConfiguration(before = ValidationAutoConfiguration.class)
-public class ValidatorConfig {
+public class ValidatorAutoConfiguration {
     /**
      * 配置校验框架 快速失败模式
      */

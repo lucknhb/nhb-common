@@ -1,3 +1,3 @@
-com.nhb.common.web.config.WebMvcConfig
-com.nhb.common.web.config.XssConfig
-com.nhb.common.web.config.UndertowConfig
+com.nhb.common.web.config.WebMvcAutoConfiguration
+com.nhb.common.web.config.XssAutoConfiguration
+com.nhb.common.web.config.UndertowAutoConfiguration

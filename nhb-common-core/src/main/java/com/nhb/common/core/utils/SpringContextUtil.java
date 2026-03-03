@@ -1,6 +1,7 @@
 package com.nhb.common.core.utils;
 
 import cn.hutool.extra.spring.SpringUtil;
+import com.nhb.common.core.config.ThreadPoolAutoConfiguration;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.boot.autoconfigure.thread.Threading;
@@ -12,7 +13,7 @@ import org.springframework.core.env.Environment;
  * @version 1.0
  * @date 2026/2/13 15:32
  * @description: Spring工具类
- * 此工具类以加载在容器中 可查看{@link com.nhb.common.core.config.ThreadPoolConfig} 中 @Import(SpringContextUtil.class)
+ * 此工具类以加载在容器中 可查看{@link ThreadPoolAutoConfiguration} 中 @Import(SpringContextUtil.class)
  */
 @Slf4j
 public final class SpringContextUtil extends SpringUtil {

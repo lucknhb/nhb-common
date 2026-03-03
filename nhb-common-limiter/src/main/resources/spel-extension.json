@@ -1,0 +1,7 @@
+{
+  "com.nhb.common.limiter.annotation.ApiRateLimiter@key": {
+    "method": {
+      "parameters": true
+    }
+  }
+}

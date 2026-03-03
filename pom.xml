@@ -20,6 +20,7 @@
         <module>nhb-common-api</module>
         <module>nhb-common-encrypt</module>
         <module>nhb-common-signature</module>
+        <module>nhb-common-limiter</module>
     </modules>
 
     <properties>

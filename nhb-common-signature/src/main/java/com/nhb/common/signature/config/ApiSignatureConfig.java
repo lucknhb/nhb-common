@@ -1,6 +1,6 @@
 package com.nhb.common.signature.config;
 
-import com.nhb.common.signature.aop.ApiSignatureAop;
+import com.nhb.common.signature.aspectj.ApiSignatureAspect;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Bean;
 
@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Bean;
 public class ApiSignatureConfig {
 
     @Bean
-    public ApiSignatureAop apiSignatureAop() {
-        return new ApiSignatureAop();
+    public ApiSignatureAspect apiSignatureAop() {
+        return new ApiSignatureAspect();
     }
 }

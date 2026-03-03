@@ -1,9 +1,8 @@
-package com.nhb.common.web.utils;
+package com.nhb.common.core.utils;
 
 import cn.hutool.core.convert.Convert;
 import cn.hutool.extra.servlet.JakartaServletUtil;
 import cn.hutool.http.HttpStatus;
-import com.nhb.common.core.utils.StringUtil;
 import jakarta.servlet.ReadListener;
 import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.ServletRequest;
@@ -26,10 +25,7 @@ import java.io.IOException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author luck_nhb
@@ -47,7 +43,7 @@ public class ServletUtil extends JakartaServletUtil {
      * @return 参数值
      */
     public static String getParameter(String name) {
-        return getRequest().getParameter(name);
+        return Objects.requireNonNull(getRequest()).getParameter(name);
     }
 
     /**
@@ -58,7 +54,7 @@ public class ServletUtil extends JakartaServletUtil {
      * @return 参数值或默认值
      */
     public static String getParameter(String name, String defaultValue) {
-        return Convert.toStr(getRequest().getParameter(name), defaultValue);
+        return Convert.toStr(Objects.requireNonNull(getRequest()).getParameter(name), defaultValue);
     }
 
     /**
@@ -68,7 +64,7 @@ public class ServletUtil extends JakartaServletUtil {
      * @return 参数值
      */
     public static Integer getParameterToInt(String name) {
-        return Convert.toInt(getRequest().getParameter(name));
+        return Convert.toInt(Objects.requireNonNull(getRequest()).getParameter(name));
     }
 
     /**
@@ -79,7 +75,7 @@ public class ServletUtil extends JakartaServletUtil {
      * @return 参数值或默认值
      */
     public static Integer getParameterToInt(String name, Integer defaultValue) {
-        return Convert.toInt(getRequest().getParameter(name), defaultValue);
+        return Convert.toInt(Objects.requireNonNull(getRequest()).getParameter(name), defaultValue);
     }
 
     /**
@@ -89,7 +85,7 @@ public class ServletUtil extends JakartaServletUtil {
      * @return 参数值
      */
     public static Boolean getParameterToBool(String name) {
-        return Convert.toBool(getRequest().getParameter(name));
+        return Convert.toBool(Objects.requireNonNull(getRequest()).getParameter(name));
     }
 
     /**
@@ -100,7 +96,7 @@ public class ServletUtil extends JakartaServletUtil {
      * @return 参数值或默认值
      */
     public static Boolean getParameterToBool(String name, Boolean defaultValue) {
-        return Convert.toBool(getRequest().getParameter(name), defaultValue);
+        return Convert.toBool(Objects.requireNonNull(getRequest()).getParameter(name), defaultValue);
     }
 
     /**
@@ -135,7 +131,7 @@ public class ServletUtil extends JakartaServletUtil {
      */
     public static HttpServletRequest getRequest() {
         try {
-            return getRequestAttributes().getRequest();
+            return Objects.requireNonNull(getRequestAttributes()).getRequest();
         } catch (Exception e) {
             return null;
         }
@@ -148,7 +144,7 @@ public class ServletUtil extends JakartaServletUtil {
      */
     public static HttpServletResponse getResponse() {
         try {
-            return getRequestAttributes().getResponse();
+            return Objects.requireNonNull(getRequestAttributes()).getResponse();
         } catch (Exception e) {
             return null;
         }
@@ -166,7 +162,7 @@ public class ServletUtil extends JakartaServletUtil {
      * @return 当前请求的 HttpSession 对象
      */
     public static HttpSession getSession() {
-        return getRequest().getSession();
+        return Objects.requireNonNull(getRequest()).getSession();
     }
 
     /**
@@ -240,7 +236,7 @@ public class ServletUtil extends JakartaServletUtil {
      * @return 客户端 IP 地址
      */
     public static String getClientIP() {
-        return getClientIP(getRequest());
+        return getClientIP(Objects.requireNonNull(getRequest()));
     }
 
     /**

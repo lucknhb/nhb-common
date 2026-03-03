@@ -1,4 +1,4 @@
-package com.nhb.common.signature.aop;
+package com.nhb.common.signature.aspectj;
 
 import cn.hutool.core.collection.CollUtil;
 import com.nhb.common.core.utils.JacksonUtil;
@@ -27,7 +27,7 @@ import java.util.Map;
  */
 @Slf4j
 @Aspect
-public class ApiSignatureAop {
+public class ApiSignatureAspect {
     /**
      * 随机字符
      */

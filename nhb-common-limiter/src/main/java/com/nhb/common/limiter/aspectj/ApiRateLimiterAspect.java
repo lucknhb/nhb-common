@@ -3,10 +3,10 @@ package com.nhb.common.limiter.aspectj;
 import com.nhb.common.core.constant.GlobalConstants;
 import com.nhb.common.core.exception.ServiceException;
 import com.nhb.common.core.utils.ResourceMessageUtil;
-import com.nhb.common.core.utils.ServletUtil;
 import com.nhb.common.core.utils.SpringContextUtil;
 import com.nhb.common.limiter.annotation.ApiRateLimiter;
 import com.nhb.common.redis.utils.RedissonUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.JoinPoint;
@@ -22,6 +22,10 @@ import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.ParserContext;
 import org.springframework.expression.common.TemplateParserContext;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
+import org.springframework.util.Assert;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.lang.reflect.Method;
 import java.util.Objects;
@@ -93,8 +97,11 @@ public class ApiRateLimiterAspect {
             }
             key = expression.getValue(context, String.class);
         }
-        return GlobalConstants.RATE_LIMIT_KEY + Objects.requireNonNull(ServletUtil.getRequest()).getRequestURI() + ":" +
-                apiRateLimiter.limitType().resolve() + ":" +
+        RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+        Assert.notNull(requestAttributes, "RequestAttributes Not Be Null");
+        HttpServletRequest httpServletRequest = ((ServletRequestAttributes) requestAttributes).getRequest();
+        return GlobalConstants.RATE_LIMIT_KEY + Objects.requireNonNull(httpServletRequest).getRequestURI() + ":" +
+                apiRateLimiter.limitType().resolve(httpServletRequest) + ":" +
                 key;
     }
 }

@@ -23,6 +23,8 @@
         <module>nhb-common-limiter</module>
         <module>nhb-common-idempotent</module>
         <module>nhb-common-job</module>
+        <module>nhb-common-gateway</module>
+        <module>nhb-common-security</module>
     </modules>
 
     <properties>
@@ -97,6 +99,14 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+            <!--sa-token相关依赖-->
+            <dependency>
+                <groupId>cn.dev33</groupId>
+                <artifactId>sa-token-bom</artifactId>
+                <version>${sa-token.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
             <!--XXL_JOB-->
             <dependency>
                 <groupId>com.xuxueli</groupId>
@@ -154,29 +164,6 @@
                 <artifactId>therapi-runtime-javadoc</artifactId>
                 <version>${therapi-javadoc.version}</version>
             </dependency>
-            <!--sa-token相关依赖-->
-            <dependency>
-                <groupId>cn.dev33</groupId>
-                <artifactId>sa-token-core</artifactId>
-                <version>${sa-token.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>cn.dev33</groupId>
-                <artifactId>sa-token-spring-boot3-starter</artifactId>
-                <version>${sa-token.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>cn.dev33</groupId>
-                <artifactId>sa-token-dubbo3</artifactId>
-                <version>${sa-token.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.apache.dubbo</groupId>
-                        <artifactId>dubbo</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-
         </dependencies>
     </dependencyManagement>
 

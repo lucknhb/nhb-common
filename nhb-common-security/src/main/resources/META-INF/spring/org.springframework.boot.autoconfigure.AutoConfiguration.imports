@@ -1,0 +1,2 @@
+com.nhb.common.security.config.SecurityWebMvcAutoConfiguration
+com.nhb.common.security.config.SecurityWebFluxAutoConfiguration

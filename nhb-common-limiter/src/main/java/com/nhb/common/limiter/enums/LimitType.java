@@ -1,8 +1,9 @@
 package com.nhb.common.limiter.enums;
 
 import cn.hutool.core.util.StrUtil;
-import com.nhb.common.core.utils.ServletUtil;
+import cn.hutool.extra.servlet.JakartaServletUtil;
 import com.nhb.common.redis.utils.RedissonUtil;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * @author luck_nhb
@@ -16,7 +17,7 @@ public enum LimitType {
      */
     DEFAULT {
         @Override
-        public String resolve() {
+        public String resolve(HttpServletRequest request) {
             return StrUtil.EMPTY;
         }
     },
@@ -26,8 +27,8 @@ public enum LimitType {
      */
     IP {
         @Override
-        public String resolve() {
-            return ServletUtil.getClientIP();
+        public String resolve(HttpServletRequest request) {
+            return JakartaServletUtil.getClientIP(request);
         }
     },
 
@@ -36,10 +37,10 @@ public enum LimitType {
      */
     CLUSTER {
         @Override
-        public String resolve() {
+        public String resolve(HttpServletRequest request) {
             return RedissonUtil.getClient().getId();
         }
     };
 
-    public abstract String resolve();
+    public abstract String resolve(HttpServletRequest request);
 }

@@ -1,8 +1,9 @@
-package com.nhb.common.core.utils;
+package com.nhb.common.web.utils;
 
 import cn.hutool.core.convert.Convert;
 import cn.hutool.extra.servlet.JakartaServletUtil;
 import cn.hutool.http.HttpStatus;
+import com.nhb.common.core.utils.StringUtil;
 import jakarta.servlet.ReadListener;
 import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.ServletRequest;

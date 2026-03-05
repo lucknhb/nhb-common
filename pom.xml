@@ -10,7 +10,7 @@
     <name>nhb-common</name>
     <modules>
         <module>nhb-common-core</module>
-        <module>nhb-common-export</module>
+        <module>nhb-common-office</module>
         <module>nhb-common-web</module>
         <module>nhb-common-ip2region</module>
         <module>nhb-common-sensitive</module>
@@ -25,6 +25,7 @@
         <module>nhb-common-job</module>
         <module>nhb-common-gateway</module>
         <module>nhb-common-security</module>
+        <module>nhb-common-bom</module>
     </modules>
 
     <properties>

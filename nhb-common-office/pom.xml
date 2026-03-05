@@ -7,7 +7,7 @@
         <version>${revision}</version>
     </parent>
 
-    <artifactId>nhb-common-export</artifactId>
+    <artifactId>nhb-common-office</artifactId>
     <packaging>jar</packaging>
     <name>nhb-common-export</name>
 

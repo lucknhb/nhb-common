@@ -19,8 +19,17 @@
             <version>${revision}</version>
         </dependency>
         <dependency>
+            <groupId>com.nhb</groupId>
+            <artifactId>nhb-common-redis</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
             <groupId>cn.dev33</groupId>
             <artifactId>sa-token-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>cn.dev33</groupId>
+            <artifactId>sa-token-jwt</artifactId>
         </dependency>
         <!--WebFlux-->
         <dependency>

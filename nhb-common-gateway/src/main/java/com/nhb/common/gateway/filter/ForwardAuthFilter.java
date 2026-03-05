@@ -13,7 +13,8 @@ import reactor.core.publisher.Mono;
  * @author luck_nhb
  * @version 1.0
  * @date 2026/3/4 16:43
- * @description: 转发认证过滤器 防止外网直接访问子服务(既必须通过网关请求访问)
+ * @description: 转发认证过滤器 防止外网直接访问子服务(既必须通过网关请求访问) <BR/>
+ * 该过滤器只有在服务上下游都开启 sa-token.checkSameToken=true时 才会发挥作用
  */
 public class ForwardAuthFilter implements GlobalFilter, Ordered {
     @Override

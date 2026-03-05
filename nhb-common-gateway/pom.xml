@@ -13,12 +13,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
+            <groupId>com.nhb</groupId>
+            <artifactId>nhb-common-core</artifactId>
+            <version>${revision}</version>
         </dependency>
         <dependency>
             <groupId>cn.dev33</groupId>

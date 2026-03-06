@@ -1,6 +1,6 @@
 package com.nhb.common.core.exception;
 
-import com.nhb.common.core.utils.ResourceMessageUtil;
+import com.nhb.common.core.utils.I18MessageUtil;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -55,7 +55,7 @@ public class I18nBaseException extends RuntimeException {
     public String getMessage() {
         String result = null;
         if (!StringUtils.isEmpty(code)) {
-            result = ResourceMessageUtil.message(code, args);
+            result = I18MessageUtil.message(code, args);
         }
         if (Objects.isNull(result)) {
             result = message;

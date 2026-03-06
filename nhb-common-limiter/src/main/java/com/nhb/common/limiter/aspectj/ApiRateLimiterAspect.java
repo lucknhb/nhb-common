@@ -2,7 +2,7 @@ package com.nhb.common.limiter.aspectj;
 
 import com.nhb.common.core.constant.GlobalConstants;
 import com.nhb.common.core.exception.ServiceException;
-import com.nhb.common.core.utils.ResourceMessageUtil;
+import com.nhb.common.core.utils.I18MessageUtil;
 import com.nhb.common.core.utils.SpringContextUtil;
 import com.nhb.common.limiter.annotation.ApiRateLimiter;
 import com.nhb.common.redis.utils.RedissonUtil;
@@ -64,7 +64,7 @@ public class ApiRateLimiterAspect {
             if (number == -1) {
                 String message = apiRateLimiter.message();
                 if (StringUtils.startsWith(message, "{") && StringUtils.endsWith(message, "}")) {
-                    message = ResourceMessageUtil.message(StringUtils.substring(message, 1, message.length() - 1));
+                    message = I18MessageUtil.message(StringUtils.substring(message, 1, message.length() - 1));
                 }
                 throw new ServiceException(message);
             }

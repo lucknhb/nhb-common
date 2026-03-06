@@ -66,6 +66,11 @@
             </dependency>
             <dependency>
                 <groupId>com.nhb</groupId>
+                <artifactId>nhb-common-nacos</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.nhb</groupId>
                 <artifactId>nhb-common-office</artifactId>
                 <version>${revision}</version>
             </dependency>

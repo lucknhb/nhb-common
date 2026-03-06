@@ -8,7 +8,7 @@ import com.nhb.common.core.constant.GlobalConstants;
 import com.nhb.common.core.domain.ResultMessage;
 import com.nhb.common.core.exception.ServiceException;
 import com.nhb.common.core.utils.JacksonUtil;
-import com.nhb.common.core.utils.ResourceMessageUtil;
+import com.nhb.common.core.utils.I18MessageUtil;
 import com.nhb.common.core.utils.ServletUtil;
 import com.nhb.common.idempotent.annotation.ApiRepeatSubmit;
 import com.nhb.common.redis.utils.RedissonUtil;
@@ -62,7 +62,7 @@ public class ApiRepeatSubmitAspect {
         } else {
             String message = apiRepeatSubmit.message();
             if (StringUtils.startsWith(message, "{") && StringUtils.endsWith(message, "}")) {
-                message = ResourceMessageUtil.message(StringUtils.substring(message, 1, message.length() - 1));
+                message = I18MessageUtil.message(StringUtils.substring(message, 1, message.length() - 1));
             }
             throw new ServiceException(message);
         }

@@ -16,7 +16,7 @@ import org.springframework.context.i18n.LocaleContextHolder;
  */
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class ResourceMessageUtil {
+public class I18MessageUtil {
     private static final MessageSource MESSAGE_SOURCE = SpringContextUtil.getBean(MessageSource.class);
 
     /**

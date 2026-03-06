@@ -163,7 +163,7 @@ public class JacksonUtil {
      * @return 转换后的对象的列表，如果字符串为空则返回空列表
      * @throws RuntimeException 如果转换过程中发生IO异常，则抛出运行时异常
      */
-    public static <T> List<T> parseArray(String text, Class<T> clazz) {
+    public static <T> List<T> toList(String text, Class<T> clazz) {
         if (StringUtils.isEmpty(text)) {
             return new ArrayList<>();
         }

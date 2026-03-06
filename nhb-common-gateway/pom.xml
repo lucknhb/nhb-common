@@ -14,7 +14,7 @@
     <dependencies>
         <dependency>
             <groupId>com.nhb</groupId>
-            <artifactId>nhb-common-core</artifactId>
+            <artifactId>nhb-common-nacos</artifactId>
             <version>${revision}</version>
         </dependency>
         <dependency>
@@ -28,10 +28,6 @@
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-gateway-server-webflux</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-context</artifactId>
         </dependency>
     </dependencies>
 </project>

@@ -9,7 +9,6 @@ import com.nhb.common.core.domain.ResultMessage;
 import com.nhb.common.core.exception.ServiceException;
 import com.nhb.common.core.utils.JacksonUtil;
 import com.nhb.common.core.utils.I18MessageUtil;
-import com.nhb.common.core.utils.ServletUtil;
 import com.nhb.common.idempotent.annotation.ApiRepeatSubmit;
 import com.nhb.common.redis.utils.RedissonUtil;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,7 +20,11 @@ import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
+import org.springframework.util.Assert;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Duration;
@@ -48,7 +51,9 @@ public class ApiRepeatSubmitAspect {
         if (interval < 1000) {
             throw new ServiceException("重复提交间隔时间不能小于'1'秒");
         }
-        HttpServletRequest request = ServletUtil.getRequest();
+        RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+        Assert.notNull(requestAttributes, "RequestAttributes Not Be Null");
+        HttpServletRequest request = ((ServletRequestAttributes) requestAttributes).getRequest();
         String nowParams = argsArrayToString(point.getArgs());
         // 请求地址（作为存放cache的key值）
         String url = Objects.requireNonNull(request).getRequestURI();

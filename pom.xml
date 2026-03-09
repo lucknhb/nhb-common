@@ -27,6 +27,7 @@
         <module>nhb-common-security</module>
         <module>nhb-common-bom</module>
         <module>nhb-common-nacos</module>
+        <module>nhb-common-sse</module>
     </modules>
 
     <properties>

@@ -17,7 +17,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
  * @author luck_nhb
  * @version 1.0
  * @date 2026/2/28 14:40
- * @description: 请求响应拦截处理器<BR/>
+ * @description: 请求响应拦截处理器<BR />
  * 防止接口返回 null
  */
 @Slf4j
@@ -39,7 +39,8 @@ public class ResponseBodyHandler implements ResponseBodyAdvice<Object> {
         }
         if (ObjectUtil.isNull(body)) {
             return ResultMessage.ok();
+        } else {
+            return ResultMessage.ok(body);
         }
-        return body;
     }
 }

@@ -1,0 +1,265 @@
+package com.nhb.common.file.platform;
+
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.StrUtil;
+import com.nhb.common.file.core.*;
+import com.nhb.common.file.pretreatment.*;
+import com.nhb.common.file.utils.ToolUtil;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.experimental.Accessors;
+
+import java.io.InputStream;
+import java.util.Comparator;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+/**
+ * @author luck_nhb
+ * @version 1.0
+ * @date 2026/3/9 22:53
+ * @description 文件存储接口，对应各个平台
+ */
+public interface FileStorage extends AutoCloseable {
+
+    /**
+     * 获取平台
+     */
+    String getPlatform();
+
+    /**
+     * 设置平台
+     */
+    void setPlatform(String platform);
+
+    /**
+     * 保存文件
+     */
+    boolean save(FileInfo fileInfo, UploadPretreatment pre);
+
+    /**
+     * 是否支持手动分片上传
+     */
+    default MultipartUploadSupportInfo isSupportMultipartUpload() {
+        return MultipartUploadSupportInfo.notSupport();
+    }
+
+    /**
+     * 手动分片上传-初始化
+     */
+    default void initiateMultipartUpload(FileInfo fileInfo, InitiateMultipartUploadPretreatment pre) {}
+
+    /**
+     * 手动分片上传-上传分片
+     */
+    default FilePartInfo uploadPart(UploadPartPretreatment pre) {
+        return null;
+    }
+
+    /**
+     * 手动分片上传-完成
+     */
+    default void completeMultipartUpload(CompleteMultipartUploadPretreatment pre) {}
+
+    /**
+     * 手动分片上传-取消
+     */
+    default void abortMultipartUpload(AbortMultipartUploadPretreatment pre) {}
+
+    /**
+     * 手动分片上传-列举已上传的分片
+     */
+    default FilePartInfoList listParts(ListPartsPretreatment pre) {
+        return null;
+    }
+
+    /**
+     * 是否支持列举文件
+     */
+    default ListFilesSupportInfo isSupportListFiles() {
+        return ListFilesSupportInfo.notSupport();
+    }
+
+    /**
+     * 列举文件-匹配文件
+     */
+    default <T> ListFilesMatchResult<T> listFilesMatch(
+            List<T> list, Function<T, String> nameGetter, ListFilesPretreatment pre, boolean sort) {
+        // 匹配文件名前缀
+        if (CollUtil.isNotEmpty(list) && StrUtil.isNotEmpty(pre.getFilenamePrefix())) {
+            list = list.stream()
+                    .filter(p -> nameGetter.apply(p).startsWith(pre.getFilenamePrefix()))
+                    .collect(Collectors.toList());
+        }
+        // 排序
+        if (CollUtil.isNotEmpty(list) && sort) {
+            list = list.stream().sorted(Comparator.comparing(nameGetter)).collect(Collectors.toList());
+        }
+        // 分页-确定开始位置
+        if (CollUtil.isNotEmpty(list) && StrUtil.isNotEmpty(pre.getMarker())) {
+            int index = CollUtil.indexOf(list, p -> nameGetter.apply(p).equals(pre.getMarker()));
+            if (index >= 0) list = list.subList(index + 1, list.size());
+        }
+        // 分页-确定结束位置
+        boolean isTruncated = false;
+        String nextMarker = null;
+        if (CollUtil.isNotEmpty(list) && pre.getMaxFiles() != null && list.size() > pre.getMaxFiles()) {
+            list = list.subList(0, pre.getMaxFiles());
+            isTruncated = true;
+            nextMarker = nameGetter.apply(list.get(list.size() - 1));
+        }
+        return new ListFilesMatchResult<>(list, isTruncated, nextMarker);
+    }
+
+    /**
+     * 列举文件
+     */
+    default ListFilesResult listFiles(ListFilesPretreatment pre) {
+        return null;
+    }
+
+    /**
+     * 获取文件
+     */
+    default RemoteFileInfo getFile(GetFilePretreatment pre) {
+        return null;
+    }
+
+    /**
+     * 是否支持对文件生成可以签名访问的 URL
+     */
+    default boolean isSupportPresignedUrl() {
+        return false;
+    }
+
+    /**
+     * 生成预签名 URL
+     *
+     * @param pre 生成预签名 URL 预处理器
+     */
+    default GeneratePresignedUrlResult generatePresignedUrl(GeneratePresignedUrlPretreatment pre) {
+        return null;
+    }
+
+    /**
+     * 是否支持文件的访问控制列表，一般情况下只有对象存储支持该功能
+     */
+    default boolean isSupportAcl() {
+        return false;
+    }
+
+    /**
+     * 设置文件的访问控制列表，一般情况下只有对象存储支持该功能
+     */
+    default boolean setFileAcl(FileInfo fileInfo, Object acl) {
+        return false;
+    }
+
+    /**
+     * 设置缩略图文件的访问控制列表，一般情况下只有对象存储支持该功能
+     */
+    default boolean setThFileAcl(FileInfo fileInfo, Object acl) {
+        return false;
+    }
+
+    /**
+     * 是否支持 Metadata，一般情况下只有对象存储支持该功能
+     */
+    default boolean isSupportMetadata() {
+        return false;
+    }
+
+    /**
+     * 删除文件
+     */
+    boolean delete(FileInfo fileInfo);
+
+    /**
+     * 文件是否存在
+     */
+    boolean exists(FileInfo fileInfo);
+
+    /**
+     * 下载文件
+     */
+    void download(FileInfo fileInfo, Consumer<InputStream> consumer);
+
+    /**
+     * 下载缩略图文件
+     */
+    void downloadTh(FileInfo fileInfo, Consumer<InputStream> consumer);
+
+    /**
+     * 是否支持同存储平台复制文件
+     */
+    default boolean isSupportSameCopy() {
+        return false;
+    }
+
+    /**
+     * 同存储平台复制文件
+     */
+    default void sameCopy(FileInfo srcFileInfo, FileInfo destFileInfo, CopyPretreatment pre) {}
+
+    /**
+     * 是否支持同存储平台移动文件
+     */
+    default boolean isSupportSameMove() {
+        return false;
+    }
+
+    /**
+     * 同存储平台移动文件
+     */
+    default void sameMove(FileInfo srcFileInfo, FileInfo destFileInfo, MovePretreatment pre) {}
+
+    /**
+     * 释放相关资源
+     */
+    default void close() {}
+
+    /**
+     * 获取文件全路径（相对存储平台的存储路径）
+     *
+     * @param fileInfo 文件信息
+     */
+    default String getFileKey(FileInfo fileInfo) {
+        return ToolUtil.getNotNull(fileInfo.getBasePath(), StrUtil.EMPTY)
+                + ToolUtil.getNotNull(fileInfo.getPath(), StrUtil.EMPTY)
+                + ToolUtil.getNotNull(fileInfo.getFileName(), StrUtil.EMPTY);
+    }
+    /**
+     * 获取缩略图全路径（相对存储平台的存储路径）
+     *
+     * @param fileInfo 文件信息
+     */
+    default String getThFileKey(FileInfo fileInfo) {
+        if (StrUtil.isBlank(fileInfo.getThumbnailFileName())) return null;
+        return ToolUtil.getNotNull(fileInfo.getBasePath(), StrUtil.EMPTY)
+                + ToolUtil.getNotNull(fileInfo.getPath(), StrUtil.EMPTY)
+                + ToolUtil.getNotNull(fileInfo.getThumbnailFileName(), StrUtil.EMPTY);
+    }
+
+    /**
+     * 列举文件-匹配结果
+     */
+    @Data
+    @Accessors(chain = true)
+    @AllArgsConstructor
+    class ListFilesMatchResult<T> {
+        /**
+         * 列表
+         */
+        private List<T> list;
+        /**
+         * 列表是否被截断，就是当前 uploadId下还有其它分片超出最大分片数量未被列举
+         */
+        private Boolean isTruncated;
+        /**
+         * 下次列举的起始位置
+         */
+        private String nextMarker;
+    }
+}

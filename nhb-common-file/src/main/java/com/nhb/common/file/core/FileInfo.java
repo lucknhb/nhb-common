@@ -85,7 +85,7 @@ public class FileInfo implements Serializable {
     /**
      * 缩略图名称
      */
-    private String thumbnailFilename;
+    private String thumbnailFileName;
 
     /**
      * 缩略图大小，单位字节

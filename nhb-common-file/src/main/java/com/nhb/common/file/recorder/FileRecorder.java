@@ -1,7 +1,7 @@
 package com.nhb.common.file.recorder;
 
 import com.nhb.common.file.core.FileInfo;
-import com.nhb.common.file.upload.FilePartInfo;
+import com.nhb.common.file.core.FilePartInfo;
 
 /**
  * @author luck_nhb

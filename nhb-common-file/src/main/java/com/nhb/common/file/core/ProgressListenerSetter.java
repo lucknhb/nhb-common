@@ -1,6 +1,5 @@
 package com.nhb.common.file.core;
 
-import com.nhb.common.file.listeners.ProgressListener;
 import com.nhb.common.file.utils.ToolUtil;
 
 import java.util.function.BiConsumer;

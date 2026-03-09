@@ -1,7 +1,6 @@
 package com.nhb.common.file.core;
 
 import com.nhb.common.file.hash.HashCalculatorManager;
-import com.nhb.common.file.listeners.ProgressListener;
 import lombok.Getter;
 
 import java.io.FilterInputStream;

@@ -1,5 +1,7 @@
 package com.nhb.common.file.hash;
 
+import com.nhb.common.file.constant.FileStorageConstants;
+
 /**
  * @author luck_nhb
  * @version 1.0
@@ -8,7 +10,7 @@ package com.nhb.common.file.hash;
  */
 public interface HashCalculator {
     /**
-     * 获取哈希名称，例如 MD5、SHA1、SHA256等，详情{@link org.dromara.x.file.storage.core.constant.Constant.Hash}
+     * 获取哈希名称，例如 MD5、SHA1、SHA256等，详情{@link FileStorageConstants.Hash}
      */
     String getName();
 

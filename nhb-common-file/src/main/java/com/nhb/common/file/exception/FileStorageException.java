@@ -1,0 +1,28 @@
+package com.nhb.common.file.exception;
+
+/**
+ * @author luck_nhb
+ * @version 1.0
+ * @date 2026/3/9 16:06
+ * @description: FileStorage 运行时异常
+ */
+public class FileStorageException extends RuntimeException {
+    public FileStorageException() {}
+
+    public FileStorageException(String message) {
+        super(message);
+    }
+
+    public FileStorageException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public FileStorageException(Throwable cause) {
+        super(cause);
+    }
+
+    public FileStorageException(
+            String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
+    }
+}

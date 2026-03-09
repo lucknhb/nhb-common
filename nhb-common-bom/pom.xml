@@ -36,6 +36,11 @@
             </dependency>
             <dependency>
                 <groupId>com.nhb</groupId>
+                <artifactId>nhb-common-file</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.nhb</groupId>
                 <artifactId>nhb-common-fory</artifactId>
                 <version>${revision}</version>
             </dependency>

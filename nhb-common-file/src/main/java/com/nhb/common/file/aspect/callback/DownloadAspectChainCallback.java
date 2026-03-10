@@ -7,8 +7,12 @@ import com.nhb.common.file.platform.FileStorage;
 import java.io.InputStream;
 import java.util.function.Consumer;
 
+
 /**
- * 下载切面调用链结束回调
+ * @author luck_nhb
+ * @version 1.0
+ * @date 2026/3/9 15:01
+ * @description: 下载切面调用链结束回调
  */
 public interface DownloadAspectChainCallback {
     void run(FileInfo fileInfo, FileStorage fileStorage, Consumer<InputStream> consumer);

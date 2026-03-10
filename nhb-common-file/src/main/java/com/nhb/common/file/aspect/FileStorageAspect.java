@@ -140,7 +140,7 @@ public interface FileStorageAspect {
      * 下载缩略图文件，成功返回文件内容
      */
     default void downloadThAround(
-            DownloadThAspectChain chain, FileInfo fileInfo, FileStorage fileStorage, Consumer<InputStream> consumer) {
+            DownloadThumbnailAspectChain chain, FileInfo fileInfo, FileStorage fileStorage, Consumer<InputStream> consumer) {
         chain.next(fileInfo, fileStorage, consumer);
     }
 
@@ -163,7 +163,7 @@ public interface FileStorageAspect {
      * 对缩略图文件生成可以签名访问的 URL，无法生成则返回 null
      */
     default String generateThPresignedUrlAround(
-            GenerateThPresignedUrlAspectChain chain, FileInfo fileInfo, Date expiration, FileStorage fileStorage) {
+            GenerateThumbnailPresignedUrlAspectChain chain, FileInfo fileInfo, Date expiration, FileStorage fileStorage) {
         return chain.next(fileInfo, expiration, fileStorage);
     }
 

@@ -35,14 +35,18 @@ import com.azure.storage.file.datalake.DataLakeFileClient;
 import com.azure.storage.file.datalake.models.PathAccessControlEntry;
 import com.azure.storage.file.datalake.models.PathPermissions;
 import com.azure.storage.file.datalake.models.RolePermissions;
+import com.nhb.common.file.constant.FileStorageConstants;
 import com.nhb.common.file.core.*;
-import com.nhb.common.file.pretreatment.*;
 import com.nhb.common.file.exception.Check;
 import com.nhb.common.file.exception.ExceptionFactory;
-import com.nhb.common.file.core.ProgressListener;
+import com.nhb.common.file.exception.FileStorageException;
 import com.nhb.common.file.platform.FileStorage;
-import com.nhb.common.file.core.GeneratePresignedUrlResult;
+import com.nhb.common.file.platform.FileStorageClientFactory;
+import com.nhb.common.file.platform.factory.AzureBlobStorageFileStorageClientFactory;
+import com.nhb.common.file.pretreatment.*;
 import com.nhb.common.file.utils.KebabCaseInsensitiveMap;
+import com.nhb.common.file.utils.ToolUtil;
+import com.nhb.common.file.wrapper.FileWrapper;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -62,8 +66,10 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
- * Azure Blob Storage
- * @author dongfeng <dongfeng@51ddi.com> XuYanwu <1171736840@qq.com>
+ * @author luck_nhb
+ * @version 1.0
+ * @date 2026/3/9 15:01
+ * @description: Azure Blob Storage
  */
 @Getter
 @Setter
@@ -122,10 +128,10 @@ public class AzureBlobStorageFileStorage implements FileStorage {
      */
     private CaseInsensitiveMap<String, String> methodToPermissionMap;
 
-    private FileStorageClientFactory<AzureBlobStorageClient> clientFactory;
+    private FileStorageClientFactory<AzureBlobStorageFileStorageClientFactory.AzureBlobStorageClient> clientFactory;
 
-    public AzureBlobStorageFileStorage(
-            AzureBlobStorageConfig config, FileStorageClientFactory<AzureBlobStorageClient> clientFactory) {
+    public AzureBlobStorageFileStorage( FileStorageProperties.AzureBlobStorageConfig config,
+                                        FileStorageClientFactory<AzureBlobStorageFileStorageClientFactory.AzureBlobStorageClient> clientFactory) {
         platform = config.getPlatform();
         containerName = config.getContainerName();
         domain = config.getDomain();
@@ -138,7 +144,7 @@ public class AzureBlobStorageFileStorage implements FileStorage {
         this.clientFactory = clientFactory;
     }
 
-    public AzureBlobStorageClient getClient() {
+    public AzureBlobStorageFileStorageClientFactory.AzureBlobStorageClient getClient() {
         return clientFactory.getClient();
     }
 
@@ -193,12 +199,12 @@ public class AzureBlobStorageFileStorage implements FileStorage {
             byte[] thumbnailBytes = pre.getThumbnailBytes();
             if (thumbnailBytes != null) {
                 String newThFileKey = getThFileKey(fileInfo);
-                fileInfo.setThUrl(getUrl(newThFileKey));
-                AclWrapper thAcl = getAcl(fileInfo.getThFileAcl());
+                fileInfo.setThumbnailUrl(getUrl(newThFileKey));
+                AclWrapper thAcl = getAcl(fileInfo.getThumbnailFileAcl());
                 BlobParallelUploadOptions thOptions =
                         new BlobParallelUploadOptions(new ByteArrayInputStream(thumbnailBytes));
-                thOptions.setMetadata(fileInfo.getThUserMetadata());
-                thOptions.setHeaders(getBlobHttpHeaders(fileInfo.getThContentType(), fileInfo.getThMetadata()));
+                thOptions.setMetadata(fileInfo.getThumbnailUserMetadata());
+                thOptions.setHeaders(getBlobHttpHeaders(fileInfo.getThumbnailContentType(), fileInfo.getThumbnailMetadata()));
                 thBlobClient = getBlobClient(newThFileKey);
                 thBlobClient.uploadWithResponse(thOptions, null, Context.NONE);
                 setFileAcl(newFileKey, thAcl);
@@ -251,7 +257,7 @@ public class AzureBlobStorageFileStorage implements FileStorage {
         pre.setHashCalculatorMd5();
         try (InputStreamPlus in = pre.getInputStreamPlus()) {
             // Azure Blob Storage 比较特殊，上传分片必须传入分片大小，这里强制获取，可能会占用大量内存
-            if (partSize == null) partSize = partFileWrapper.getInputStreamMaskResetReturn(Tools::getSize);
+            if (partSize == null) partSize = partFileWrapper.getInputStreamMaskResetReturn(ToolUtil::getSize);
             String blockIdBase64 = Base64.encode(String.format("%06d", pre.getPartNumber()));
             blobClient.stageBlock(blockIdBase64, in, partSize);
             String etag = pre.getHashCalculatorManager().getHashInfo().getMd5();
@@ -474,16 +480,16 @@ public class AzureBlobStorageFileStorage implements FileStorage {
             String sAcl = (String) acl;
             if (StrUtil.isEmpty(sAcl)) sAcl = defaultAcl;
             if (StrUtil.isEmpty(sAcl)) return null;
-            if (Constant.AzureBlobStorageACL.PRIVATE.equalsIgnoreCase(sAcl)) {
+            if (FileStorageConstants.AzureBlobStorageACL.PRIVATE.equalsIgnoreCase(sAcl)) {
                 return new AclWrapper(new PathPermissions()
                         .setGroup(new RolePermissions().setReadPermission(true))
                         .setOwner(new RolePermissions().setReadPermission(true).setWritePermission(true)));
-            } else if (Constant.AzureBlobStorageACL.PUBLIC_READ.equalsIgnoreCase(sAcl)) {
+            } else if (FileStorageConstants.AzureBlobStorageACL.PUBLIC_READ.equalsIgnoreCase(sAcl)) {
                 return new AclWrapper(new PathPermissions()
                         .setGroup(new RolePermissions().setReadPermission(true))
                         .setOwner(new RolePermissions().setReadPermission(true).setWritePermission(true))
                         .setOther(new RolePermissions().setReadPermission(true)));
-            } else if (Constant.AzureBlobStorageACL.PUBLIC_READ_WRITE.equalsIgnoreCase(sAcl)) {
+            } else if (FileStorageConstants.AzureBlobStorageACL.PUBLIC_READ_WRITE.equalsIgnoreCase(sAcl)) {
                 return new AclWrapper(new PathPermissions()
                         .setGroup(new RolePermissions().setReadPermission(true).setWritePermission(true))
                         .setOwner(new RolePermissions().setReadPermission(true).setWritePermission(true))
@@ -498,7 +504,7 @@ public class AzureBlobStorageFileStorage implements FileStorage {
                                 if (item instanceof PathAccessControlEntry) {
                                     return (PathAccessControlEntry) item;
                                 } else {
-                                    throw new FileStorageRuntimeException("不支持的ACL：" + item);
+                                    throw new FileStorageException("不支持的ACL：" + item);
                                 }
                             })
                             .collect(Collectors.toList());
@@ -571,7 +577,7 @@ public class AzureBlobStorageFileStorage implements FileStorage {
     @Override
     public boolean delete(FileInfo fileInfo) {
         try {
-            if (fileInfo.getThFilename() != null) { // 删除缩略图
+            if (fileInfo.getThumbnailFileName() != null) { // 删除缩略图
                 getBlobClient(getThFileKey(fileInfo)).deleteIfExists();
             }
             getBlobClient(getFileKey(fileInfo)).deleteIfExists();
@@ -646,11 +652,11 @@ public class AzureBlobStorageFileStorage implements FileStorage {
             BlobServiceSasSignatureValues values = new BlobServiceSasSignatureValues(expiration, permission);
             KebabCaseInsensitiveMap<String, String> responseHeaders =
                     new KebabCaseInsensitiveMap<>(pre.getResponseHeaders());
-            values.setCacheControl(responseHeaders.get(Constant.Metadata.CACHE_CONTROL));
-            values.setContentDisposition(responseHeaders.get(Constant.Metadata.CONTENT_DISPOSITION));
-            values.setContentEncoding(responseHeaders.get(Constant.Metadata.CONTENT_ENCODING));
-            values.setContentLanguage(responseHeaders.get(Constant.Metadata.CONTENT_LANGUAGE));
-            values.setContentType(responseHeaders.get(Constant.Metadata.CONTENT_TYPE));
+            values.setCacheControl(responseHeaders.get(FileStorageConstants.Metadata.CACHE_CONTROL));
+            values.setContentDisposition(responseHeaders.get(FileStorageConstants.Metadata.CONTENT_DISPOSITION));
+            values.setContentEncoding(responseHeaders.get(FileStorageConstants.Metadata.CONTENT_ENCODING));
+            values.setContentLanguage(responseHeaders.get(FileStorageConstants.Metadata.CONTENT_LANGUAGE));
+            values.setContentType(responseHeaders.get(FileStorageConstants.Metadata.CONTENT_TYPE));
             if (pre.getStartTime() != null)
                 values.setStartTime(
                         pre.getStartTime().toInstant().atZone(ZoneOffset.UTC).toOffsetDateTime());
@@ -723,10 +729,10 @@ public class AzureBlobStorageFileStorage implements FileStorage {
         }
         // 复制缩略图文件
         if (destThClient != null) {
-            destFileInfo.setThUrl(getUrl(destThFileKey));
+            destFileInfo.setThumbnailUrl(getUrl(destThFileKey));
             try {
                 awaitCopy(destThClient.beginCopy(srcThClient.getBlobUrl(), Duration.ofSeconds(1)));
-                setFileAcl(destThFileKey, getAcl(srcFileInfo.getThFileAcl()));
+                setFileAcl(destThFileKey, getAcl(srcFileInfo.getThumbnailFileAcl()));
             } catch (Exception e) {
                 try {
                     destThClient.deleteIfExists();

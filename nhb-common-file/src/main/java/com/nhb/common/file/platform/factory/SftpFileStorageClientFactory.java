@@ -26,7 +26,10 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 /**
- * SFTP 存储平台的 Client 工厂，使用了对象池缓存，性能更高
+ * @author luck_nhb
+ * @version 1.0
+ * @date 2026/3/9 15:01
+ * @description: SFTP 存储平台的 Client 工厂，使用了对象池缓存，性能更高
  */
 @Slf4j
 @Getter

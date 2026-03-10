@@ -7,8 +7,16 @@ import cn.hutool.core.map.MapProxy;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.google.common.collect.Multimap;
+import com.nhb.common.file.constant.FileStorageConstants;
+import com.nhb.common.file.core.*;
+import com.nhb.common.file.exception.Check;
+import com.nhb.common.file.exception.ExceptionFactory;
 import com.nhb.common.file.platform.FileStorage;
 import com.nhb.common.file.platform.FileStorageClientFactory;
+import com.nhb.common.file.pretreatment.*;
+import com.nhb.common.file.utils.KebabCaseInsensitiveMap;
+import com.nhb.common.file.utils.ToolUtil;
+import com.nhb.common.file.wrapper.FileWrapper;
 import io.minio.*;
 import io.minio.errors.ErrorResponseException;
 import io.minio.http.Method;
@@ -31,7 +39,10 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
- * MinIO 存储
+ * @author luck_nhb
+ * @version 1.0
+ * @date 2026/3/9 15:01
+ * @description: MinIO 存储
  */
 @Getter
 @Setter
@@ -45,7 +56,7 @@ public class MinioFileStorage implements FileStorage {
     private int multipartPartSize;
     private FileStorageClientFactory<MinioClient> clientFactory;
 
-    public MinioFileStorage(MinioConfig config, FileStorageClientFactory<MinioClient> clientFactory) {
+    public MinioFileStorage(FileStorageProperties.MinioConfig config, FileStorageClientFactory<MinioClient> clientFactory) {
         platform = config.getPlatform();
         bucketName = config.getBucketName();
         domain = config.getDomain();
@@ -91,12 +102,12 @@ public class MinioFileStorage implements FileStorage {
             byte[] thumbnailBytes = pre.getThumbnailBytes();
             if (thumbnailBytes != null) { // 上传缩略图
                 String newThFileKey = getThFileKey(fileInfo);
-                fileInfo.setThUrl(domain + newThFileKey);
+                fileInfo.setThumbnailUrl(domain + newThFileKey);
                 client.putObject(PutObjectArgs.builder().bucket(bucketName).object(newThFileKey).stream(
                                 new ByteArrayInputStream(thumbnailBytes), thumbnailBytes.length, -1)
-                        .contentType(fileInfo.getThContentType())
-                        .headers(fileInfo.getThMetadata())
-                        .userMetadata(fileInfo.getThUserMetadata())
+                        .contentType(fileInfo.getThumbnailContentType())
+                        .headers(fileInfo.getThumbnailMetadata())
+                        .userMetadata(fileInfo.getThumbnailUserMetadata())
                         .build());
             }
 
@@ -214,7 +225,7 @@ public class MinioFileStorage implements FileStorage {
         Long partSize = partFileWrapper.getSize();
         try (InputStreamPlus in = pre.getInputStreamPlus()) {
             // MinIO 比较特殊，上传分片必须传入分片大小，这里强制获取，可能会占用大量内存
-            if (partSize == null) partSize = partFileWrapper.getInputStreamMaskResetReturn(Tools::getSize);
+            if (partSize == null) partSize = partFileWrapper.getInputStreamMaskResetReturn(ToolUtil::getSize);
 
             PutObjectArgs args = PutObjectArgs.builder().bucket(bucketName).object(newFileKey).stream(in, partSize, -1)
                     .build();
@@ -487,9 +498,9 @@ public class MinioFileStorage implements FileStorage {
             info.setSize(file.size());
             info.setExt(FileNameUtil.extName(info.getFilename()));
             info.setETag(file.etag());
-            info.setContentDisposition(headersProxy.getStr(Constant.Metadata.CONTENT_DISPOSITION));
+            info.setContentDisposition(headersProxy.getStr(FileStorageConstants.Metadata.CONTENT_DISPOSITION));
             info.setContentType(file.contentType());
-            info.setContentMd5(headersProxy.getStr(Constant.Metadata.CONTENT_MD5));
+            info.setContentMd5(headersProxy.getStr(FileStorageConstants.Metadata.CONTENT_MD5));
             info.setLastModified(DateUtil.date(file.lastModified()));
             info.setMetadata(headers.entrySet().stream()
                     .filter(e -> !e.getKey().startsWith("x-amz-meta-"))
@@ -521,7 +532,7 @@ public class MinioFileStorage implements FileStorage {
             GetPresignedObjectUrlArgs args = GetPresignedObjectUrlArgs.builder()
                     .bucket(bucketName)
                     .object(fileKey)
-                    .method(Tools.getEnum(Method.class, pre.getMethod()))
+                    .method(ToolUtil.getEnum(Method.class, pre.getMethod()))
                     .expiry((int) ((pre.getExpiration().getTime() - System.currentTimeMillis()) / 1000))
                     .extraHeaders(headers)
                     .extraQueryParams(queryParam)
@@ -545,7 +556,7 @@ public class MinioFileStorage implements FileStorage {
     public boolean delete(FileInfo fileInfo) {
         MinioClient client = getClient();
         try {
-            if (fileInfo.getThFilename() != null) { // 删除缩略图
+            if (fileInfo.getThumbnailFileName() != null) { // 删除缩略图
                 client.removeObject(RemoveObjectArgs.builder()
                         .bucket(bucketName)
                         .object(getThFileKey(fileInfo))
@@ -634,9 +645,9 @@ public class MinioFileStorage implements FileStorage {
 
         // 复制缩略图文件
         String destThFileKey = null;
-        if (StrUtil.isNotBlank(srcFileInfo.getThFilename())) {
+        if (StrUtil.isNotBlank(srcFileInfo.getThumbnailFileName())) {
             destThFileKey = getThFileKey(destFileInfo);
-            destFileInfo.setThUrl(domain + destThFileKey);
+            destFileInfo.setThumbnailUrl(domain + destThFileKey);
             try {
                 client.copyObject(CopyObjectArgs.builder()
                         .bucket(bucketName)
@@ -660,7 +671,7 @@ public class MinioFileStorage implements FileStorage {
             ProgressListener.quickStart(pre.getProgressListener(), fileSize);
             if (useMultipartCopy) { // 大文件复制，MinIO 内部会自动走分片上传，不会自动复制 Metadata，需要重新设置
                 Map<String, String> headers = new HashMap<>();
-                headers.put(Constant.Metadata.CONTENT_TYPE, destFileInfo.getContentType());
+                headers.put(FileStorageConstants.Metadata.CONTENT_TYPE, destFileInfo.getContentType());
                 headers.putAll(destFileInfo.getMetadata());
                 client.composeObject(ComposeObjectArgs.builder()
                         .bucket(bucketName)

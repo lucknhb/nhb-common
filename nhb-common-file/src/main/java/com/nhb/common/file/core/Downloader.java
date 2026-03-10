@@ -4,7 +4,7 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.IoUtil;
 import com.nhb.common.file.aspect.FileStorageAspect;
 import com.nhb.common.file.aspect.chain.DownloadAspectChain;
-import com.nhb.common.file.aspect.chain.DownloadThAspectChain;
+import com.nhb.common.file.aspect.chain.DownloadThumbnailAspectChain;
 import com.nhb.common.file.exception.FileStorageException;
 import com.nhb.common.file.hash.HashCalculator;
 import com.nhb.common.file.hash.HashCalculatorManager;
@@ -21,7 +21,10 @@ import java.util.List;
 import java.util.function.Consumer;
 
 /**
- * 下载器
+ * @author luck_nhb
+ * @version 1.0
+ * @date 2026/3/9 15:01
+ * @description: 下载器
  */
 public class Downloader implements ProgressListenerSetter<Downloader>, HashCalculatorSetter<Downloader> {
     /**
@@ -95,7 +98,7 @@ public class Downloader implements ProgressListenerSetter<Downloader>, HashCalcu
                             in -> consumer.accept(new InputStreamPlus(
                                     in, progressListener, fileInfo.getSize(), hashCalculatorManager)));
         } else if (target == TARGET_TH_FILE) { // 下载缩略图文件
-            new DownloadThAspectChain(
+            new DownloadThumbnailAspectChain(
                             aspectList,
                             (_fileInfo, _fileStorage, _consumer) -> _fileStorage.downloadTh(_fileInfo, _consumer))
                     .next(

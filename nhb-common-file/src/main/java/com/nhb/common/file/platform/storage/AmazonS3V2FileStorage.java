@@ -9,14 +9,16 @@ import cn.hutool.core.map.MapProxy;
 import cn.hutool.core.text.NamingCase;
 import cn.hutool.core.util.CharUtil;
 import cn.hutool.core.util.StrUtil;
+import com.nhb.common.file.constant.FileStorageConstants;
 import com.nhb.common.file.core.*;
-import com.nhb.common.file.pretreatment.*;
 import com.nhb.common.file.exception.Check;
 import com.nhb.common.file.exception.ExceptionFactory;
-import com.nhb.common.file.core.ProgressListener;
 import com.nhb.common.file.platform.FileStorage;
-import com.nhb.common.file.core.GeneratePresignedUrlResult;
+import com.nhb.common.file.platform.FileStorageClientFactory;
+import com.nhb.common.file.platform.factory.AmazonS3V2FileStorageClientFactory;
+import com.nhb.common.file.pretreatment.*;
 import com.nhb.common.file.utils.KebabCaseInsensitiveMap;
+import com.nhb.common.file.utils.ToolUtil;
 import com.nhb.common.file.wrapper.FileWrapper;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -39,11 +41,12 @@ import java.util.stream.Collectors;
 
 
 /**
- * Amazon S3 存储<br/>
+ * @author luck_nhb
+ * @version 1.0
+ * @date 2026/3/9 15:01
+ * @description: Amazon S3 存储<br/>
  * 适用于AWS SDK for Java 2.x，根据 Amazon 公告，AWS SDK for Java 1.x 自 2024 年 7 月 31 日起将进入维护模式，并于 2025 年 12 月 31 日终止支持<br/>
  * 公告链接地址：<a href="https://aws.amazon.com/blogs/developer/the-aws-sdk-for-java-1-x-is-in-maintenance-mode-effective-july-31-2024/">The AWS SDK for Java 1.x is in maintenance mode, effective July 31, 2024</a>
- * @author zhangxin
- * @date 2024-12-08
  */
 @Getter
 @Setter
@@ -57,10 +60,10 @@ public class AmazonS3V2FileStorage implements FileStorage {
     private String defaultAcl;
     private int multipartThreshold;
     private int multipartPartSize;
-    private FileStorageClientFactory<AmazonS3V2Client> clientFactory;
+    private FileStorageClientFactory<AmazonS3V2FileStorageClientFactory.AmazonS3V2Client> clientFactory;
 
     public AmazonS3V2FileStorage(
-            FileStorageProperties.AmazonS3V2Config config, FileStorageClientFactory<AmazonS3V2Client> clientFactory) {
+            FileStorageProperties.AmazonS3V2Config config, FileStorageClientFactory<AmazonS3V2FileStorageClientFactory.AmazonS3V2Client> clientFactory) {
         platform = config.getPlatform();
         region = config.getRegion();
         bucketName = config.getBucketName();
@@ -72,7 +75,7 @@ public class AmazonS3V2FileStorage implements FileStorage {
         this.clientFactory = clientFactory;
     }
 
-    public AmazonS3V2Client getClient() {
+    public AmazonS3V2FileStorageClientFactory.AmazonS3V2Client getClient() {
         return clientFactory.getClient();
     }
 
@@ -154,7 +157,7 @@ public class AmazonS3V2FileStorage implements FileStorage {
             byte[] thumbnailBytes = pre.getThumbnailBytes();
             if (thumbnailBytes != null) { // 上传缩略图
                 String newThFileKey = getThFileKey(fileInfo);
-                fileInfo.setThUrl(domain + newThFileKey);
+                fileInfo.setThumbnailUrl(domain + newThFileKey);
                 client.putObject(
                         setThMetadata(
                                         PutObjectRequest.builder()
@@ -221,7 +224,7 @@ public class AmazonS3V2FileStorage implements FileStorage {
         Long partSize = partFileWrapper.getSize();
         try (InputStreamPlus in = pre.getInputStreamPlus()) {
             // Amazon S3 比较特殊，上传分片必须传入分片大小，这里强制获取，可能会占用大量内存
-            if (partSize == null) partSize = partFileWrapper.getInputStreamMaskResetReturn(Tools::getSize);
+            if (partSize == null) partSize = partFileWrapper.getInputStreamMaskResetReturn(ToolUtil::getSize);
             UploadPartRequest partRequest = UploadPartRequest.builder()
                     .bucket(bucketName)
                     .key(newFileKey)
@@ -410,7 +413,7 @@ public class AmazonS3V2FileStorage implements FileStorage {
             info.setETag(file.eTag());
             info.setContentDisposition(file.contentDisposition());
             info.setContentType(file.contentType());
-            info.setContentMd5(headersProxy.getStr(Constant.Metadata.CONTENT_MD5));
+            info.setContentMd5(headersProxy.getStr(FileStorageConstants.Metadata.CONTENT_MD5));
             info.setLastModified(Date.from(file.lastModified()));
             info.setMetadata(headers.entrySet().stream()
                     .filter(e -> !e.getKey().startsWith("x-amz-meta-"))
@@ -493,14 +496,14 @@ public class AmazonS3V2FileStorage implements FileStorage {
      * 设置缩略图对象的元数据
      */
     public PutObjectRequest.Builder setThMetadata(PutObjectRequest.Builder builder, FileInfo fileInfo) {
-        builder.contentType(fileInfo.getThContentType()).metadata(fileInfo.getThUserMetadata());
-        if (CollUtil.isNotEmpty(fileInfo.getThMetadata())) {
+        builder.contentType(fileInfo.getThumbnailContentType()).metadata(fileInfo.getThumbnailUserMetadata());
+        if (CollUtil.isNotEmpty(fileInfo.getThumbnailMetadata())) {
             CopyOptions copyOptions = CopyOptions.create()
                     .ignoreCase()
                     .setFieldNameEditor(name -> NamingCase.toCamelCase(name, CharUtil.DASHED));
-            BeanUtil.copyProperties(fileInfo.getThMetadata(), builder, copyOptions);
+            BeanUtil.copyProperties(fileInfo.getThumbnailMetadata(), builder, copyOptions);
         }
-        builder.acl(getAcl(fileInfo.getThFileAcl()));
+        builder.acl(getAcl(fileInfo.getThumbnailFileAcl()));
         return builder;
     }
 
@@ -667,7 +670,7 @@ public class AmazonS3V2FileStorage implements FileStorage {
     public boolean delete(FileInfo fileInfo) {
         S3Client client = getClient().getClient();
         try {
-            if (fileInfo.getThFilename() != null) { // 删除缩略图
+            if (fileInfo.getThumbnailFileName() != null) { // 删除缩略图
                 client.deleteObject(DeleteObjectRequest.builder()
                         .bucket(bucketName)
                         .key(getThFileKey(fileInfo))
@@ -767,16 +770,16 @@ public class AmazonS3V2FileStorage implements FileStorage {
 
         // 复制缩略图文件
         String destThFileKey = null;
-        if (StrUtil.isNotBlank(srcFileInfo.getThFilename())) {
+        if (StrUtil.isNotBlank(srcFileInfo.getThumbnailFileName())) {
             destThFileKey = getThFileKey(destFileInfo);
-            destFileInfo.setThUrl(domain + destThFileKey);
+            destFileInfo.setThumbnailUrl(domain + destThFileKey);
             try {
                 client.copyObject(CopyObjectRequest.builder()
                         .sourceBucket(bucketName)
                         .sourceKey(getThFileKey(srcFileInfo))
                         .destinationBucket(bucketName)
                         .destinationKey(destThFileKey)
-                        .acl(getAcl(destFileInfo.getThFileAcl()))
+                        .acl(getAcl(destFileInfo.getThumbnailFileAcl()))
                         .build());
             } catch (Exception e) {
                 throw ExceptionFactory.sameCopyTh(srcFileInfo, destFileInfo, platform, e);

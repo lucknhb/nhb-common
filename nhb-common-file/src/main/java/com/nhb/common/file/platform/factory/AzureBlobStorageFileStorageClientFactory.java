@@ -11,6 +11,12 @@ import lombok.Getter;
 import lombok.Setter;
 
 
+/**
+ * @author luck_nhb
+ * @version 1.0
+ * @date 2026/3/9 15:01
+ * @description: 微软对象存储工厂类
+ */
 @Data
 public class AzureBlobStorageFileStorageClientFactory implements FileStorageClientFactory<AzureBlobStorageFileStorageClientFactory.AzureBlobStorageClient> {
 

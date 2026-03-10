@@ -7,7 +7,10 @@ import com.nhb.common.file.platform.FileStorage;
 import com.nhb.common.file.recorder.FileRecorder;
 
 /**
- * 同存储平台复制切面调用链结束回调
+ * @author luck_nhb
+ * @version 1.0
+ * @date 2026/3/9 15:01
+ * @description:  同存储平台复制切面调用链结束回调
  */
 public interface SameCopyAspectChainCallback {
     FileInfo run(

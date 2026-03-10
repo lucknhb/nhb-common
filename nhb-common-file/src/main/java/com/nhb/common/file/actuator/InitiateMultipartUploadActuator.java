@@ -5,6 +5,7 @@ import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import com.nhb.common.file.aspect.FileStorageAspect;
 import com.nhb.common.file.aspect.chain.InitiateMultipartUploadAspectChain;
+import com.nhb.common.file.constant.FileStorageConstants;
 import com.nhb.common.file.core.FileInfo;
 import com.nhb.common.file.core.FileStorageService;
 import com.nhb.common.file.exception.ExceptionFactory;
@@ -16,7 +17,10 @@ import java.util.Date;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * 手动分片上传-初始化执行器
+ * @author luck_nhb
+ * @version 1.0
+ * @date 2026/3/9 15:01
+ * @description: 手动分片上传-初始化执行器
  */
 public class InitiateMultipartUploadActuator {
     private final FileStorageService fileStorageService;
@@ -35,7 +39,7 @@ public class InitiateMultipartUploadActuator {
         FileInfo fileInfo = new FileInfo();
         fileInfo.setCreateTime(new Date());
         fileInfo.setSize(pre.getSize());
-        fileInfo.setOriginalFilename(pre.getOriginalFilename());
+        fileInfo.setOriginalFileName(pre.getOriginalFilename());
         fileInfo.setExt(FileNameUtil.getSuffix(pre.getOriginalFilename()));
         fileInfo.setObjectId(pre.getObjectId());
         fileInfo.setObjectType(pre.getObjectType());
@@ -45,12 +49,12 @@ public class InitiateMultipartUploadActuator {
         fileInfo.setUserMetadata(pre.getUserMetadata());
         fileInfo.setAttr(pre.getAttr());
         fileInfo.setFileAcl(pre.getFileAcl());
-        fileInfo.setUploadStatus(Constant.FileInfoUploadStatus.INITIATE);
+        fileInfo.setUploadStatus(FileStorageConstants.FileInfoUploadStatus.INITIATE);
 
         if (StrUtil.isNotBlank(pre.getSaveFilename())) {
-            fileInfo.setFilename(pre.getSaveFilename());
+            fileInfo.setFileName(pre.getSaveFilename());
         } else {
-            fileInfo.setFilename(
+            fileInfo.setFileName(
                     IdUtil.objectId() + (StrUtil.isEmpty(fileInfo.getExt()) ? StrUtil.EMPTY : "." + fileInfo.getExt()));
         }
         fileInfo.setContentType(pre.getContentType());

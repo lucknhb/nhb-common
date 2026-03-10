@@ -9,8 +9,13 @@ import cn.hutool.core.io.file.FileNameUtil;
 import cn.hutool.core.text.NamingCase;
 import cn.hutool.core.util.CharUtil;
 import cn.hutool.core.util.StrUtil;
+import com.nhb.common.file.core.*;
+import com.nhb.common.file.exception.Check;
+import com.nhb.common.file.exception.ExceptionFactory;
 import com.nhb.common.file.platform.FileStorage;
 import com.nhb.common.file.platform.FileStorageClientFactory;
+import com.nhb.common.file.pretreatment.*;
+import com.nhb.common.file.wrapper.FileWrapper;
 import com.volcengine.tos.TOSV2;
 import com.volcengine.tos.TosServerException;
 import com.volcengine.tos.comm.common.ACLType;
@@ -28,7 +33,10 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
- * 火山引擎 TOS 存储
+ * @author luck_nhb
+ * @version 1.0
+ * @date 2026/3/9 15:01
+ * @description: 火山引擎 TOS 存储
  */
 @Getter
 @Setter
@@ -44,7 +52,8 @@ public class VolcengineTosFileStorage implements FileStorage {
     private int multipartPartSize;
     private FileStorageClientFactory<TOSV2> clientFactory;
 
-    public VolcengineTosFileStorage(VolcengineTosConfig config, FileStorageClientFactory<TOSV2> clientFactory) {
+    public VolcengineTosFileStorage(FileStorageProperties.VolcengineTosConfig config,
+                                    FileStorageClientFactory<TOSV2> clientFactory) {
         platform = config.getPlatform();
         bucketName = config.getBucketName();
         domain = config.getDomain();
@@ -137,7 +146,7 @@ public class VolcengineTosFileStorage implements FileStorage {
             byte[] thumbnailBytes = pre.getThumbnailBytes();
             if (thumbnailBytes != null) { // 上传缩略图
                 String newThFileKey = getThFileKey(fileInfo);
-                fileInfo.setThUrl(domain + newThFileKey);
+                fileInfo.setThumbnailUrl(domain + newThFileKey);
                 PutObjectInput input = new PutObjectInput()
                         .setBucket(bucketName)
                         .setKey(newThFileKey)
@@ -443,14 +452,14 @@ public class VolcengineTosFileStorage implements FileStorage {
      */
     private ObjectMetaRequestOptions getThObjectMetadata(FileInfo fileInfo) {
         ObjectMetaRequestOptions metadata = new ObjectMetaRequestOptions();
-        metadata.setContentType(fileInfo.getThContentType());
-        metadata.setAclType(getAcl(fileInfo.getThFileAcl()));
-        metadata.setCustomMetadata(fileInfo.getThUserMetadata());
-        if (CollUtil.isNotEmpty(fileInfo.getThMetadata())) {
+        metadata.setContentType(fileInfo.getThumbnailContentType());
+        metadata.setAclType(getAcl(fileInfo.getThumbnailFileAcl()));
+        metadata.setCustomMetadata(fileInfo.getThumbnailUserMetadata());
+        if (CollUtil.isNotEmpty(fileInfo.getThumbnailMetadata())) {
             CopyOptions copyOptions = CopyOptions.create()
                     .ignoreCase()
                     .setFieldNameEditor(name -> NamingCase.toCamelCase(name, CharUtil.DASHED));
-            BeanUtil.copyProperties(fileInfo.getThMetadata(), metadata, copyOptions);
+            BeanUtil.copyProperties(fileInfo.getThumbnailMetadata(), metadata, copyOptions);
         }
         return metadata;
     }
@@ -537,7 +546,7 @@ public class VolcengineTosFileStorage implements FileStorage {
     public boolean delete(FileInfo fileInfo) {
         TOSV2 client = getClient();
         try {
-            if (fileInfo.getThFilename() != null) { // 删除缩略图
+            if (fileInfo.getThumbnailFileName() != null) { // 删除缩略图
                 DeleteObjectInput thInput =
                         new DeleteObjectInput().setBucket(bucketName).setKey(getThFileKey(fileInfo));
                 client.deleteObject(thInput);
@@ -630,9 +639,9 @@ public class VolcengineTosFileStorage implements FileStorage {
 
         // 复制缩略图文件
         String destThFileKey = null;
-        if (StrUtil.isNotBlank(srcFileInfo.getThFilename())) {
+        if (StrUtil.isNotBlank(srcFileInfo.getThumbnailFileName())) {
             destThFileKey = getThFileKey(destFileInfo);
-            destFileInfo.setThUrl(domain + destThFileKey);
+            destFileInfo.setThumbnailUrl(domain + destThFileKey);
             try {
                 CopyObjectV2Input input = new CopyObjectV2Input()
                         .setSrcBucket(bucketName)
@@ -747,10 +756,10 @@ public class VolcengineTosFileStorage implements FileStorage {
         // 移动缩略图文件
         String srcThFileKey = null;
         String destThFileKey = null;
-        if (StrUtil.isNotBlank(srcFileInfo.getThFilename())) {
+        if (StrUtil.isNotBlank(srcFileInfo.getThumbnailFileName())) {
             srcThFileKey = getThFileKey(srcFileInfo);
             destThFileKey = getThFileKey(destFileInfo);
-            destFileInfo.setThUrl(domain + destThFileKey);
+            destFileInfo.setThumbnailUrl(domain + destThFileKey);
             try {
                 client.renameObject(new RenameObjectInput()
                         .setBucket(bucketName)

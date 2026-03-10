@@ -8,10 +8,15 @@ import cn.hutool.core.io.file.FileNameUtil;
 import cn.hutool.core.text.NamingCase;
 import cn.hutool.core.util.CharUtil;
 import cn.hutool.core.util.StrUtil;
-import com.nhb.common.file.core.FileInfo;
+import com.nhb.common.file.core.*;
+import com.nhb.common.file.core.ProgressListener;
+import com.nhb.common.file.exception.Check;
+import com.nhb.common.file.exception.ExceptionFactory;
 import com.nhb.common.file.platform.FileStorage;
 import com.nhb.common.file.platform.FileStorageClientFactory;
-import com.nhb.common.file.pretreatment.UploadPretreatment;
+import com.nhb.common.file.pretreatment.*;
+import com.nhb.common.file.utils.ToolUtil;
+import com.nhb.common.file.wrapper.FileWrapper;
 import com.obs.services.ObsClient;
 import com.obs.services.internal.ObsConvertor;
 import com.obs.services.model.*;
@@ -27,7 +32,10 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
- * 华为云 OBS 存储
+ * @author luck_nhb
+ * @version 1.0
+ * @date 2026/3/9 15:01
+ * @description: 华为云 OBS 存储
  */
 @Getter
 @Setter
@@ -42,7 +50,7 @@ public class HuaweiObsFileStorage implements FileStorage {
     private int multipartPartSize;
     private FileStorageClientFactory<ObsClient> clientFactory;
 
-    public HuaweiObsFileStorage(HuaweiObsConfig config, FileStorageClientFactory<ObsClient> clientFactory) {
+    public HuaweiObsFileStorage(FileStorageProperties.HuaweiObsConfig config, FileStorageClientFactory<ObsClient> clientFactory) {
         platform = config.getPlatform();
         bucketName = config.getBucketName();
         domain = config.getDomain();
@@ -123,11 +131,11 @@ public class HuaweiObsFileStorage implements FileStorage {
             byte[] thumbnailBytes = pre.getThumbnailBytes();
             if (thumbnailBytes != null) { // 上传缩略图
                 String newThFileKey = getThFileKey(fileInfo);
-                fileInfo.setThUrl(domain + newThFileKey);
+                fileInfo.setThumbnailUrl(domain + newThFileKey);
                 PutObjectRequest request =
                         new PutObjectRequest(bucketName, newThFileKey, new ByteArrayInputStream(thumbnailBytes));
                 request.setMetadata(getThObjectMetadata(fileInfo));
-                request.setAcl(getAcl(fileInfo.getThFileAcl()));
+                request.setAcl(getAcl(fileInfo.getThumbnailFileAcl()));
                 client.putObject(request);
             }
 
@@ -397,14 +405,14 @@ public class HuaweiObsFileStorage implements FileStorage {
      */
     public ObjectMetadata getThObjectMetadata(FileInfo fileInfo) {
         ObjectMetadata metadata = new ObjectMetadata();
-        metadata.setContentLength(fileInfo.getThSize());
-        metadata.setContentType(fileInfo.getThContentType());
-        fileInfo.getThUserMetadata().forEach(metadata::addUserMetadata);
-        if (CollUtil.isNotEmpty(fileInfo.getThMetadata())) {
+        metadata.setContentLength(fileInfo.getThumbnailSize());
+        metadata.setContentType(fileInfo.getThumbnailContentType());
+        fileInfo.getThumbnailUserMetadata().forEach(metadata::addUserMetadata);
+        if (CollUtil.isNotEmpty(fileInfo.getThumbnailMetadata())) {
             CopyOptions copyOptions = CopyOptions.create()
                     .ignoreCase()
                     .setFieldNameEditor(name -> NamingCase.toCamelCase(name, CharUtil.DASHED));
-            BeanUtil.copyProperties(fileInfo.getThMetadata(), metadata, copyOptions);
+            BeanUtil.copyProperties(fileInfo.getThumbnailMetadata(), metadata, copyOptions);
         }
         return metadata;
     }
@@ -417,8 +425,8 @@ public class HuaweiObsFileStorage implements FileStorage {
     @Override
     public GeneratePresignedUrlResult generatePresignedUrl(GeneratePresignedUrlPretreatment pre) {
         try {
-            HttpMethodEnum method = Tools.getEnum(HttpMethodEnum.class, pre.getMethod());
-            SpecialParamEnum specialParam = Tools.getEnum(SpecialParamEnum.class, pre.getSpecialParam());
+            HttpMethodEnum method = ToolUtil.getEnum(HttpMethodEnum.class, pre.getMethod());
+            SpecialParamEnum specialParam = ToolUtil.getEnum(SpecialParamEnum.class, pre.getSpecialParam());
             long expires = (pre.getExpiration().getTime() - System.currentTimeMillis()) / 1000;
             TemporarySignatureRequest request = new TemporarySignatureRequest(method, expires);
             request.setBucketName(bucketName);
@@ -483,7 +491,7 @@ public class HuaweiObsFileStorage implements FileStorage {
     public boolean delete(FileInfo fileInfo) {
         ObsClient client = getClient();
         try {
-            if (fileInfo.getThFilename() != null) { // 删除缩略图
+            if (fileInfo.getThumbnailFileName() != null) { // 删除缩略图
                 client.deleteObject(bucketName, getThFileKey(fileInfo));
             }
             client.deleteObject(bucketName, getFileKey(fileInfo));
@@ -546,13 +554,13 @@ public class HuaweiObsFileStorage implements FileStorage {
 
         // 复制缩略图文件
         String destThFileKey = null;
-        if (StrUtil.isNotBlank(srcFileInfo.getThFilename())) {
+        if (StrUtil.isNotBlank(srcFileInfo.getThumbnailFileName())) {
             destThFileKey = getThFileKey(destFileInfo);
-            destFileInfo.setThUrl(domain + destThFileKey);
+            destFileInfo.setThumbnailUrl(domain + destThFileKey);
             try {
                 CopyObjectRequest request =
                         new CopyObjectRequest(bucketName, getThFileKey(srcFileInfo), bucketName, destThFileKey);
-                request.setAcl(getAcl(destFileInfo.getThFileAcl()));
+                request.setAcl(getAcl(destFileInfo.getThumbnailFileAcl()));
                 client.copyObject(request);
             } catch (Exception e) {
                 throw ExceptionFactory.sameCopyTh(srcFileInfo, destFileInfo, platform, e);

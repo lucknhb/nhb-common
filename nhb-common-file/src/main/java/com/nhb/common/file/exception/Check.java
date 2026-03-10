@@ -13,7 +13,10 @@ import com.nhb.common.file.pretreatment.UploadPretreatment;
 
 
 /**
- * 用于检查条件并抛出对应异常，主要用于存储平台的实现类中
+ * @author luck_nhb
+ * @version 1.0
+ * @date 2026/3/9 15:01
+ * @description: 用于检查条件并抛出对应异常，主要用于存储平台的实现类中
  */
 public class Check {
 

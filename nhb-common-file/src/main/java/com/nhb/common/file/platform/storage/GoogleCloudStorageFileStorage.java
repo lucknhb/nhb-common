@@ -16,14 +16,15 @@ import com.google.cloud.storage.*;
 import com.google.cloud.storage.Storage.CopyRequest;
 import com.google.cloud.storage.Storage.PredefinedAcl;
 import com.google.cloud.storage.Storage.SignUrlOption;
+import com.nhb.common.file.constant.FileStorageConstants;
 import com.nhb.common.file.core.*;
-import com.nhb.common.file.pretreatment.*;
 import com.nhb.common.file.exception.Check;
 import com.nhb.common.file.exception.ExceptionFactory;
-import com.nhb.common.file.core.ProgressListener;
+import com.nhb.common.file.exception.FileStorageException;
 import com.nhb.common.file.platform.FileStorage;
 import com.nhb.common.file.platform.FileStorageClientFactory;
-import com.nhb.common.file.core.GeneratePresignedUrlResult;
+import com.nhb.common.file.pretreatment.*;
+import com.nhb.common.file.utils.ToolUtil;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -40,11 +41,10 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
- * GoogleCloud Storage 存储
- *
- * @author Kytrun Xuyanwu
+ * @author luck_nhb
  * @version 1.0
- * {@code @date} 2022/11/4 9:56
+ * @date 2026/3/9 15:01
+ * @description: GoogleCloud Storage 存储
  */
 @Getter
 @Setter
@@ -58,7 +58,7 @@ public class GoogleCloudStorageFileStorage implements FileStorage {
     private FileStorageClientFactory<Storage> clientFactory;
 
     public GoogleCloudStorageFileStorage(
-            GoogleCloudStorageConfig config, FileStorageClientFactory<Storage> clientFactory) {
+            FileStorageProperties.GoogleCloudStorageConfig config, FileStorageClientFactory<Storage> clientFactory) {
         platform = config.getPlatform();
         bucketName = config.getBucketName();
         domain = config.getDomain();
@@ -95,7 +95,7 @@ public class GoogleCloudStorageFileStorage implements FileStorage {
             byte[] thumbnailBytes = pre.getThumbnailBytes();
             if (thumbnailBytes != null) {
                 String newThFileKey = getThFileKey(fileInfo);
-                fileInfo.setThUrl(domain + newThFileKey);
+                fileInfo.setThumbnailUrl(domain + newThFileKey);
                 ArrayList<Storage.BlobWriteOption> thOptionList = new ArrayList<>();
                 BlobInfo.Builder thBlobInfoBuilder = BlobInfo.newBuilder(bucketName, newThFileKey);
                 setThMetadata(thBlobInfoBuilder, fileInfo, thOptionList);
@@ -127,7 +127,7 @@ public class GoogleCloudStorageFileStorage implements FileStorage {
         Storage client = getClient();
         try {
             String uploadId = "multi_" + IdUtil.objectId();
-            String path = Tools.getParent(newFileKey) + "/" + uploadId + "/";
+            String path = ToolUtil.getParent(newFileKey) + "/" + uploadId + "/";
             ByteArrayInputStream in = new ByteArrayInputStream(new byte[0]);
             client.createFrom(BlobInfo.newBuilder(bucketName, path + "index").build(), in);
             fileInfo.setUploadId(uploadId);
@@ -142,7 +142,7 @@ public class GoogleCloudStorageFileStorage implements FileStorage {
         String newFileKey = getFileKey(fileInfo);
         Storage client = getClient();
         try (InputStreamPlus in = pre.getInputStreamPlus()) {
-            String part = Tools.getParent(newFileKey) + "/" + fileInfo.getUploadId() + "/"
+            String part = ToolUtil.getParent(newFileKey) + "/" + fileInfo.getUploadId() + "/"
                     + StrUtil.padPre(String.valueOf(pre.getPartNumber()), 10, "0");
             Blob blob = client.createFrom(BlobInfo.newBuilder(bucketName, part).build(), in);
             FilePartInfo filePartInfo = new FilePartInfo(fileInfo);
@@ -164,7 +164,7 @@ public class GoogleCloudStorageFileStorage implements FileStorage {
         try {
             ProgressListener.quickStart(pre.getProgressListener(), fileInfo.getSize());
             client.delete(BlobId.of(bucketName, newFileKey));
-            String path = Tools.getParent(newFileKey) + "/" + fileInfo.getUploadId() + "/";
+            String path = ToolUtil.getParent(newFileKey) + "/" + fileInfo.getUploadId() + "/";
             LinkedList<String> sources = pre.getPartInfoList().stream()
                     .map(part -> path + StrUtil.padPre(String.valueOf(part.getPartNumber()), 10, "0"))
                     .collect(Collectors.toCollection(LinkedList::new));
@@ -221,7 +221,7 @@ public class GoogleCloudStorageFileStorage implements FileStorage {
         String newFileKey = getFileKey(fileInfo);
         Storage client = getClient();
         try {
-            String path = Tools.getParent(newFileKey) + "/" + fileInfo.getUploadId() + "/";
+            String path = ToolUtil.getParent(newFileKey) + "/" + fileInfo.getUploadId() + "/";
             List<BlobId> blobIdList =
                     ListUtil.toList(client.list(bucketName, Storage.BlobListOption.prefix(path))
                                     .iterateAll())
@@ -240,7 +240,7 @@ public class GoogleCloudStorageFileStorage implements FileStorage {
         String newFileKey = getFileKey(fileInfo);
         Storage client = getClient();
         try {
-            String path = Tools.getParent(newFileKey) + "/" + fileInfo.getUploadId() + "/";
+            String path = ToolUtil.getParent(newFileKey) + "/" + fileInfo.getUploadId() + "/";
             if (client.get(BlobId.of(bucketName, path + "index")) == null) {
                 throw new FileNotFoundException(path + "index");
             }
@@ -348,20 +348,20 @@ public class GoogleCloudStorageFileStorage implements FileStorage {
                         info.setLastModified(DateUtil.date(item.getUpdateTimeOffsetDateTime()));
                         HashMap<String, Object> metadata = new HashMap<>();
                         if (item.getContentType() != null)
-                            metadata.put(Constant.Metadata.CONTENT_TYPE, item.getContentType());
+                            metadata.put(FileStorageConstants.Metadata.CONTENT_TYPE, item.getContentType());
                         if (item.getContentEncoding() != null)
-                            metadata.put(Constant.Metadata.CONTENT_ENCODING, item.getContentEncoding());
+                            metadata.put(FileStorageConstants.Metadata.CONTENT_ENCODING, item.getContentEncoding());
                         if (item.getContentDisposition() != null)
-                            metadata.put(Constant.Metadata.CONTENT_DISPOSITION, item.getContentDisposition());
+                            metadata.put(FileStorageConstants.Metadata.CONTENT_DISPOSITION, item.getContentDisposition());
                         if (item.getContentLanguage() != null)
-                            metadata.put(Constant.Metadata.CONTENT_LANGUAGE, item.getContentLanguage());
+                            metadata.put(FileStorageConstants.Metadata.CONTENT_LANGUAGE, item.getContentLanguage());
                         if (item.getStorageClass() != null) metadata.put("Storage-Class", item.getStorageClass());
-                        if (item.getSize() != null) metadata.put(Constant.Metadata.CONTENT_LENGTH, item.getSize());
-                        if (item.getMd5() != null) metadata.put(Constant.Metadata.CONTENT_MD5, item.getMd5());
+                        if (item.getSize() != null) metadata.put(FileStorageConstants.Metadata.CONTENT_LENGTH, item.getSize());
+                        if (item.getMd5() != null) metadata.put(FileStorageConstants.Metadata.CONTENT_MD5, item.getMd5());
                         if (item.getEtag() != null) metadata.put("E-Tag", item.getEtag());
                         if (item.getUpdateTimeOffsetDateTime() != null)
                             metadata.put(
-                                    Constant.Metadata.LAST_MODIFIED,
+                                    FileStorageConstants.Metadata.LAST_MODIFIED,
                                     DateUtil.formatHttpDate(DateUtil.date(item.getUpdateTimeOffsetDateTime())));
                         info.setMetadata(metadata);
                         if (item.getMetadata() != null) info.setUserMetadata(new HashMap<>(item.getMetadata()));
@@ -410,20 +410,20 @@ public class GoogleCloudStorageFileStorage implements FileStorage {
             info.setContentMd5(file.getMd5());
             info.setLastModified(DateUtil.date(file.getUpdateTimeOffsetDateTime()));
             HashMap<String, Object> metadata = new HashMap<>();
-            if (file.getContentType() != null) metadata.put(Constant.Metadata.CONTENT_TYPE, file.getContentType());
+            if (file.getContentType() != null) metadata.put(FileStorageConstants.Metadata.CONTENT_TYPE, file.getContentType());
             if (file.getContentEncoding() != null)
-                metadata.put(Constant.Metadata.CONTENT_ENCODING, file.getContentEncoding());
+                metadata.put(FileStorageConstants.Metadata.CONTENT_ENCODING, file.getContentEncoding());
             if (file.getContentDisposition() != null)
-                metadata.put(Constant.Metadata.CONTENT_DISPOSITION, file.getContentDisposition());
+                metadata.put(FileStorageConstants.Metadata.CONTENT_DISPOSITION, file.getContentDisposition());
             if (file.getContentLanguage() != null)
-                metadata.put(Constant.Metadata.CONTENT_LANGUAGE, file.getContentLanguage());
+                metadata.put(FileStorageConstants.Metadata.CONTENT_LANGUAGE, file.getContentLanguage());
             if (file.getStorageClass() != null) metadata.put("Storage-Class", file.getStorageClass());
-            if (file.getSize() != null) metadata.put(Constant.Metadata.CONTENT_LENGTH, file.getSize());
-            if (file.getMd5() != null) metadata.put(Constant.Metadata.CONTENT_MD5, file.getMd5());
+            if (file.getSize() != null) metadata.put(FileStorageConstants.Metadata.CONTENT_LENGTH, file.getSize());
+            if (file.getMd5() != null) metadata.put(FileStorageConstants.Metadata.CONTENT_MD5, file.getMd5());
             if (file.getEtag() != null) metadata.put("E-Tag", file.getEtag());
             if (file.getUpdateTimeOffsetDateTime() != null)
                 metadata.put(
-                        Constant.Metadata.LAST_MODIFIED,
+                        FileStorageConstants.Metadata.LAST_MODIFIED,
                         DateUtil.formatHttpDate(DateUtil.date(file.getUpdateTimeOffsetDateTime())));
             info.setMetadata(metadata);
             if (file.getMetadata() != null) info.setUserMetadata(new HashMap<>(file.getMetadata()));
@@ -460,7 +460,7 @@ public class GoogleCloudStorageFileStorage implements FileStorage {
                                 if (item instanceof Acl) {
                                     return (Acl) item;
                                 } else {
-                                    throw new FileStorageRuntimeException("不支持的ACL：" + item);
+                                    throw new FileStorageException("不支持的ACL：" + item);
                                 }
                             })
                             .collect(Collectors.toList());
@@ -497,14 +497,14 @@ public class GoogleCloudStorageFileStorage implements FileStorage {
      */
     public void setThMetadata(
             BlobInfo.Builder blobInfoBuilder, FileInfo fileInfo, ArrayList<Storage.BlobWriteOption> optionList) {
-        blobInfoBuilder.setContentType(fileInfo.getThContentType()).setMetadata(fileInfo.getThUserMetadata());
-        if (CollUtil.isNotEmpty(fileInfo.getThMetadata())) {
+        blobInfoBuilder.setContentType(fileInfo.getThumbnailContentType()).setMetadata(fileInfo.getThumbnailUserMetadata());
+        if (CollUtil.isNotEmpty(fileInfo.getThumbnailMetadata())) {
             CopyOptions copyOptions = CopyOptions.create()
                     .ignoreCase()
                     .setFieldNameEditor(name -> NamingCase.toCamelCase(name, CharUtil.DASHED));
-            BeanUtil.copyProperties(fileInfo.getThMetadata(), blobInfoBuilder, copyOptions);
+            BeanUtil.copyProperties(fileInfo.getThumbnailMetadata(), blobInfoBuilder, copyOptions);
         }
-        AclWrapper fileAcl = getAcl(fileInfo.getThFileAcl());
+        AclWrapper fileAcl = getAcl(fileInfo.getThumbnailFileAcl());
         if (fileAcl != null) {
             if (fileAcl.getAclList() != null) {
                 blobInfoBuilder.setAcl(fileAcl.getAclList());
@@ -646,7 +646,7 @@ public class GoogleCloudStorageFileStorage implements FileStorage {
     @Override
     public boolean delete(FileInfo fileInfo) {
         try {
-            if (fileInfo.getThFilename() != null) { // 删除缩略图
+            if (fileInfo.getThumbnailFileName() != null) { // 删除缩略图
                 checkAndDelete(getThFileKey(fileInfo));
             }
             checkAndDelete(getFileKey(fileInfo));
@@ -682,8 +682,8 @@ public class GoogleCloudStorageFileStorage implements FileStorage {
 
     @Override
     public void downloadTh(FileInfo fileInfo, Consumer<InputStream> consumer) {
-        if (StrUtil.isBlank(fileInfo.getThFilename())) {
-            throw new FileStorageRuntimeException("缩略图文件下载失败，文件不存在！fileInfo：" + fileInfo);
+        if (StrUtil.isBlank(fileInfo.getThumbnailFileName())) {
+            throw new FileStorageException("缩略图文件下载失败，文件不存在！fileInfo：" + fileInfo);
         }
         Storage client = getClient();
         BlobId thBlobId = BlobId.of(bucketName, getThFileKey(fileInfo));
@@ -734,9 +734,9 @@ public class GoogleCloudStorageFileStorage implements FileStorage {
 
         // 复制缩略图文件
         String destThFileKey = null;
-        if (StrUtil.isNotBlank(srcFileInfo.getThFilename())) {
+        if (StrUtil.isNotBlank(srcFileInfo.getThumbnailFileName())) {
             destThFileKey = getThFileKey(destFileInfo);
-            destFileInfo.setThUrl(domain + destThFileKey);
+            destFileInfo.setThumbnailUrl(domain + destThFileKey);
             try {
                 client.copy(CopyRequest.newBuilder()
                                 .setSource(BlobId.of(bucketName, getThFileKey(srcFileInfo)))

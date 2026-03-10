@@ -13,7 +13,10 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * 获取文件执行器
+ * @author luck_nhb
+ * @version 1.0
+ * @date 2026/3/9 15:01
+ * @description: 获取文件执行器
  */
 public class GetFileActuator {
     private final FileStorageService fileStorageService;

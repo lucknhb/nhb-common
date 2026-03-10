@@ -6,7 +6,10 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 /**
- * 列举文件支持信息
+ * @author luck_nhb
+ * @version 1.0
+ * @date 2026/3/9 15:01
+ * @description: 列举文件支持信息
  */
 @Data
 @Accessors(chain = true)

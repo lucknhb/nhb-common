@@ -10,12 +10,13 @@ import com.amazonaws.event.ProgressEventType;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.*;
 import com.nhb.common.file.core.*;
-import com.nhb.common.file.pretreatment.*;
+import com.nhb.common.file.core.ProgressListener;
 import com.nhb.common.file.exception.Check;
 import com.nhb.common.file.exception.ExceptionFactory;
 import com.nhb.common.file.platform.FileStorage;
 import com.nhb.common.file.platform.FileStorageClientFactory;
-import com.nhb.common.file.core.GeneratePresignedUrlResult;
+import com.nhb.common.file.pretreatment.*;
+import com.nhb.common.file.utils.ToolUtil;
 import com.nhb.common.file.wrapper.FileWrapper;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -31,7 +32,10 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
- * Amazon S3 存储
+ * @author luck_nhb
+ * @version 1.0
+ * @date 2026/3/9 15:01
+ * @description: Amazon S3 存储
  */
 @Getter
 @Setter
@@ -46,8 +50,8 @@ public class AmazonS3FileStorage implements FileStorage {
     private int multipartPartSize;
     private FileStorageClientFactory<AmazonS3> clientFactory;
 
-    public AmazonS3FileStorage(
-            FileStorageProperties.AmazonS3Config config, FileStorageClientFactory<AmazonS3> clientFactory) {
+    public AmazonS3FileStorage(FileStorageProperties.AmazonS3Config config,
+            FileStorageClientFactory<AmazonS3> clientFactory) {
         platform = config.getPlatform();
         bucketName = config.getBucketName();
         domain = config.getDomain();
@@ -134,13 +138,13 @@ public class AmazonS3FileStorage implements FileStorage {
             byte[] thumbnailBytes = pre.getThumbnailBytes();
             if (thumbnailBytes != null) { // 上传缩略图
                 String newThFileKey = getThFileKey(fileInfo);
-                fileInfo.setThUrl(domain + newThFileKey);
+                fileInfo.setThumbnailUrl(domain + newThFileKey);
                 PutObjectRequest request = new PutObjectRequest(
                         bucketName,
                         newThFileKey,
                         new ByteArrayInputStream(thumbnailBytes),
                         getThObjectMetadata(fileInfo));
-                request.setCannedAcl(getAcl(fileInfo.getThFileAcl()));
+                request.setCannedAcl(getAcl(fileInfo.getThumbnailFileAcl()));
                 client.putObject(request);
             }
 
@@ -190,7 +194,7 @@ public class AmazonS3FileStorage implements FileStorage {
         Long partSize = partFileWrapper.getSize();
         try (InputStreamPlus in = pre.getInputStreamPlus()) {
             // Amazon S3 比较特殊，上传分片必须传入分片大小，这里强制获取，可能会占用大量内存
-            if (partSize == null) partSize = partFileWrapper.getInputStreamMaskResetReturn(Tools::getSize);
+            if (partSize == null) partSize = partFileWrapper.getInputStreamMaskResetReturn(ToolUtil::getSize);
             UploadPartRequest part = new UploadPartRequest();
             part.setBucketName(bucketName);
             part.setKey(newFileKey);
@@ -412,11 +416,11 @@ public class AmazonS3FileStorage implements FileStorage {
      */
     public ObjectMetadata getThObjectMetadata(FileInfo fileInfo) {
         ObjectMetadata metadata = new ObjectMetadata();
-        metadata.setContentLength(fileInfo.getThSize());
-        metadata.setContentType(fileInfo.getThContentType());
-        metadata.setUserMetadata(fileInfo.getThUserMetadata());
-        if (CollUtil.isNotEmpty(fileInfo.getThMetadata())) {
-            fileInfo.getThMetadata().forEach(metadata::setHeader);
+        metadata.setContentLength(fileInfo.getThumbnailSize());
+        metadata.setContentType(fileInfo.getThumbnailContentType());
+        metadata.setUserMetadata(fileInfo.getThumbnailUserMetadata());
+        if (CollUtil.isNotEmpty(fileInfo.getThumbnailMetadata())) {
+            fileInfo.getThumbnailMetadata().forEach(metadata::setHeader);
         }
         return metadata;
     }
@@ -432,7 +436,7 @@ public class AmazonS3FileStorage implements FileStorage {
             String fileKey = getFileKey(new FileInfo(basePath, pre.getPath(), pre.getFilename()));
             GeneratePresignedUrlRequest request = new GeneratePresignedUrlRequest(bucketName, fileKey);
             request.setExpiration(pre.getExpiration());
-            request.setMethod(Tools.getEnum(HttpMethod.class, pre.getMethod()));
+            request.setMethod(ToolUtil.getEnum(HttpMethod.class, pre.getMethod()));
             Map<String, String> headers = new HashMap<>(pre.getHeaders());
             headers.putAll(pre.getUserMetadata().entrySet().stream()
                     .collect(Collectors.toMap(
@@ -491,7 +495,7 @@ public class AmazonS3FileStorage implements FileStorage {
     public boolean delete(FileInfo fileInfo) {
         AmazonS3 client = getClient();
         try {
-            if (fileInfo.getThFilename() != null) { // 删除缩略图
+            if (fileInfo.getThumbnailFileName() != null) { // 删除缩略图
                 client.deleteObject(bucketName, getThFileKey(fileInfo));
             }
             client.deleteObject(bucketName, getFileKey(fileInfo));
@@ -554,13 +558,13 @@ public class AmazonS3FileStorage implements FileStorage {
 
         // 复制缩略图文件
         String destThFileKey = null;
-        if (StrUtil.isNotBlank(srcFileInfo.getThFilename())) {
+        if (StrUtil.isNotBlank(srcFileInfo.getThumbnailFileName())) {
             destThFileKey = getThFileKey(destFileInfo);
-            destFileInfo.setThUrl(domain + destThFileKey);
+            destFileInfo.setThumbnailUrl(domain + destThFileKey);
             try {
                 client.copyObject(
                         new CopyObjectRequest(bucketName, getThFileKey(srcFileInfo), bucketName, destThFileKey)
-                                .withCannedAccessControlList(getAcl(destFileInfo.getThFileAcl())));
+                                .withCannedAccessControlList(getAcl(destFileInfo.getThumbnailFileAcl())));
             } catch (Exception e) {
                 throw ExceptionFactory.sameCopyTh(srcFileInfo, destFileInfo, platform, e);
             }

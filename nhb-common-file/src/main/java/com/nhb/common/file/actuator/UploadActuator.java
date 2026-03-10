@@ -17,19 +17,14 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * 上传执行器
+ * @author luck_nhb
+ * @version 1.0
+ * @date 2026/3/9 15:01
+ * @description: 上传执行器
  */
 public class UploadActuator {
     private final FileStorageService fileStorageService;
     private final UploadPretreatment pre;
-
-    /**
-     * 通过旧的 UploadPretreatment 构造
-     */
-    @Deprecated
-    public UploadActuator(org.dromara.x.file.storage.core.UploadPretreatment pre) {
-        this(new UploadPretreatment(pre));
-    }
 
     /**
      * 通过新的 UploadPretreatment 构造
@@ -71,32 +66,32 @@ public class UploadActuator {
         fileInfo.setPlatform(pre.getPlatform());
         fileInfo.setMetadata(pre.getMetadata());
         fileInfo.setUserMetadata(pre.getUserMetadata());
-        fileInfo.setThMetadata(pre.getThMetadata());
-        fileInfo.setThUserMetadata(pre.getThUserMetadata());
+        fileInfo.setThumbnailMetadata(pre.getThumbnailMetadata());
+        fileInfo.setThumbnailUserMetadata(pre.getThumbnailUserMetadata());
         fileInfo.setAttr(pre.getAttr());
         fileInfo.setFileAcl(pre.getFileAcl());
-        fileInfo.setThFileAcl(pre.getThFileAcl());
-        if (StrUtil.isNotBlank(pre.getSaveFilename())) {
-            fileInfo.setFilename(pre.getSaveFilename());
+        fileInfo.setThumbnailFileAcl(pre.getThumbnailFileAcl());
+        if (StrUtil.isNotBlank(pre.getSaveFileName())) {
+            fileInfo.setFileName(pre.getSaveFileName());
         } else {
-            fileInfo.setFilename(
+            fileInfo.setFileName(
                     IdUtil.objectId() + (StrUtil.isEmpty(fileInfo.getExt()) ? StrUtil.EMPTY : "." + fileInfo.getExt()));
         }
         fileInfo.setContentType(file.getContentType());
 
         byte[] thumbnailBytes = pre.getThumbnailBytes();
         if (thumbnailBytes != null) {
-            fileInfo.setThSize((long) thumbnailBytes.length);
-            if (StrUtil.isNotBlank(pre.getSaveThFilename())) {
-                fileInfo.setThFilename(pre.getSaveThFilename() + pre.getThumbnailSuffix());
+            fileInfo.setThumbnailSize((long) thumbnailBytes.length);
+            if (StrUtil.isNotBlank(pre.getSaveThumbnailFileName())) {
+                fileInfo.setThumbnailFileName(pre.getSaveThumbnailFileName() + pre.getThumbnailSuffix());
             } else {
-                fileInfo.setThFilename(fileInfo.getFilename() + pre.getThumbnailSuffix());
+                fileInfo.setThumbnailFileName(fileInfo.getFileName() + pre.getThumbnailSuffix());
             }
-            if (StrUtil.isNotBlank(pre.getThContentType())) {
-                fileInfo.setThContentType(pre.getThContentType());
+            if (StrUtil.isNotBlank(pre.getThumbnailContentType())) {
+                fileInfo.setThumbnailContentType(pre.getThumbnailContentType());
             } else {
-                fileInfo.setThContentType(
-                        fileStorageService.getContentTypeDetect().detect(thumbnailBytes, fileInfo.getThFilename()));
+                fileInfo.setThumbnailContentType(
+                        fileStorageService.getContentTypeDetect().detect(thumbnailBytes, fileInfo.getThumbnailFileName()));
             }
         }
 

@@ -6,6 +6,7 @@ import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.nhb.common.file.core.FileStorageProperties;
 import com.nhb.common.file.platform.FileStorageClientFactory;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,7 +14,10 @@ import lombok.Setter;
 
 
 /**
- * Amazon S3 存储平台的 Client 工厂
+ * @author luck_nhb
+ * @version 1.0
+ * @date 2026/3/9 15:01
+ * @description: Amazon S3 存储平台的 Client 工厂
  */
 @Getter
 @Setter
@@ -26,7 +30,7 @@ public class AmazonS3FileStorageClientFactory implements FileStorageClientFactor
     private String endPoint;
     private volatile AmazonS3 client;
 
-    public AmazonS3FileStorageClientFactory(AmazonS3Config config) {
+    public AmazonS3FileStorageClientFactory(FileStorageProperties.AmazonS3Config config) {
         platform = config.getPlatform();
         accessKey = config.getAccessKey();
         secretKey = config.getSecretKey();

@@ -6,9 +6,12 @@ import cn.hutool.core.io.StreamProgress;
 import cn.hutool.core.io.file.FileNameUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
-import com.nhb.common.file.core.FileInfo;
+import com.nhb.common.file.core.*;
+import com.nhb.common.file.exception.Check;
+import com.nhb.common.file.exception.ExceptionFactory;
 import com.nhb.common.file.platform.FileStorage;
-import com.nhb.common.file.pretreatment.UploadPretreatment;
+import com.nhb.common.file.pretreatment.*;
+import com.nhb.common.file.wrapper.FileWrapper;
 import lombok.*;
 
 import java.io.BufferedOutputStream;
@@ -24,7 +27,10 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
- * 本地文件存储升级版
+ * @author luck_nhb
+ * @version 1.0
+ * @date 2026/3/9 15:01
+ * @description: 本地文件存储升级版
  */
 @Getter
 @Setter
@@ -35,7 +41,7 @@ public class LocalFileStorage implements FileStorage {
     private String platform;
     private String domain;
 
-    public LocalFileStorage(LocalPlusConfig config) {
+    public LocalFileStorage(FileStorageProperties.LocalConfig config) {
         platform = config.getPlatform();
         basePath = config.getBasePath();
         domain = config.getDomain();
@@ -75,7 +81,7 @@ public class LocalFileStorage implements FileStorage {
             byte[] thumbnailBytes = pre.getThumbnailBytes();
             if (thumbnailBytes != null) { // 上传缩略图
                 String newThFileKey = getThFileKey(fileInfo);
-                fileInfo.setThUrl(domain + newThFileKey);
+                fileInfo.setThumbnailUrl(domain + newThFileKey);
                 FileUtil.writeBytes(thumbnailBytes, getAbsolutePath(newThFileKey));
             }
             return true;
@@ -337,7 +343,7 @@ public class LocalFileStorage implements FileStorage {
     @Override
     public boolean delete(FileInfo fileInfo) {
         try {
-            if (fileInfo.getThFilename() != null) { // 删除缩略图
+            if (fileInfo.getThumbnailFileName() != null) { // 删除缩略图
                 FileUtil.del(getAbsolutePath(getThFileKey(fileInfo)));
             }
             return FileUtil.del(getAbsolutePath(getFileKey(fileInfo)));
@@ -393,9 +399,9 @@ public class LocalFileStorage implements FileStorage {
 
         // 复制缩略图文件
         File destThFile = null;
-        if (StrUtil.isNotBlank(srcFileInfo.getThFilename())) {
+        if (StrUtil.isNotBlank(srcFileInfo.getThumbnailFileName())) {
             String destThFileKey = getThFileKey(destFileInfo);
-            destFileInfo.setThUrl(domain + destThFileKey);
+            destFileInfo.setThumbnailUrl(domain + destThFileKey);
             try {
                 File srcThFile = new File(getAbsolutePath(getThFileKey(srcFileInfo)));
                 destThFile = FileUtil.touch(getAbsolutePath(destThFileKey));
@@ -454,9 +460,9 @@ public class LocalFileStorage implements FileStorage {
         // 移动缩略图文件
         File srcThFile = null;
         File destThFile = null;
-        if (StrUtil.isNotBlank(srcFileInfo.getThFilename())) {
+        if (StrUtil.isNotBlank(srcFileInfo.getThumbnailFileName())) {
             String destThFileKey = getThFileKey(destFileInfo);
-            destFileInfo.setThUrl(domain + destThFileKey);
+            destFileInfo.setThumbnailUrl(domain + destThFileKey);
             try {
                 srcThFile = new File(getAbsolutePath(getThFileKey(srcFileInfo)));
                 destThFile = FileUtil.touch(getAbsolutePath(destThFileKey));

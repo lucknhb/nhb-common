@@ -2,6 +2,7 @@ package com.nhb.common.file.platform.factory;
 
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
+import com.nhb.common.file.core.FileStorageProperties;
 import com.nhb.common.file.platform.FileStorageClientFactory;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,7 +10,10 @@ import lombok.Setter;
 
 
 /**
- * 阿里云 OSS 存储平台的 Client 工厂
+ * @author luck_nhb
+ * @version 1.0
+ * @date 2026/3/9 15:01
+ * @description: 阿里云 OSS 存储平台的 Client 工厂
  */
 @Getter
 @Setter
@@ -21,7 +25,7 @@ public class AliyunOssFileStorageClientFactory implements FileStorageClientFacto
     private String endPoint;
     private volatile OSS client;
 
-    public AliyunOssFileStorageClientFactory(AliyunOssConfig config) {
+    public AliyunOssFileStorageClientFactory(FileStorageProperties.AliyunOssConfig config) {
         platform = config.getPlatform();
         accessKey = config.getAccessKey();
         secretKey = config.getSecretKey();

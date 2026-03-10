@@ -29,7 +29,10 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
- * WebDAV 存储
+ * @author luck_nhb
+ * @version 1.0
+ * @date 2026/3/9 15:01
+ * @description: WebDAV 存储
  */
 @Getter
 @Setter

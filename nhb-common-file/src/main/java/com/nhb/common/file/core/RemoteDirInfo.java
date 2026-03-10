@@ -14,7 +14,10 @@ import org.apache.commons.net.ftp.FTPFile;
 import java.io.File;
 
 /**
- * 远程目录信息
+ * @author luck_nhb
+ * @version 1.0
+ * @date 2026/3/9 15:01
+ * @description: 远程目录信息
  */
 @Data
 @NoArgsConstructor

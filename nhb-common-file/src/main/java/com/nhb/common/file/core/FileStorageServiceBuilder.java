@@ -8,7 +8,6 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.baidubce.services.bos.BosClient;
 import com.github.sardine.Sardine;
 import com.google.cloud.storage.Storage;
-import com.google.storage.v2.StorageClient;
 import com.nhb.common.file.adapter.*;
 import com.nhb.common.file.aspect.FileStorageAspect;
 import com.nhb.common.file.exception.FileStorageException;
@@ -30,7 +29,10 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -267,7 +269,7 @@ public class FileStorageServiceBuilder {
     /**
      * 根据配置文件创建本地文件存储平台
      */
-    public static List<LocalFileStorage> buildLocalFileStorage(List<? extends LocalConfig> list) {
+    public static List<LocalFileStorage> buildLocalFileStorage(List<? extends FileStorageProperties.LocalConfig> list) {
         if (CollUtil.isEmpty(list)) return Collections.emptyList();
         return list.stream()
                 .map(config -> {
@@ -280,12 +282,12 @@ public class FileStorageServiceBuilder {
     /**
      * 根据配置文件创建本地文件升级版存储平台
      */
-    public static List<LocalPlusFileStorage> buildLocalPlusFileStorage(List<? extends LocalPlusConfig> list) {
+    public static List<LocalFileStorage> buildLocalPlusFileStorage(List<? extends FileStorageProperties.LocalConfig> list) {
         if (CollUtil.isEmpty(list)) return Collections.emptyList();
         return list.stream()
                 .map(config -> {
                     log.info("加载本地升级版存储平台：{}", config.getPlatform());
-                    return new LocalPlusFileStorage(config);
+                    return new LocalFileStorage(config);
                 })
                 .collect(Collectors.toList());
     }
@@ -294,7 +296,7 @@ public class FileStorageServiceBuilder {
      * 根据配置文件创建华为云 OBS 存储平台
      */
     public static List<HuaweiObsFileStorage> buildHuaweiObsFileStorage(
-            List<? extends HuaweiObsConfig> list, List<List<FileStorageClientFactory<?>>> clientFactoryList) {
+            List<? extends FileStorageProperties.HuaweiObsConfig> list, List<List<FileStorageClientFactory<?>>> clientFactoryList) {
         if (CollUtil.isEmpty(list)) return Collections.emptyList();
         buildFileStorageDetect(list, "华为云 OBS", "com.obs.services.ObsClient");
         return list.stream()
@@ -313,7 +315,7 @@ public class FileStorageServiceBuilder {
      * 根据配置文件创建阿里云 OSS 存储平台
      */
     public static List<AliyunOssFileStorage> buildAliyunOssFileStorage(
-            List<? extends AliyunOssConfig> list, List<List<FileStorageClientFactory<?>>> clientFactoryList) {
+            List<? extends FileStorageProperties.AliyunOssConfig> list, List<List<FileStorageClientFactory<?>>> clientFactoryList) {
         if (CollUtil.isEmpty(list)) return Collections.emptyList();
         buildFileStorageDetect(list, "阿里云 OSS", "com.aliyun.oss.OSS");
         return list.stream()
@@ -329,29 +331,10 @@ public class FileStorageServiceBuilder {
     }
 
     /**
-     * 根据配置文件创建七牛云 Kodo 存储平台
-     */
-    public static List<QiniuKodoFileStorage> buildQiniuKodoFileStorage(
-            List<? extends QiniuKodoConfig> list, List<List<FileStorageClientFactory<?>>> clientFactoryList) {
-        if (CollUtil.isEmpty(list)) return Collections.emptyList();
-        buildFileStorageDetect(list, "七牛云 Kodo", "com.qiniu.storage.UploadManager");
-        return list.stream()
-                .map(config -> {
-                    log.info("加载七牛云 Kodo 存储平台：{}", config.getPlatform());
-                    FileStorageClientFactory<QiniuKodoClient> clientFactory = getFactory(
-                            config.getPlatform(),
-                            clientFactoryList,
-                            () -> new QiniuKodoFileStorageClientFactory(config));
-                    return new QiniuKodoFileStorage(config, clientFactory);
-                })
-                .collect(Collectors.toList());
-    }
-
-    /**
      * 根据配置文件创建腾讯云 COS 存储平台
      */
     public static List<TencentCosFileStorage> buildTencentCosFileStorage(
-            List<? extends TencentCosConfig> list, List<List<FileStorageClientFactory<?>>> clientFactoryList) {
+            List<? extends FileStorageProperties.TencentCosConfig> list, List<List<FileStorageClientFactory<?>>> clientFactoryList) {
         if (CollUtil.isEmpty(list)) return Collections.emptyList();
         buildFileStorageDetect(list, "腾讯云 COS", "com.qcloud.cos.COSClient");
         return list.stream()
@@ -370,7 +353,7 @@ public class FileStorageServiceBuilder {
      * 根据配置文件创建百度云 BOS 存储平台
      */
     public static List<BaiduBosFileStorage> buildBaiduBosFileStorage(
-            List<? extends BaiduBosConfig> list, List<List<FileStorageClientFactory<?>>> clientFactoryList) {
+            List<? extends FileStorageProperties.BaiduBosConfig> list, List<List<FileStorageClientFactory<?>>> clientFactoryList) {
         if (CollUtil.isEmpty(list)) return Collections.emptyList();
         buildFileStorageDetect(list, "百度云 BOS", "com.baidubce.services.bos.BosClient");
         return list.stream()
@@ -385,30 +368,12 @@ public class FileStorageServiceBuilder {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * 根据配置文件创建又拍云 USS 存储平台
-     */
-    public static List<UpyunUssFileStorage> buildUpyunUssFileStorage(
-            List<? extends UpyunUssConfig> list, List<List<FileStorageClientFactory<?>>> clientFactoryList) {
-        if (CollUtil.isEmpty(list)) return Collections.emptyList();
-        buildFileStorageDetect(list, "又拍云 USS", "com.upyun.RestManager");
-        return list.stream()
-                .map(config -> {
-                    log.info("加载又拍云 USS 存储平台：{}", config.getPlatform());
-                    FileStorageClientFactory<RestManager> clientFactory = getFactory(
-                            config.getPlatform(),
-                            clientFactoryList,
-                            () -> new UpyunUssFileStorageClientFactory(config));
-                    return new UpyunUssFileStorage(config, clientFactory);
-                })
-                .collect(Collectors.toList());
-    }
 
     /**
      * 根据配置文件创建 MinIO 存储平台
      */
     public static List<MinioFileStorage> buildMinioFileStorage(
-            List<? extends MinioConfig> list, List<List<FileStorageClientFactory<?>>> clientFactoryList) {
+            List<? extends FileStorageProperties.MinioConfig> list, List<List<FileStorageClientFactory<?>>> clientFactoryList) {
         if (CollUtil.isEmpty(list)) return Collections.emptyList();
         buildFileStorageDetect(list, "MinIO", "io.minio.MinioClient");
         return list.stream()
@@ -425,7 +390,7 @@ public class FileStorageServiceBuilder {
      * 根据配置文件创建又 Amazon S3 存储平台
      */
     public static List<AmazonS3FileStorage> buildAmazonS3FileStorage(
-            List<? extends AmazonS3Config> list, List<List<FileStorageClientFactory<?>>> clientFactoryList) {
+            List<? extends FileStorageProperties.AmazonS3Config> list, List<List<FileStorageClientFactory<?>>> clientFactoryList) {
         if (CollUtil.isEmpty(list)) return Collections.emptyList();
         buildFileStorageDetect(list, "Amazon S3", "com.amazonaws.services.s3.AmazonS3");
         return list.stream()
@@ -444,13 +409,13 @@ public class FileStorageServiceBuilder {
      * 根据配置文件创建 Amazon S3 存储平台，使用v2SDK
      */
     public static List<AmazonS3V2FileStorage> buildAmazonS3V2FileStorage(
-            List<? extends AmazonS3V2Config> list, List<List<FileStorageClientFactory<?>>> clientFactoryList) {
+            List<? extends FileStorageProperties.AmazonS3V2Config> list, List<List<FileStorageClientFactory<?>>> clientFactoryList) {
         if (CollUtil.isEmpty(list)) return Collections.emptyList();
         buildFileStorageDetect(list, "Amazon S3 v2", "software.amazon.awssdk.services.s3.S3Client");
         return list.stream()
                 .map(config -> {
                     log.info("加载 Amazon S3 v2 存储平台：{}", config.getPlatform());
-                    FileStorageClientFactory<AmazonS3V2Client> clientFactory = getFactory(
+                    FileStorageClientFactory<AmazonS3V2FileStorageClientFactory.AmazonS3V2Client> clientFactory = getFactory(
                             config.getPlatform(),
                             clientFactoryList,
                             () -> new AmazonS3V2FileStorageClientFactory(config));
@@ -463,7 +428,7 @@ public class FileStorageServiceBuilder {
      * 根据配置文件创建 FTP 存储平台
      */
     public static List<FtpFileStorage> buildFtpFileStorage(
-            List<? extends FtpConfig> list, List<List<FileStorageClientFactory<?>>> clientFactoryList) {
+            List<? extends FileStorageProperties.FtpConfig> list, List<List<FileStorageClientFactory<?>>> clientFactoryList) {
         if (CollUtil.isEmpty(list)) return Collections.emptyList();
         buildFileStorageDetect(
                 list,
@@ -485,7 +450,7 @@ public class FileStorageServiceBuilder {
      * 根据配置文件创建 SFTP 存储平台
      */
     public static List<SftpFileStorage> buildSftpFileStorage(
-            List<? extends SftpConfig> list, List<List<FileStorageClientFactory<?>>> clientFactoryList) {
+            List<? extends FileStorageProperties.SftpConfig> list, List<List<FileStorageClientFactory<?>>> clientFactoryList) {
         if (CollUtil.isEmpty(list)) return Collections.emptyList();
         buildFileStorageDetect(
                 list,
@@ -539,41 +504,19 @@ public class FileStorageServiceBuilder {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * 构建 FastDFS 客户端
-     * @param fastdfs FastDFS 配置列表
-     * @param clientFactoryList 客户端工厂
-     * @return {@link Collection}<{@link ?} {@link extends} {@link FileStorage}>
-     */
-    private Collection<? extends FileStorage> buildFastDfsFileStorage(
-            List<? extends FastDfsConfig> fastdfs, List<List<FileStorageClientFactory<?>>> clientFactoryList) {
-        if (CollUtil.isEmpty(fastdfs)) {
-            return Collections.emptyList();
-        }
 
-        buildFileStorageDetect(fastdfs, "FastDFS", "org.csource.fastdfs.StorageClient");
-
-        return fastdfs.stream()
-                .map(config -> {
-                    log.info("加载 FastDFS 存储平台：{}", config.getPlatform());
-                    FileStorageClientFactory<StorageClient> clientFactory = getFactory(
-                            config.getPlatform(), clientFactoryList, () -> new FastDfsFileStorageClientFactory(config));
-                    return new FastDfsFileStorage(config, clientFactory);
-                })
-                .collect(Collectors.toList());
-    }
 
     /**
      * 根据配置文件创建 Azure Blob Storage 存储平台
      */
     public static List<AzureBlobStorageFileStorage> buildAzureBlobFileStorage(
-            List<? extends AzureBlobStorageConfig> list, List<List<FileStorageClientFactory<?>>> clientFactoryList) {
+            List<? extends FileStorageProperties.AzureBlobStorageConfig> list, List<List<FileStorageClientFactory<?>>> clientFactoryList) {
         if (CollUtil.isEmpty(list)) return Collections.emptyList();
         buildFileStorageDetect(list, "Azure Blob Storage", "com.azure.storage.blob.BlobServiceClient");
         return list.stream()
                 .map(config -> {
                     log.info("加载 Azure Blob Storage 存储平台：{}", config.getPlatform());
-                    FileStorageClientFactory<AzureBlobStorageClient> clientFactory = getFactory(
+                    FileStorageClientFactory<AzureBlobStorageFileStorageClientFactory.AzureBlobStorageClient> clientFactory = getFactory(
                             config.getPlatform(),
                             clientFactoryList,
                             () -> new AzureBlobStorageFileStorageClientFactory(config));
@@ -586,13 +529,13 @@ public class FileStorageServiceBuilder {
      * 根据配置文件创建 Mongo GridFS 存储平台
      */
     public static List<MongoGridFsFileStorage> buildMongoGridFsStorage(
-            List<? extends MongoGridFsConfig> list, List<List<FileStorageClientFactory<?>>> clientFactoryList) {
+            List<? extends FileStorageProperties.MongoGridFsConfig> list, List<List<FileStorageClientFactory<?>>> clientFactoryList) {
         if (CollUtil.isEmpty(list)) return Collections.emptyList();
         buildFileStorageDetect(list, "Mongo GridFS", "com.mongodb.client.MongoClient");
         return list.stream()
                 .map(config -> {
                     log.info("加载 Mongo GridFS 存储平台：{}", config.getPlatform());
-                    FileStorageClientFactory<MongoGridFsClient> clientFactory = getFactory(
+                    FileStorageClientFactory<MongoGridFsFileStorageClientFactory.MongoGridFsClient> clientFactory = getFactory(
                             config.getPlatform(),
                             clientFactoryList,
                             () -> new MongoGridFsFileStorageClientFactory(config));
@@ -601,30 +544,12 @@ public class FileStorageServiceBuilder {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * 根据配置文件创建 go-fastdfs 存储平台
-     */
-    public static List<GoFastDfsFileStorage> buildGoFastDfsStorage(
-            List<? extends GoFastDfsConfig> list, List<List<FileStorageClientFactory<?>>> clientFactoryList) {
-        if (CollUtil.isEmpty(list)) return Collections.emptyList();
-        buildFileStorageDetect(list, "go-fastdfs", "cn.hutool.json.JSONUtil", "cn.hutool.http.HttpUtil");
-        return list.stream()
-                .map(config -> {
-                    log.info("加载 go-fastdfs 存储平台：{}", config.getPlatform());
-                    FileStorageClientFactory<GoFastDfsClient> clientFactory = getFactory(
-                            config.getPlatform(),
-                            clientFactoryList,
-                            () -> new GoFastDfsFileStorageClientFactory(config));
-                    return new GoFastDfsFileStorage(config, clientFactory);
-                })
-                .collect(Collectors.toList());
-    }
 
     /**
      * 根据配置文件创建火山引擎 TOS 存储平台
      */
     public static List<VolcengineTosFileStorage> buildVolcengineTosFileStorage(
-            List<? extends VolcengineTosConfig> list, List<List<FileStorageClientFactory<?>>> clientFactoryList) {
+            List<? extends FileStorageProperties.VolcengineTosConfig> list, List<List<FileStorageClientFactory<?>>> clientFactoryList) {
         if (CollUtil.isEmpty(list)) return Collections.emptyList();
         buildFileStorageDetect(list, "火山引擎 TOS", "com.volcengine.tos.TOSV2");
         return list.stream()

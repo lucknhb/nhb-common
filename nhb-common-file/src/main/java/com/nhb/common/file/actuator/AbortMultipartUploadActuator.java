@@ -13,7 +13,10 @@ import com.nhb.common.file.pretreatment.AbortMultipartUploadPretreatment;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * 手动分片上传-取消执行器
+ * @author luck_nhb
+ * @version 1.0
+ * @date 2026/3/9 15:01
+ * @description: 手动分片上传-取消执行器
  */
 public class AbortMultipartUploadActuator {
     private final FileStorageService fileStorageService;

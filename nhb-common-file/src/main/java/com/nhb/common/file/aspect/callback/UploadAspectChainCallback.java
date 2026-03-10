@@ -7,7 +7,10 @@ import com.nhb.common.file.recorder.FileRecorder;
 import com.nhb.common.file.pretreatment.UploadPretreatment;
 
 /**
- * 上传切面调用链结束回调
+ * @author luck_nhb
+ * @version 1.0
+ * @date 2026/3/9 15:01
+ * @description:  上传切面调用链结束回调
  */
 public interface UploadAspectChainCallback {
     FileInfo run(FileInfo fileInfo, UploadPretreatment pre, FileStorage fileStorage, FileRecorder fileRecorder);

@@ -7,7 +7,10 @@ import lombok.experimental.Accessors;
 import java.util.List;
 
 /**
- * 文件信息列举结果
+ * @author luck_nhb
+ * @version 1.0
+ * @date 2026/3/9 15:01
+ * @description: 文件信息列举结果
  */
 @Data
 @NoArgsConstructor

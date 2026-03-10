@@ -16,6 +16,7 @@ import com.nhb.common.file.core.ProgressListener;
 import com.nhb.common.file.platform.FileStorage;
 import com.nhb.common.file.platform.FileStorageClientFactory;
 import com.nhb.common.file.core.GeneratePresignedUrlResult;
+import com.nhb.common.file.utils.ToolUtil;
 import com.nhb.common.file.wrapper.FileWrapper;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -33,7 +34,10 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
- * 阿里云 OSS 存储
+ * @author luck_nhb
+ * @version 1.0
+ * @date 2026/3/9 15:01
+ * @description: 阿里云 OSS 存储
  */
 @Getter
 @Setter
@@ -133,7 +137,7 @@ public class AliyunOssFileStorage implements FileStorage {
             byte[] thumbnailBytes = pre.getThumbnailBytes();
             if (thumbnailBytes != null) { // 上传缩略图
                 String newThFileKey = getThFileKey(fileInfo);
-                fileInfo.setThUrl(domain + newThFileKey);
+                fileInfo.setThumbnailUrl(domain + newThFileKey);
                 client.putObject(
                         bucketName,
                         newThFileKey,
@@ -410,12 +414,12 @@ public class AliyunOssFileStorage implements FileStorage {
      */
     public ObjectMetadata getThObjectMetadata(FileInfo fileInfo) {
         ObjectMetadata metadata = new ObjectMetadata();
-        metadata.setContentLength(fileInfo.getThSize());
-        metadata.setContentType(fileInfo.getThContentType());
-        metadata.setObjectAcl(getAcl(fileInfo.getThFileAcl()));
-        metadata.setUserMetadata(fileInfo.getThUserMetadata());
-        if (CollUtil.isNotEmpty(fileInfo.getThMetadata())) {
-            fileInfo.getThMetadata().forEach(metadata::setHeader);
+        metadata.setContentLength(fileInfo.getThumbnailSize());
+        metadata.setContentType(fileInfo.getThumbnailContentType());
+        metadata.setObjectAcl(getAcl(fileInfo.getThumbnailFileAcl()));
+        metadata.setUserMetadata(fileInfo.getThumbnailUserMetadata());
+        if (CollUtil.isNotEmpty(fileInfo.getThumbnailMetadata())) {
+            fileInfo.getThumbnailMetadata().forEach(metadata::setHeader);
         }
         return metadata;
     }
@@ -431,7 +435,7 @@ public class AliyunOssFileStorage implements FileStorage {
             String fileKey = getFileKey(new FileInfo(basePath, pre.getPath(), pre.getFilename()));
             GeneratePresignedUrlRequest request = new GeneratePresignedUrlRequest(bucketName, fileKey);
             request.setExpiration(pre.getExpiration());
-            request.setMethod(Tools.getEnum(HttpMethod.class, pre.getMethod()));
+            request.setMethod(ToolUtil.getEnum(HttpMethod.class, pre.getMethod()));
             request.setHeaders(new HashMap<>(pre.getHeaders()));
             request.setUserMetadata(new HashMap<>(pre.getUserMetadata()));
             HashMap<String, String> queryParam = new HashMap<>(pre.getQueryParams());
@@ -487,7 +491,7 @@ public class AliyunOssFileStorage implements FileStorage {
     public boolean delete(FileInfo fileInfo) {
         OSS client = getClient();
         try {
-            if (fileInfo.getThFilename() != null) { // 删除缩略图
+            if (fileInfo.getThumbnailFileName() != null) { // 删除缩略图
                 client.deleteObject(bucketName, getThFileKey(fileInfo));
             }
             client.deleteObject(bucketName, getFileKey(fileInfo));
@@ -550,9 +554,9 @@ public class AliyunOssFileStorage implements FileStorage {
 
         // 复制缩略图文件
         String destThFileKey = null;
-        if (StrUtil.isNotBlank(srcFileInfo.getThFilename())) {
+        if (StrUtil.isNotBlank(srcFileInfo.getThumbnailFileName())) {
             destThFileKey = getThFileKey(destFileInfo);
-            destFileInfo.setThUrl(domain + destThFileKey);
+            destFileInfo.setThumbnailUrl(domain + destThFileKey);
             try {
                 client.copyObject(bucketName, getThFileKey(srcFileInfo), bucketName, destThFileKey);
             } catch (Exception e) {

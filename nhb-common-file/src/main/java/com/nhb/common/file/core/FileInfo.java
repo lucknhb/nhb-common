@@ -1,6 +1,7 @@
 package com.nhb.common.file.core;
 
-import com.baidubce.services.ruleengine.model.dict.Dict;
+
+import cn.hutool.core.lang.Dict;
 import com.nhb.common.file.constant.FileStorageConstants;
 import com.nhb.common.file.hash.HashInfo;
 import lombok.Data;

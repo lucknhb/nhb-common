@@ -1,7 +1,10 @@
 package com.nhb.common.file.platform;
 
 /**
- * 存储平台的 Client 的对象的工厂接口
+ * @author luck_nhb
+ * @version 1.0
+ * @date 2026/3/9 15:01
+ * @description: 存储平台的 Client 的对象的工厂接口
  */
 public interface FileStorageClientFactory<Client> extends AutoCloseable {
 

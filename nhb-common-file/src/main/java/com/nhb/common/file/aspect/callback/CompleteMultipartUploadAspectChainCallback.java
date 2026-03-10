@@ -8,7 +8,10 @@ import com.nhb.common.file.recorder.FileRecorder;
 import com.nhb.common.file.pretreatment.CompleteMultipartUploadPretreatment;
 
 /**
- * 手动分片上传-完成切面调用链结束回调
+ * @author luck_nhb
+ * @version 1.0
+ * @date 2026/3/9 15:01
+ * @description: 手动分片上传-完成切面调用链结束回调
  */
 public interface CompleteMultipartUploadAspectChainCallback {
     FileInfo run(

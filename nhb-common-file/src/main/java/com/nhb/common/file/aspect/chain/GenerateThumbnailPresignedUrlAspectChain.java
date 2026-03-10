@@ -11,16 +11,19 @@ import java.util.Date;
 import java.util.Iterator;
 
 /**
- * 对缩略图文件生成可以签名访问的 URL 的切面调用链
+ * @author luck_nhb
+ * @version 1.0
+ * @date 2026/3/9 15:01
+ * @description: 对缩略图文件生成可以签名访问的 URL 的切面调用链
  */
 @Getter
 @Setter
-public class GenerateThPresignedUrlAspectChain {
+public class GenerateThumbnailPresignedUrlAspectChain {
 
     private GenerateThPresignedUrlAspectChainCallback callback;
     private Iterator<FileStorageAspect> aspectIterator;
 
-    public GenerateThPresignedUrlAspectChain(
+    public GenerateThumbnailPresignedUrlAspectChain(
             Iterable<FileStorageAspect> aspects, GenerateThPresignedUrlAspectChainCallback callback) {
         this.aspectIterator = aspects.iterator();
         this.callback = callback;

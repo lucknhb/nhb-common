@@ -1,7 +1,7 @@
 package com.nhb.common.file.aspect.chain;
 
 import com.nhb.common.file.aspect.FileStorageAspect;
-import com.nhb.common.file.aspect.callback.SetThFileAclAspectChainCallback;
+import com.nhb.common.file.aspect.callback.SetThumbnailFileAclAspectChainCallback;
 import com.nhb.common.file.core.FileInfo;
 import com.nhb.common.file.platform.FileStorage;
 import lombok.Getter;
@@ -16,10 +16,10 @@ import java.util.Iterator;
 @Setter
 public class SetThFileAclAspectChain {
 
-    private SetThFileAclAspectChainCallback callback;
+    private SetThumbnailFileAclAspectChainCallback callback;
     private Iterator<FileStorageAspect> aspectIterator;
 
-    public SetThFileAclAspectChain(Iterable<FileStorageAspect> aspects, SetThFileAclAspectChainCallback callback) {
+    public SetThFileAclAspectChain(Iterable<FileStorageAspect> aspects, SetThumbnailFileAclAspectChainCallback callback) {
         this.aspectIterator = aspects.iterator();
         this.callback = callback;
     }

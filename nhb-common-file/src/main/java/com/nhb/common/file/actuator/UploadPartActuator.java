@@ -9,11 +9,15 @@ import com.nhb.common.file.core.FileStorageService;
 import com.nhb.common.file.exception.Check;
 import com.nhb.common.file.platform.FileStorage;
 import com.nhb.common.file.pretreatment.UploadPartPretreatment;
+import com.nhb.common.file.recorder.FileRecorder;
 
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * 手动分片上传-上传分片执行器
+ * @author luck_nhb
+ * @version 1.0
+ * @date 2026/3/9 15:01
+ * @description: 手动分片上传-上传分片执行器
  */
 public class UploadPartActuator {
     private final FileStorageService fileStorageService;

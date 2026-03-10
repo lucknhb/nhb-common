@@ -7,12 +7,11 @@ import cn.hutool.extra.ftp.Ftp;
 import com.nhb.common.file.core.*;
 import com.nhb.common.file.exception.Check;
 import com.nhb.common.file.exception.ExceptionFactory;
-import com.nhb.common.file.core.ProgressListener;
-import com.nhb.common.file.pretreatment.MovePretreatment;
 import com.nhb.common.file.platform.FileStorage;
 import com.nhb.common.file.platform.FileStorageClientFactory;
 import com.nhb.common.file.pretreatment.GetFilePretreatment;
 import com.nhb.common.file.pretreatment.ListFilesPretreatment;
+import com.nhb.common.file.pretreatment.MovePretreatment;
 import com.nhb.common.file.pretreatment.UploadPretreatment;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -29,7 +28,10 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
- * FTP 存储
+ * @author luck_nhb
+ * @version 1.0
+ * @date 2026/3/9 15:01
+ * @description: FTP 存储
  */
 @Getter
 @Setter
@@ -41,7 +43,7 @@ public class FtpFileStorage implements FileStorage {
     private String storagePath;
     private FileStorageClientFactory<Ftp> clientFactory;
 
-    public FtpFileStorage(FtpConfig config, FileStorageClientFactory<Ftp> clientFactory) {
+    public FtpFileStorage(FileStorageProperties.FtpConfig config, FileStorageClientFactory<Ftp> clientFactory) {
         platform = config.getPlatform();
         domain = config.getDomain();
         basePath = config.getBasePath();
@@ -85,16 +87,16 @@ public class FtpFileStorage implements FileStorage {
 
         Ftp client = getClient();
         try (InputStreamPlus in = pre.getInputStreamPlus()) {
-            client.upload(getAbsolutePath(basePath + fileInfo.getPath()), fileInfo.getFilename(), in);
+            client.upload(getAbsolutePath(basePath + fileInfo.getPath()), fileInfo.getFileName(), in);
             if (fileInfo.getSize() == null) fileInfo.setSize(in.getProgressSize());
 
             byte[] thumbnailBytes = pre.getThumbnailBytes();
             if (thumbnailBytes != null) { // 上传缩略图
                 String newThFileKey = getThFileKey(fileInfo);
-                fileInfo.setThUrl(domain + newThFileKey);
+                fileInfo.setThumbnailUrl(domain + newThFileKey);
                 client.upload(
                         getAbsolutePath(basePath + fileInfo.getPath()),
-                        fileInfo.getThFilename(),
+                        fileInfo.getThumbnailFileName(),
                         new ByteArrayInputStream(thumbnailBytes));
             }
 
@@ -207,7 +209,7 @@ public class FtpFileStorage implements FileStorage {
     public boolean delete(FileInfo fileInfo) {
         Ftp client = getClient();
         try {
-            if (fileInfo.getThFilename() != null) { // 删除缩略图
+            if (fileInfo.getThumbnailFileName() != null) { // 删除缩略图
                 client.delFile(getAbsolutePath(getThFileKey(fileInfo)));
             }
             client.delFile(getAbsolutePath(getFileKey(fileInfo)));
@@ -224,7 +226,7 @@ public class FtpFileStorage implements FileStorage {
         Ftp client = getClient();
         try {
             client.cd(getAbsolutePath(fileInfo.getBasePath() + fileInfo.getPath()));
-            return client.existFile(fileInfo.getFilename());
+            return client.existFile(fileInfo.getFileName());
         } catch (Exception e) {
             throw ExceptionFactory.exists(fileInfo, platform, e);
         } finally {
@@ -239,7 +241,7 @@ public class FtpFileStorage implements FileStorage {
             client.cd(getAbsolutePath(fileInfo.getBasePath() + fileInfo.getPath()));
             FTPClient ftpClient = client.getClient();
             ftpClient.setFileType(FTPClient.BINARY_FILE_TYPE);
-            try (InputStream in = ftpClient.retrieveFileStream(fileInfo.getFilename())) {
+            try (InputStream in = ftpClient.retrieveFileStream(fileInfo.getFileName())) {
                 if (in == null) {
                     throw ExceptionFactory.download(fileInfo, platform, null);
                 }
@@ -262,7 +264,7 @@ public class FtpFileStorage implements FileStorage {
             client.cd(getAbsolutePath(fileInfo.getBasePath() + fileInfo.getPath()));
             FTPClient ftpClient = client.getClient();
             ftpClient.setFileType(FTPClient.BINARY_FILE_TYPE);
-            try (InputStream in = ftpClient.retrieveFileStream(fileInfo.getThFilename())) {
+            try (InputStream in = ftpClient.retrieveFileStream(fileInfo.getThumbnailFileName())) {
                 if (in == null) {
                     throw ExceptionFactory.downloadTh(fileInfo, platform, null);
                 }
@@ -299,19 +301,19 @@ public class FtpFileStorage implements FileStorage {
 
             FTPFile srcFile;
             try {
-                srcFile = ftpClient.listFiles(srcFileInfo.getFilename())[0];
+                srcFile = ftpClient.listFiles(srcFileInfo.getFileName())[0];
             } catch (Exception e) {
                 throw ExceptionFactory.sameMoveNotFound(srcFileInfo, destFileInfo, platform, e);
             }
 
             // 移动缩略图文件
             String destThFileRelativizeKey = null;
-            if (StrUtil.isNotBlank(srcFileInfo.getThFilename())) {
-                destFileInfo.setThUrl(domain + getThFileKey(destFileInfo));
-                destThFileRelativizeKey = relativizePath + destFileInfo.getThFilename();
+            if (StrUtil.isNotBlank(srcFileInfo.getThumbnailFileName())) {
+                destFileInfo.setThumbnailUrl(domain + getThFileKey(destFileInfo));
+                destThFileRelativizeKey = relativizePath + destFileInfo.getThumbnailFileName();
                 try {
                     client.mkDirs(destPath);
-                    ftpClient.rename(srcFileInfo.getThFilename(), destThFileRelativizeKey);
+                    ftpClient.rename(srcFileInfo.getThumbnailFileName(), destThFileRelativizeKey);
                 } catch (Exception e) {
                     throw ExceptionFactory.sameMoveTh(srcFileInfo, destFileInfo, platform, e);
                 }
@@ -320,23 +322,23 @@ public class FtpFileStorage implements FileStorage {
             // 移动文件
             String destFileKey = getFileKey(destFileInfo);
             destFileInfo.setUrl(domain + destFileKey);
-            String destFileRelativizeKey = relativizePath + destFileInfo.getFilename();
+            String destFileRelativizeKey = relativizePath + destFileInfo.getFileName();
             try {
                 ProgressListener.quickStart(pre.getProgressListener(), srcFile.getSize());
-                ftpClient.rename(srcFileInfo.getFilename(), destFileRelativizeKey);
+                ftpClient.rename(srcFileInfo.getFileName(), destFileRelativizeKey);
                 ProgressListener.quickFinish(pre.getProgressListener(), srcFile.getSize());
             } catch (Exception e) {
                 if (destThFileRelativizeKey != null) {
                     try {
-                        ftpClient.rename(destThFileRelativizeKey, srcFileInfo.getThFilename());
+                        ftpClient.rename(destThFileRelativizeKey, srcFileInfo.getThumbnailFileName());
                     } catch (Exception ignored) {
                     }
                 }
                 try {
-                    if (client.existFile(srcFileInfo.getFilename())) {
+                    if (client.existFile(srcFileInfo.getFileName())) {
                         client.delFile(destFileRelativizeKey);
                     } else {
-                        ftpClient.rename(destFileRelativizeKey, srcFileInfo.getFilename());
+                        ftpClient.rename(destFileRelativizeKey, srcFileInfo.getFileName());
                     }
                 } catch (Exception ignored) {
                 }

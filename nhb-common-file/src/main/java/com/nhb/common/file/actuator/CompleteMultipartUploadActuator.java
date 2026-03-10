@@ -20,7 +20,10 @@ import java.io.IOException;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * 手动分片上传-完成执行器
+ * @author luck_nhb
+ * @version 1.0
+ * @date 2026/3/9 15:01
+ * @description: 手动分片上传-完成执行器
  */
 public class CompleteMultipartUploadActuator {
     private final FileStorageService fileStorageService;
@@ -68,7 +71,7 @@ public class CompleteMultipartUploadActuator {
                                             .inputStream(in -> {
                                                 try {
                                                     _fileInfo.setContentType(_contentTypeDetect.detect(
-                                                            in, _fileInfo.getOriginalFilename()));
+                                                            in, _fileInfo.getOriginalFileName()));
                                                     // 这里静默关闭流，防止出现 Premature end of Content-Length
                                                     // delimited message body 错误
                                                     IoUtil.close(in);

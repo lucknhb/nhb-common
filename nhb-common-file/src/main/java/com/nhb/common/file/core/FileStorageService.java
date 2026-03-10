@@ -5,6 +5,7 @@ import cn.hutool.core.util.StrUtil;
 import com.nhb.common.file.adapter.FileWrapperAdapter;
 import com.nhb.common.file.aspect.FileStorageAspect;
 import com.nhb.common.file.aspect.chain.*;
+import com.nhb.common.file.constant.FileStorageConstants;
 import com.nhb.common.file.pretreatment.*;
 import com.nhb.common.file.exception.FileStorageException;
 import com.nhb.common.file.platform.FileStorage;
@@ -23,7 +24,10 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Predicate;
 
 /**
- * 用来处理文件存储，对接多个平台
+ * @author luck_nhb
+ * @version 1.0
+ * @date 2026/3/9 15:01
+ * @description: 用来处理文件存储，对接多个平台
  */
 @Slf4j
 @Getter
@@ -249,8 +253,8 @@ public class FileStorageService {
                 .setExpiration(expiration)
                 .setPlatform(fileInfo.getPlatform())
                 .setPath(fileInfo.getPath())
-                .setFilename(fileInfo.getFilename())
-                .setMethod(Constant.GeneratePresignedUrl.Method.GET)
+                .setFilename(fileInfo.getFileName())
+                .setMethod(FileStorageConstants.GeneratePresignedUrl.Method.GET)
                 .generatePresignedUrl();
         return result == null ? null : result.getUrl();
     }
@@ -266,8 +270,8 @@ public class FileStorageService {
                 .setExpiration(expiration)
                 .setPlatform(fileInfo.getPlatform())
                 .setPath(fileInfo.getPath())
-                .setFilename(fileInfo.getThFilename())
-                .setMethod(Constant.GeneratePresignedUrl.Method.GET)
+                .setFilename(fileInfo.getThumbnailFileName())
+                .setMethod(FileStorageConstants.GeneratePresignedUrl.Method.GET)
                 .generatePresignedUrl();
         return result == null ? null : result.getUrl();
     }
@@ -538,7 +542,7 @@ public class FileStorageService {
         return getFile()
                 .setPlatform(fileInfo.getPlatform())
                 .setPath(fileInfo.getPath() != null, fileInfo.getPath())
-                .setFilename(fileInfo.getFilename() != null, fileInfo.getFilename())
+                .setFilename(fileInfo.getFileName() != null, fileInfo.getFileName())
                 .setUrl(fileInfo.getUrl() != null, fileInfo.getUrl())
                 .getFile();
     }
@@ -552,8 +556,8 @@ public class FileStorageService {
         return getFile()
                 .setPlatform(fileInfo.getPlatform())
                 .setPath(fileInfo.getPath() != null, fileInfo.getPath())
-                .setFilename(fileInfo.getThFilename() != null, fileInfo.getThFilename())
-                .setUrl(fileInfo.getThUrl() != null, fileInfo.getThUrl())
+                .setFilename(fileInfo.getThumbnailFileName() != null, fileInfo.getThumbnailFileName())
+                .setUrl(fileInfo.getThumbnailUrl() != null, fileInfo.getThumbnailUrl())
                 .getFile();
     }
 

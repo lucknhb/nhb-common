@@ -12,9 +12,14 @@ import com.baidubce.BceServiceException;
 import com.baidubce.http.HttpMethodName;
 import com.baidubce.services.bos.BosClient;
 import com.baidubce.services.bos.model.*;
+import com.nhb.common.file.core.*;
+import com.nhb.common.file.exception.Check;
+import com.nhb.common.file.exception.ExceptionFactory;
 import com.nhb.common.file.platform.FileStorage;
 import com.nhb.common.file.platform.FileStorageClientFactory;
-import com.nhb.common.file.pretreatment.UploadPretreatment;
+import com.nhb.common.file.pretreatment.*;
+import com.nhb.common.file.utils.ToolUtil;
+import com.nhb.common.file.wrapper.FileWrapper;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -28,7 +33,10 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
- * 百度云 BOS 存储
+ * @author luck_nhb
+ * @version 1.0
+ * @date 2026/3/9 15:01
+ * @description: 百度云 BOS 存储
  */
 @Getter
 @Setter
@@ -43,7 +51,7 @@ public class BaiduBosFileStorage implements FileStorage {
     private int multipartPartSize;
     private FileStorageClientFactory<BosClient> clientFactory;
 
-    public BaiduBosFileStorage(BaiduBosConfig config, FileStorageClientFactory<BosClient> clientFactory) {
+    public BaiduBosFileStorage(FileStorageProperties.BaiduBosConfig config, FileStorageClientFactory<BosClient> clientFactory) {
         platform = config.getPlatform();
         bucketName = config.getBucketName();
         domain = config.getDomain();
@@ -128,7 +136,7 @@ public class BaiduBosFileStorage implements FileStorage {
             byte[] thumbnailBytes = pre.getThumbnailBytes();
             if (thumbnailBytes != null) { // 上传缩略图
                 String newThFileKey = getThFileKey(fileInfo);
-                fileInfo.setThUrl(domain + newThFileKey);
+                fileInfo.setThumbnailUrl(domain + newThFileKey);
 
                 client.putObject(
                         bucketName,
@@ -182,7 +190,7 @@ public class BaiduBosFileStorage implements FileStorage {
         Long partSize = partFileWrapper.getSize();
         try (InputStreamPlus in = pre.getInputStreamPlus()) {
             // 百度云 BOS 比较特殊，上传分片必须传入分片大小，这里强制获取，可能会占用大量内存
-            if (partSize == null) partSize = partFileWrapper.getInputStreamMaskResetReturn(Tools::getSize);
+            if (partSize == null) partSize = partFileWrapper.getInputStreamMaskResetReturn(ToolUtil::getSize);
             UploadPartRequest part = new UploadPartRequest();
             part.setBucketName(bucketName);
             part.setKey(newFileKey);
@@ -404,16 +412,16 @@ public class BaiduBosFileStorage implements FileStorage {
      */
     public ObjectMetadata getThObjectMetadata(FileInfo fileInfo) {
         ObjectMetadata metadata = new ObjectMetadata();
-        metadata.setContentLength(fileInfo.getThSize());
-        metadata.setContentType(fileInfo.getThContentType());
-        CannedAccessControlList thFileAcl = getAcl(fileInfo.getThFileAcl());
+        metadata.setContentLength(fileInfo.getThumbnailSize());
+        metadata.setContentType(fileInfo.getThumbnailContentType());
+        CannedAccessControlList thFileAcl = getAcl(fileInfo.getThumbnailFileAcl());
         if (thFileAcl != null) metadata.setxBceAcl(thFileAcl.toString());
-        metadata.setUserMetadata(fileInfo.getThUserMetadata());
-        if (CollUtil.isNotEmpty(fileInfo.getThMetadata())) {
+        metadata.setUserMetadata(fileInfo.getThumbnailUserMetadata());
+        if (CollUtil.isNotEmpty(fileInfo.getThumbnailMetadata())) {
             CopyOptions copyOptions = CopyOptions.create()
                     .ignoreCase()
                     .setFieldNameEditor(name -> NamingCase.toCamelCase(name, CharUtil.DASHED));
-            BeanUtil.copyProperties(fileInfo.getThMetadata(), metadata, copyOptions);
+            BeanUtil.copyProperties(fileInfo.getThumbnailMetadata(), metadata, copyOptions);
         }
         return metadata;
     }
@@ -429,7 +437,7 @@ public class BaiduBosFileStorage implements FileStorage {
             String fileKey = getFileKey(new FileInfo(basePath, pre.getPath(), pre.getFilename()));
             GeneratePresignedUrlRequest request = new GeneratePresignedUrlRequest(bucketName, fileKey);
             request.setExpiration((int) ((pre.getExpiration().getTime() - System.currentTimeMillis()) / 1000));
-            request.setMethod(Tools.getEnum(HttpMethodName.class, pre.getMethod()));
+            request.setMethod(ToolUtil.getEnum(HttpMethodName.class, pre.getMethod()));
             Map<String, String> headers = new HashMap<>(pre.getHeaders());
             headers.putAll(pre.getUserMetadata().entrySet().stream()
                     .collect(Collectors.toMap(
@@ -490,7 +498,7 @@ public class BaiduBosFileStorage implements FileStorage {
     public boolean delete(FileInfo fileInfo) {
         BosClient client = getClient();
         try {
-            if (fileInfo.getThFilename() != null) { // 删除缩略图
+            if (fileInfo.getThumbnailFileName() != null) { // 删除缩略图
                 try {
                     client.deleteObject(bucketName, getThFileKey(fileInfo));
                 } catch (BceServiceException e) {
@@ -561,9 +569,9 @@ public class BaiduBosFileStorage implements FileStorage {
 
         // 复制缩略图文件
         String destThFileKey = null;
-        if (StrUtil.isNotBlank(srcFileInfo.getThFilename())) {
+        if (StrUtil.isNotBlank(srcFileInfo.getThumbnailFileName())) {
             destThFileKey = getThFileKey(destFileInfo);
-            destFileInfo.setThUrl(domain + destThFileKey);
+            destFileInfo.setThumbnailUrl(domain + destThFileKey);
             try {
                 CopyObjectRequest request =
                         new CopyObjectRequest(bucketName, getThFileKey(srcFileInfo), bucketName, destThFileKey);

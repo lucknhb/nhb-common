@@ -14,7 +14,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 手动分片上传-列举已上传的分片执行器
+ * @author luck_nhb
+ * @version 1.0
+ * @date 2026/3/9 15:01
+ * @description: 手动分片上传-列举已上传的分片执行器
  */
 public class ListPartsActuator {
     private final FileStorageService fileStorageService;

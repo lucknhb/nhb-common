@@ -36,7 +36,10 @@ import java.util.Date;
 import java.util.Map;
 
 /**
- * 远程文件信息
+ * @author luck_nhb
+ * @version 1.0
+ * @date 2026/3/9 15:01
+ * @description: 远程文件信息
  */
 @Data
 @NoArgsConstructor

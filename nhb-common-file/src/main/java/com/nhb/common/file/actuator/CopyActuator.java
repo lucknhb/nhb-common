@@ -21,7 +21,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 /**
- * 复制执行器
+ * @author luck_nhb
+ * @version 1.0
+ * @date 2026/3/9 15:01
+ * @description: 复制执行器
  */
 public class CopyActuator {
     private final FileStorageService fileStorageService;
@@ -54,7 +57,7 @@ public class CopyActuator {
         if (StrUtil.isBlank(fileInfo.getFileName())) {
             throw new FileStorageException("fileInfo 的 filename 不能为空");
         }
-        if (StrUtil.isNotBlank(fileInfo.getThumbnailFileName()) && StrUtil.isBlank(pre.getThFilename())) {
+        if (StrUtil.isNotBlank(fileInfo.getThumbnailFileName()) && StrUtil.isBlank(pre.getThumbnailFileName())) {
             throw new FileStorageException("目标缩略图文件名不能为空");
         }
 
@@ -100,12 +103,12 @@ public class CopyActuator {
             FileRecorder fileRecorder,
             List<FileStorageAspect> aspectList) {
         // 检查文件名是否与原始的相同
-        if ((srcFileInfo.getPath() + srcFileInfo.getFileName()).equals(pre.getPath() + pre.getFilename())) {
+        if ((srcFileInfo.getPath() + srcFileInfo.getFileName()).equals(pre.getPath() + pre.getFileName())) {
             throw new FileStorageException("源文件与目标文件路径相同");
         }
         // 检查缩略图文件名是否与原始的相同
         if (StrUtil.isNotBlank(srcFileInfo.getThumbnailFileName())
-                && (srcFileInfo.getPath() + srcFileInfo.getThumbnailFileName()).equals(pre.getPath() + pre.getThFilename())) {
+                && (srcFileInfo.getPath() + srcFileInfo.getThumbnailFileName()).equals(pre.getPath() + pre.getThumbnailFileName())) {
             throw new FileStorageException("源缩略图文件与目标缩略图文件路径相同");
         }
 
@@ -132,8 +135,8 @@ public class CopyActuator {
         if (srcFileInfo.getThumbnailMetadata() != null) {
             destFileInfo.setThumbnailMetadata(new LinkedHashMap<>(srcFileInfo.getThumbnailMetadata()));
         }
-        if (srcFileInfo.getThUserMetadata() != null) {
-            destFileInfo.setThUserMetadata(new LinkedHashMap<>(srcFileInfo.getThUserMetadata()));
+        if (srcFileInfo.getThumbnailUserMetadata() != null) {
+            destFileInfo.setThumbnailUserMetadata(new LinkedHashMap<>(srcFileInfo.getThumbnailUserMetadata()));
         }
         if (srcFileInfo.getAttr() != null) {
             destFileInfo.setAttr(new Dict(srcFileInfo.getAttr()));
@@ -142,7 +145,7 @@ public class CopyActuator {
             destFileInfo.setHashInfo(new HashInfo(srcFileInfo.getHashInfo()));
         }
         destFileInfo.setFileAcl(srcFileInfo.getFileAcl());
-        destFileInfo.setThFileAcl(srcFileInfo.getThFileAcl());
+        destFileInfo.setThumbnailFileAcl(srcFileInfo.getThumbnailFileAcl());
         destFileInfo.setCreateTime(new Date());
 
         return new SameCopyAspectChain(aspectList, (_srcfileInfo, _destFileInfo, _pre, _fileStorage, _fileRecorder) -> {
@@ -163,38 +166,38 @@ public class CopyActuator {
             FileRecorder fileRecorder,
             List<FileStorageAspect> aspectList) {
         // 下载缩略图
-        byte[] thBytes = StrUtil.isNotBlank(srcFileInfo.getThFilename())
+        byte[] thBytes = StrUtil.isNotBlank(srcFileInfo.getThumbnailFileName())
                 ? new Downloader(srcFileInfo, aspectList, fileStorage, Downloader.TARGET_TH_FILE).bytes()
                 : null;
 
         final FileInfo[] destFileInfoArr = new FileInfo[1];
         new Downloader(srcFileInfo, aspectList, fileStorage, Downloader.TARGET_FILE).inputStream(in -> {
-            String thumbnailSuffix = FileNameUtil.extName(pre.getThFilename());
+            String thumbnailSuffix = FileNameUtil.extName(pre.getThumbnailFileName());
             if (StrUtil.isNotBlank(thumbnailSuffix)) thumbnailSuffix = "." + thumbnailSuffix;
 
             destFileInfoArr[0] = fileStorageService
-                    .of(in, srcFileInfo.getOriginalFilename(), srcFileInfo.getContentType(), srcFileInfo.getSize())
+                    .of(in, srcFileInfo.getOriginalFileName(), srcFileInfo.getContentType(), srcFileInfo.getSize())
                     .setPlatform(pre.getPlatform())
                     .setPath(pre.getPath())
-                    .setSaveFilename(pre.getFilename())
+                    .setSaveFileName(pre.getFileName())
                     .setContentType(srcFileInfo.getContentType())
-                    .setSaveThFilename(thBytes != null, FileNameUtil.mainName(pre.getThFilename()))
+                    .setSaveThumbnailFileName(thBytes != null, FileNameUtil.mainName(pre.getThumbnailFileName()))
                     .setThumbnailSuffix(thBytes != null, thumbnailSuffix)
                     .thumbnailOf(thBytes != null, thBytes)
-                    .setThContentType(srcFileInfo.getThContentType())
+                    .setThumbnailContentType(srcFileInfo.getThumbnailContentType())
                     .setObjectType(srcFileInfo.getObjectType())
                     .setObjectId(srcFileInfo.getObjectId())
                     .setNotSupportAclThrowException(
                             pre.getNotSupportAclThrowException() != null, pre.getNotSupportAclThrowException())
                     .setFileAcl(srcFileInfo.getFileAcl() != null, srcFileInfo.getFileAcl())
-                    .setThFileAcl(srcFileInfo.getThFileAcl() != null, srcFileInfo.getThFileAcl())
+                    .setThumbnailFileAcl(srcFileInfo.getThumbnailFileAcl() != null, srcFileInfo.getThumbnailFileAcl())
                     .setNotSupportMetadataThrowException(
                             pre.getNotSupportMetadataThrowException() != null,
                             pre.getNotSupportMetadataThrowException())
                     .putMetadataAll(srcFileInfo.getMetadata() != null, srcFileInfo.getMetadata())
-                    .putThMetadataAll(srcFileInfo.getThMetadata() != null, srcFileInfo.getThMetadata())
+                    .putThumbnailMetadataAll(srcFileInfo.getThumbnailMetadata() != null, srcFileInfo.getThumbnailMetadata())
                     .putUserMetadataAll(srcFileInfo.getMetadata() != null, srcFileInfo.getUserMetadata())
-                    .putThUserMetadataAll(srcFileInfo.getThUserMetadata() != null, srcFileInfo.getThUserMetadata())
+                    .putThumbnailUserMetadataAll(srcFileInfo.getThumbnailUserMetadata() != null, srcFileInfo.getThumbnailUserMetadata())
                     .setProgressListener(pre.getProgressListener())
                     .putAttrAll(srcFileInfo.getAttr() != null, srcFileInfo.getAttr())
                     .upload(fileStorageService.getFileStorageVerify(pre.getPlatform()), fileRecorder, aspectList);

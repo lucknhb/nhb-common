@@ -6,8 +6,17 @@ import com.mongodb.client.gridfs.GridFSBucket;
 import com.mongodb.client.gridfs.model.GridFSFile;
 import com.mongodb.client.gridfs.model.GridFSUploadOptions;
 import com.mongodb.client.model.Filters;
+import com.nhb.common.file.core.*;
+import com.nhb.common.file.exception.Check;
+import com.nhb.common.file.exception.ExceptionFactory;
 import com.nhb.common.file.platform.FileStorage;
+import com.nhb.common.file.platform.FileStorageClientFactory;
+import com.nhb.common.file.platform.factory.MongoGridFsFileStorageClientFactory;
+import com.nhb.common.file.pretreatment.GetFilePretreatment;
+import com.nhb.common.file.pretreatment.ListFilesPretreatment;
+import com.nhb.common.file.pretreatment.MovePretreatment;
 import com.nhb.common.file.pretreatment.UploadPretreatment;
+import com.nhb.common.file.utils.ToolUtil;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,7 +37,10 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * Mongo GridFS 存储
+ * @author luck_nhb
+ * @version 1.0
+ * @date 2026/3/9 15:01
+ * @description: Mongo GridFS 存储
  */
 @Getter
 @Setter
@@ -37,16 +49,17 @@ public class MongoGridFsFileStorage implements FileStorage {
     private String platform;
     private String domain;
     private String basePath;
-    private FileStorageClientFactory<MongoGridFsClient> clientFactory;
+    private FileStorageClientFactory<MongoGridFsFileStorageClientFactory.MongoGridFsClient> clientFactory;
 
-    public MongoGridFsFileStorage(MongoGridFsConfig config, FileStorageClientFactory<MongoGridFsClient> clientFactory) {
+    public MongoGridFsFileStorage(FileStorageProperties.MongoGridFsConfig config,
+                                  FileStorageClientFactory<MongoGridFsFileStorageClientFactory.MongoGridFsClient> clientFactory) {
         platform = config.getPlatform();
         domain = config.getDomain();
         basePath = config.getBasePath();
         this.clientFactory = clientFactory;
     }
 
-    public MongoGridFsClient getClient() {
+    public MongoGridFsFileStorageClientFactory.MongoGridFsClient getClient() {
         return clientFactory.getClient();
     }
 
@@ -73,7 +86,7 @@ public class MongoGridFsFileStorage implements FileStorage {
             byte[] thumbnailBytes = pre.getThumbnailBytes();
             if (thumbnailBytes != null) { // 上传缩略图
                 String newThFileKey = getThFileKey(fileInfo);
-                fileInfo.setThUrl(domain + newThFileKey);
+                fileInfo.setThumbnailUrl(domain + newThFileKey);
                 GridFSUploadOptions thOptions = new GridFSUploadOptions();
                 thOptions.metadata(getThObjectMetadata(fileInfo));
                 delete(gridFsBucket, newThFileKey);
@@ -162,9 +175,9 @@ public class MongoGridFsFileStorage implements FileStorage {
                         info.setExt(FileNameUtil.extName(info.getFilename()));
                         info.setLastModified(item.getUploadDate());
                         Document metadata = item.getMetadata();
-                        info.setMetadata(Tools.stream(
+                        info.setMetadata(ToolUtil.stream(
                                 metadata, s -> s.filter(e -> !e.getKey().startsWith("x-amz-meta-"))));
-                        info.setUserMetadata(Tools.stream(
+                        info.setUserMetadata(ToolUtil.stream(
                                 metadata, s -> s.filter(e -> e.getKey().startsWith("x-amz-meta-")), e -> e.getKey()
                                         .substring(11)));
                         info.setOriginal(item);
@@ -208,9 +221,9 @@ public class MongoGridFsFileStorage implements FileStorage {
             Document metadata = file.getMetadata();
             if (metadata != null) {
                 info.setMetadata(
-                        Tools.stream(metadata, s -> s.filter(e -> !e.getKey().startsWith("x-amz-meta-"))));
+                        ToolUtil.stream(metadata, s -> s.filter(e -> !e.getKey().startsWith("x-amz-meta-"))));
                 info.setUserMetadata(
-                        Tools.stream(metadata, s -> s.filter(e -> e.getKey().startsWith("x-amz-meta-")), e -> e.getKey()
+                        ToolUtil.stream(metadata, s -> s.filter(e -> e.getKey().startsWith("x-amz-meta-")), e -> e.getKey()
                                 .substring(11)));
             }
             info.setOriginal(file);
@@ -238,9 +251,9 @@ public class MongoGridFsFileStorage implements FileStorage {
      */
     public Document getThObjectMetadata(FileInfo fileInfo) {
         Document metadata = new Document();
-        if (fileInfo.getThMetadata() != null) metadata.putAll(fileInfo.getThMetadata());
-        if (fileInfo.getThUserMetadata() != null)
-            fileInfo.getThUserMetadata().forEach((key, value) -> metadata.put("x-amz-meta-" + key, value));
+        if (fileInfo.getThumbnailMetadata() != null) metadata.putAll(fileInfo.getThumbnailMetadata());
+        if (fileInfo.getThumbnailUserMetadata() != null)
+            fileInfo.getThumbnailUserMetadata().forEach((key, value) -> metadata.put("x-amz-meta-" + key, value));
         return metadata;
     }
 
@@ -262,7 +275,7 @@ public class MongoGridFsFileStorage implements FileStorage {
     public boolean delete(FileInfo fileInfo) {
         GridFSBucket gridFsBucket = getClient().getGridFsBucket();
         try {
-            if (fileInfo.getThFilename() != null) { // 删除缩略图
+            if (fileInfo.getThumbnailFileName() != null) { // 删除缩略图
                 delete(gridFsBucket, getThFileKey(fileInfo));
             }
             delete(gridFsBucket, getFileKey(fileInfo));
@@ -326,10 +339,10 @@ public class MongoGridFsFileStorage implements FileStorage {
         // 移动缩略图文件
         String srcThFileKey = null;
         String destThFileKey = null;
-        if (StrUtil.isNotBlank(srcFileInfo.getThFilename())) {
+        if (StrUtil.isNotBlank(srcFileInfo.getThumbnailFileName())) {
             srcThFileKey = getThFileKey(srcFileInfo);
             destThFileKey = getThFileKey(destFileInfo);
-            destFileInfo.setThUrl(domain + destThFileKey);
+            destFileInfo.setThumbnailUrl(domain + destThFileKey);
             try {
                 GridFSFile srcThFile = getFile(gridFsBucket, srcThFileKey);
                 if (srcThFile == null) throw new FileNotFoundException(srcThFileKey);

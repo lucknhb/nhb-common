@@ -10,8 +10,15 @@ import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.ChannelSftp.LsEntry;
 import com.jcraft.jsch.SftpATTRS;
 import com.jcraft.jsch.SftpException;
+import com.nhb.common.file.core.*;
+import com.nhb.common.file.exception.Check;
+import com.nhb.common.file.exception.ExceptionFactory;
 import com.nhb.common.file.platform.FileStorage;
 import com.nhb.common.file.platform.FileStorageClientFactory;
+import com.nhb.common.file.pretreatment.GetFilePretreatment;
+import com.nhb.common.file.pretreatment.ListFilesPretreatment;
+import com.nhb.common.file.pretreatment.MovePretreatment;
+import com.nhb.common.file.pretreatment.UploadPretreatment;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -27,7 +34,10 @@ import java.util.stream.Collectors;
 import static com.jcraft.jsch.ChannelSftp.SSH_FX_NO_SUCH_FILE;
 
 /**
- * SFTP 存储
+ * @author luck_nhb
+ * @version 1.0
+ * @date 2026/3/9 15:01
+ * @description: SFTP 存储
  */
 @Getter
 @Setter
@@ -39,7 +49,7 @@ public class SftpFileStorage implements FileStorage {
     private String storagePath;
     private FileStorageClientFactory<Sftp> clientFactory;
 
-    public SftpFileStorage(SftpConfig config, FileStorageClientFactory<Sftp> clientFactory) {
+    public SftpFileStorage(FileStorageProperties.SftpConfig config, FileStorageClientFactory<Sftp> clientFactory) {
         platform = config.getPlatform();
         domain = config.getDomain();
         basePath = config.getBasePath();
@@ -87,14 +97,14 @@ public class SftpFileStorage implements FileStorage {
             if (!client.exist(path)) {
                 client.mkDirs(path);
             }
-            client.upload(path, fileInfo.getFilename(), in);
+            client.upload(path, fileInfo.getFileName(), in);
             if (fileInfo.getSize() == null) fileInfo.setSize(in.getProgressSize());
 
             byte[] thumbnailBytes = pre.getThumbnailBytes();
             if (thumbnailBytes != null) { // 上传缩略图
                 String newThFileKey = getThFileKey(fileInfo);
-                fileInfo.setThUrl(domain + newThFileKey);
-                client.upload(path, fileInfo.getThFilename(), new ByteArrayInputStream(thumbnailBytes));
+                fileInfo.setThumbnailUrl(domain + newThFileKey);
+                client.upload(path, fileInfo.getThumbnailFileName(), new ByteArrayInputStream(thumbnailBytes));
             }
 
             return true;
@@ -230,7 +240,7 @@ public class SftpFileStorage implements FileStorage {
     public boolean delete(FileInfo fileInfo) {
         Sftp client = getClient();
         try {
-            if (fileInfo.getThFilename() != null) { // 删除缩略图
+            if (fileInfo.getThumbnailFileName() != null) { // 删除缩略图
                 delFile(client, getAbsolutePath(getThFileKey(fileInfo)));
             }
             delFile(client, getAbsolutePath(getFileKey(fileInfo)));
@@ -313,19 +323,19 @@ public class SftpFileStorage implements FileStorage {
 
             SftpATTRS srcFile;
             try {
-                srcFile = ftpClient.stat(srcFileInfo.getFilename());
+                srcFile = ftpClient.stat(srcFileInfo.getFileName());
             } catch (Exception e) {
                 throw ExceptionFactory.sameMoveNotFound(srcFileInfo, destFileInfo, platform, e);
             }
 
             // 移动缩略图文件
             String destThFileRelativizeKey = null;
-            if (StrUtil.isNotBlank(srcFileInfo.getThFilename())) {
-                destFileInfo.setThUrl(domain + getThFileKey(destFileInfo));
-                destThFileRelativizeKey = relativizePath + destFileInfo.getThFilename();
+            if (StrUtil.isNotBlank(srcFileInfo.getThumbnailFileName())) {
+                destFileInfo.setThumbnailUrl(domain + getThFileKey(destFileInfo));
+                destThFileRelativizeKey = relativizePath + destFileInfo.getThumbnailFileName();
                 try {
                     client.mkDirs(destPath);
-                    ftpClient.rename(srcFileInfo.getThFilename(), destThFileRelativizeKey);
+                    ftpClient.rename(srcFileInfo.getThumbnailFileName(), destThFileRelativizeKey);
                 } catch (Exception e) {
                     throw ExceptionFactory.sameMoveTh(srcFileInfo, destFileInfo, platform, e);
                 }
@@ -334,23 +344,23 @@ public class SftpFileStorage implements FileStorage {
             // 移动文件
             String destFileKey = getFileKey(destFileInfo);
             destFileInfo.setUrl(domain + destFileKey);
-            String destFileRelativizeKey = relativizePath + destFileInfo.getFilename();
+            String destFileRelativizeKey = relativizePath + destFileInfo.getFileName();
             try {
                 ProgressListener.quickStart(pre.getProgressListener(), srcFile.getSize());
-                ftpClient.rename(srcFileInfo.getFilename(), destFileRelativizeKey);
+                ftpClient.rename(srcFileInfo.getFileName(), destFileRelativizeKey);
                 ProgressListener.quickFinish(pre.getProgressListener(), srcFile.getSize());
             } catch (Exception e) {
                 if (destThFileRelativizeKey != null) {
                     try {
-                        ftpClient.rename(destThFileRelativizeKey, srcFileInfo.getThFilename());
+                        ftpClient.rename(destThFileRelativizeKey, srcFileInfo.getThumbnailFileName());
                     } catch (Exception ignored) {
                     }
                 }
                 try {
-                    if (client.exist(srcFileInfo.getFilename())) {
+                    if (client.exist(srcFileInfo.getFileName())) {
                         client.delFile(destFileRelativizeKey);
                     } else {
-                        ftpClient.rename(destFileRelativizeKey, srcFileInfo.getFilename());
+                        ftpClient.rename(destFileRelativizeKey, srcFileInfo.getFileName());
                     }
                 } catch (Exception ignored) {
                 }

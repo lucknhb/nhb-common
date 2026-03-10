@@ -12,7 +12,10 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * 手动分片上传-初始化预处理器
+ * @author luck_nhb
+ * @version 1.0
+ * @date 2026/3/9 15:01
+ * @description: 手动分片上传-初始化预处理器
  */
 @Getter
 @Setter

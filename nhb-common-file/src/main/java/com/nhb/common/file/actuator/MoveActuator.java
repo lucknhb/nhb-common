@@ -20,7 +20,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 /**
- * 移动执行器
+ * @author luck_nhb
+ * @version 1.0
+ * @date 2026/3/9 15:01
+ * @description: 移动执行器
  */
 public class MoveActuator {
     private final FileStorageService fileStorageService;
@@ -94,27 +97,27 @@ public class MoveActuator {
             List<FileStorageAspect> aspectList) {
 
         // 检查文件名是否与原始的相同
-        if ((srcFileInfo.getPath() + srcFileInfo.getFilename()).equals(pre.getPath() + pre.getFilename())) {
+        if ((srcFileInfo.getPath() + srcFileInfo.getFileName()).equals(pre.getPath() + pre.getFileName())) {
             throw new FileStorageException("源文件与目标文件路径相同");
         }
         // 检查缩略图文件名是否与原始的相同
-        if (StrUtil.isNotBlank(srcFileInfo.getThFilename())
-                && (srcFileInfo.getPath() + srcFileInfo.getThFilename()).equals(pre.getPath() + pre.getThFilename())) {
+        if (StrUtil.isNotBlank(srcFileInfo.getThumbnailFileName())
+                && (srcFileInfo.getPath() + srcFileInfo.getThumbnailFileName()).equals(pre.getPath() + pre.getThumbnailFileName())) {
             throw new FileStorageException("源缩略图文件与目标缩略图文件路径相同");
         }
 
         FileInfo destFileInfo = new FileInfo();
         destFileInfo.setSize(srcFileInfo.getSize());
-        destFileInfo.setFilename(pre.getFilename());
-        destFileInfo.setOriginalFilename(srcFileInfo.getOriginalFilename());
+        destFileInfo.setFileName(pre.getFileName());
+        destFileInfo.setOriginalFileName(srcFileInfo.getOriginalFileName());
         destFileInfo.setBasePath(srcFileInfo.getBasePath());
         destFileInfo.setPath(pre.getPath());
-        destFileInfo.setExt(FileNameUtil.extName(pre.getFilename()));
+        destFileInfo.setExt(FileNameUtil.extName(pre.getFileName()));
         destFileInfo.setContentType(srcFileInfo.getContentType());
         destFileInfo.setPlatform(pre.getPlatform());
-        destFileInfo.setThFilename(pre.getThFilename());
-        destFileInfo.setThSize(srcFileInfo.getThSize());
-        destFileInfo.setThContentType(srcFileInfo.getThContentType());
+        destFileInfo.setThumbnailFileName(pre.getThumbnailFileName());
+        destFileInfo.setThumbnailSize(srcFileInfo.getThumbnailSize());
+        destFileInfo.setThumbnailContentType(srcFileInfo.getThumbnailContentType());
         destFileInfo.setObjectId(srcFileInfo.getObjectId());
         destFileInfo.setObjectType(srcFileInfo.getObjectType());
         if (srcFileInfo.getMetadata() != null) {
@@ -123,11 +126,11 @@ public class MoveActuator {
         if (srcFileInfo.getUserMetadata() != null) {
             destFileInfo.setUserMetadata(new LinkedHashMap<>(srcFileInfo.getUserMetadata()));
         }
-        if (srcFileInfo.getThMetadata() != null) {
-            destFileInfo.setThMetadata(new LinkedHashMap<>(srcFileInfo.getThMetadata()));
+        if (srcFileInfo.getThumbnailMetadata() != null) {
+            destFileInfo.setThumbnailMetadata(new LinkedHashMap<>(srcFileInfo.getThumbnailMetadata()));
         }
-        if (srcFileInfo.getThUserMetadata() != null) {
-            destFileInfo.setThUserMetadata(new LinkedHashMap<>(srcFileInfo.getThUserMetadata()));
+        if (srcFileInfo.getThumbnailUserMetadata() != null) {
+            destFileInfo.setThumbnailUserMetadata(new LinkedHashMap<>(srcFileInfo.getThumbnailUserMetadata()));
         }
         if (srcFileInfo.getAttr() != null) {
             destFileInfo.setAttr(new Dict(srcFileInfo.getAttr()));
@@ -136,7 +139,7 @@ public class MoveActuator {
             destFileInfo.setHashInfo(new HashInfo(srcFileInfo.getHashInfo()));
         }
         destFileInfo.setFileAcl(srcFileInfo.getFileAcl());
-        destFileInfo.setThFileAcl(srcFileInfo.getThFileAcl());
+        destFileInfo.setThumbnailFileAcl(srcFileInfo.getThumbnailFileAcl());
         destFileInfo.setCreateTime(new Date());
 
         return new SameMoveAspectChain(aspectList, (_srcFileInfo, _destFileInfo, _pre, _fileStorage, _fileRecorder) -> {
@@ -169,8 +172,8 @@ public class MoveActuator {
                 .setCopyMode(pre.getCopyMode())
                 .setPlatform(pre.getPlatform())
                 .setPath(pre.getPath())
-                .setFilename(pre.getFilename())
-                .setThFilename(pre.getThFilename())
+                .setFileName(pre.getFileName())
+                .setThumbnailFileName(pre.getThumbnailFileName())
                 .setProgressListener(pre.getProgressListener())
                 .setNotSupportMetadataThrowException(
                         !pre.getNotSupportMetadataThrowException(), pre.getNotSupportMetadataThrowException())

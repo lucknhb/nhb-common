@@ -18,7 +18,7 @@ import com.nhb.common.file.pretreatment.UploadPretreatment;
  * @date 2026/3/9 15:01
  * @description: 用于检查条件并抛出对应异常，主要用于存储平台的实现类中
  */
-public class Check {
+public class ExceptionCheck {
 
     /**
      * 上传文件时，检查是否传入 ACL，如果传入则按要求抛出异常

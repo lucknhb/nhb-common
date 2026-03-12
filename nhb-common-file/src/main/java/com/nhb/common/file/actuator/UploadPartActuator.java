@@ -6,7 +6,7 @@ import com.nhb.common.file.aspect.chain.UploadPartAspectChain;
 import com.nhb.common.file.core.FileInfo;
 import com.nhb.common.file.core.FilePartInfo;
 import com.nhb.common.file.core.FileStorageService;
-import com.nhb.common.file.exception.Check;
+import com.nhb.common.file.exception.ExceptionCheck;
 import com.nhb.common.file.platform.FileStorage;
 import com.nhb.common.file.pretreatment.UploadPartPretreatment;
 import com.nhb.common.file.recorder.FileRecorder;
@@ -33,7 +33,7 @@ public class UploadPartActuator {
      */
     public FilePartInfo execute() {
         FileInfo fileInfo = pre.getFileInfo();
-        Check.uploadPart(fileInfo);
+        ExceptionCheck.uploadPart(fileInfo);
 
         FileStorage fileStorage = fileStorageService.getFileStorageVerify(fileInfo.getPlatform());
         CopyOnWriteArrayList<FileStorageAspect> aspectList = fileStorageService.getAspectList();

@@ -7,16 +7,16 @@ import com.nhb.common.file.aspect.FileStorageAspect;
 import com.nhb.common.file.aspect.chain.CopyAspectChain;
 import com.nhb.common.file.aspect.chain.SameCopyAspectChain;
 import com.nhb.common.file.constant.FileStorageConstants;
-import com.nhb.common.file.pretreatment.CopyPretreatment;
 import com.nhb.common.file.core.Downloader;
 import com.nhb.common.file.core.FileInfo;
 import com.nhb.common.file.core.FileStorageService;
 import com.nhb.common.file.exception.FileStorageException;
 import com.nhb.common.file.hash.HashInfo;
 import com.nhb.common.file.platform.FileStorage;
+import com.nhb.common.file.pretreatment.CopyPretreatment;
 import com.nhb.common.file.recorder.FileRecorder;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -51,7 +51,9 @@ public class CopyActuator {
      * 复制文件，成功后返回新的 FileInfo
      */
     public FileInfo execute(FileStorage fileStorage, FileRecorder fileRecorder, List<FileStorageAspect> aspectList) {
-        if (fileInfo == null) throw new FileStorageException("fileInfo 不能为 null");
+        if (fileInfo == null){
+            throw new FileStorageException("fileInfo 不能为 null");
+        }
         if (fileInfo.getPlatform() == null) throw new FileStorageException("fileInfo 的 platform 不能为 null");
         if (fileInfo.getPath() == null) throw new FileStorageException("fileInfo 的 path 不能为 null");
         if (StrUtil.isBlank(fileInfo.getFileName())) {
@@ -146,7 +148,7 @@ public class CopyActuator {
         }
         destFileInfo.setFileAcl(srcFileInfo.getFileAcl());
         destFileInfo.setThumbnailFileAcl(srcFileInfo.getThumbnailFileAcl());
-        destFileInfo.setCreateTime(new Date());
+        destFileInfo.setCreateTime(LocalDateTime.now());
 
         return new SameCopyAspectChain(aspectList, (_srcfileInfo, _destFileInfo, _pre, _fileStorage, _fileRecorder) -> {
                     _fileStorage.sameCopy(_srcfileInfo, _destFileInfo, _pre);

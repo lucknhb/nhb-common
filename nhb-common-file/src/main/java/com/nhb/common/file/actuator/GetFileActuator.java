@@ -4,7 +4,7 @@ package com.nhb.common.file.actuator;
 import com.nhb.common.file.aspect.FileStorageAspect;
 import com.nhb.common.file.aspect.chain.GetFileAspectChain;
 import com.nhb.common.file.core.FileStorageService;
-import com.nhb.common.file.exception.Check;
+import com.nhb.common.file.exception.ExceptionCheck;
 import com.nhb.common.file.pretreatment.GetFilePretreatment;
 import com.nhb.common.file.core.RemoteFileInfo;
 import com.nhb.common.file.platform.FileStorage;
@@ -38,7 +38,7 @@ public class GetFileActuator {
      * 执行获取文件
      */
     public RemoteFileInfo execute(FileStorage fileStorage, List<FileStorageAspect> aspectList) {
-        Check.getFile(pre);
+        ExceptionCheck.getFile(pre);
         return new GetFileAspectChain(aspectList, (_pre, _fileStorage) -> {
                     RemoteFileInfo info = _fileStorage.getFile(_pre);
                     if (info != null) {

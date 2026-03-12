@@ -9,7 +9,7 @@ import com.nhb.common.file.core.ContentTypeDetect;
 import com.nhb.common.file.core.Downloader;
 import com.nhb.common.file.core.FileInfo;
 import com.nhb.common.file.core.FileStorageService;
-import com.nhb.common.file.exception.Check;
+import com.nhb.common.file.exception.ExceptionCheck;
 import com.nhb.common.file.platform.FileStorage;
 import com.nhb.common.file.recorder.FileRecorder;
 import com.nhb.common.file.pretreatment.CompleteMultipartUploadPretreatment;
@@ -39,7 +39,7 @@ public class CompleteMultipartUploadActuator {
      */
     public FileInfo execute() {
         FileInfo fileInfo = pre.getFileInfo();
-        Check.completeMultipartUpload(fileInfo);
+        ExceptionCheck.completeMultipartUpload(fileInfo);
         FileStorage fileStorage = fileStorageService.getFileStorageVerify(fileInfo.getPlatform());
         fileInfo.setUploadStatus(FileStorageConstants.FileInfoUploadStatus.COMPLETE);
         CopyOnWriteArrayList<FileStorageAspect> aspectList = fileStorageService.getAspectList();

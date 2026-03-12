@@ -5,7 +5,7 @@ import com.nhb.common.file.aspect.FileStorageAspect;
 import com.nhb.common.file.aspect.chain.AbortMultipartUploadAspectChain;
 import com.nhb.common.file.core.FileInfo;
 import com.nhb.common.file.core.FileStorageService;
-import com.nhb.common.file.exception.Check;
+import com.nhb.common.file.exception.ExceptionCheck;
 import com.nhb.common.file.platform.FileStorage;
 import com.nhb.common.file.recorder.FileRecorder;
 import com.nhb.common.file.pretreatment.AbortMultipartUploadPretreatment;
@@ -32,7 +32,7 @@ public class AbortMultipartUploadActuator {
      */
     public FileInfo execute() {
         FileInfo fileInfo = pre.getFileInfo();
-        Check.abortMultipartUpload(fileInfo);
+        ExceptionCheck.abortMultipartUpload(fileInfo);
 
         FileStorage fileStorage = fileStorageService.getFileStorageVerify(fileInfo.getPlatform());
         CopyOnWriteArrayList<FileStorageAspect> aspectList = fileStorageService.getAspectList();

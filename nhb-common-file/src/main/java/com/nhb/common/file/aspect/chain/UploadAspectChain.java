@@ -32,8 +32,7 @@ public class UploadAspectChain {
     /**
      * 调用下一个切面
      */
-    public FileInfo next(
-            FileInfo fileInfo, UploadPretreatment pre, FileStorage fileStorage, FileRecorder fileRecorder) {
+    public FileInfo next(FileInfo fileInfo, UploadPretreatment pre, FileStorage fileStorage, FileRecorder fileRecorder) {
         if (aspectIterator.hasNext()) { // 还有下一个
             return aspectIterator.next().uploadAround(this, fileInfo, pre, fileStorage, fileRecorder);
         } else {

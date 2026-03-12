@@ -90,10 +90,18 @@ public class FileStorageAutoConfiguration {
             @Autowired(required = false) List<FileWrapperAdapter> fileWrapperAdapterList,
             @Autowired(required = false) List<List<FileStorageClientFactory<?>>> clientFactoryList) {
 
-        if (fileStorageLists == null) fileStorageLists = new ArrayList<>();
-        if (aspectList == null) aspectList = new ArrayList<>();
-        if (fileWrapperAdapterList == null) fileWrapperAdapterList = new ArrayList<>();
-        if (clientFactoryList == null) clientFactoryList = new ArrayList<>();
+        if (fileStorageLists == null) {
+            fileStorageLists = new ArrayList<>();
+        }
+        if (aspectList == null) {
+            aspectList = new ArrayList<>();
+        }
+        if (fileWrapperAdapterList == null) {
+            fileWrapperAdapterList = new ArrayList<>();
+        }
+        if (clientFactoryList == null) {
+            clientFactoryList = new ArrayList<>();
+        }
 
         FileStorageServiceBuilder builder = FileStorageServiceBuilder.create(fileStorageConfigProperties.toFileStorageProperties())
                 .setFileRecorder(fileRecorder)
@@ -118,7 +126,7 @@ public class FileStorageAutoConfiguration {
         }
         if (fileStorageConfigProperties.getEnableHttpServletRequestFileWrapper()) {
             if (doesNotExistClass("jakarta.servlet.http.HttpServletRequest")) {
-                log.warn("当前未检测到 Servlet 环境，无法加载 HttpServletRequest 的文件包装适配器，请将参数【dromara.x-file-storage.enable-http-servlet-request-file-wrapper】设置为 【false】来消除此警告");
+                log.warn("当前未检测到 Servlet 环境，无法加载 HttpServletRequest 的文件包装适配器，请将参数【enableHttpServletRequestFileWrapper】设置为 【false】来消除此警告");
             } else {
                 builder.addHttpServletRequestFileWrapperAdapter();
             }
@@ -126,7 +134,7 @@ public class FileStorageAutoConfiguration {
         if (fileStorageConfigProperties.getEnableMultipartFileWrapper()) {
             if (doesNotExistClass("org.springframework.web.multipart.MultipartFile")) {
                 log.warn(
-                        "当前未检测到 SpringWeb 环境，无法加载 MultipartFile 的文件包装适配器，请将参数【dromara.x-file-storage.enable-multipart-file-wrapper】设置为 【false】来消除此警告");
+                        "当前未检测到 SpringWeb 环境，无法加载 MultipartFile 的文件包装适配器，请将参数【enableMultipartFileWrapper】设置为 【false】来消除此警告");
             } else {
                 builder.addFileWrapperAdapter(new MultipartFileWrapperAdapter());
             }

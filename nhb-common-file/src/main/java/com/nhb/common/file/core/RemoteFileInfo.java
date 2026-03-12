@@ -32,7 +32,7 @@ import software.amazon.awssdk.services.s3.model.CommonPrefix;
 import software.amazon.awssdk.services.s3.model.HeadObjectResponse;
 
 import java.io.File;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.Map;
 
 /**
@@ -92,7 +92,7 @@ public class RemoteFileInfo {
     /**
      * 最后修改时间
      */
-    private Date lastModified;
+    private LocalDateTime lastModified;
     /**
      * 文件元数据，仅部分存储平台支持
      */

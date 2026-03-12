@@ -13,7 +13,7 @@ import com.baidubce.http.HttpMethodName;
 import com.baidubce.services.bos.BosClient;
 import com.baidubce.services.bos.model.*;
 import com.nhb.common.file.core.*;
-import com.nhb.common.file.exception.Check;
+import com.nhb.common.file.exception.ExceptionCheck;
 import com.nhb.common.file.exception.ExceptionFactory;
 import com.nhb.common.file.platform.FileStorage;
 import com.nhb.common.file.platform.FileStorageClientFactory;
@@ -27,6 +27,7 @@ import lombok.Setter;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.URL;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
@@ -313,7 +314,9 @@ public class BaiduBosFileStorage implements FileStorage {
                         info.setSize(item.getSize());
                         info.setExt(FileNameUtil.extName(info.getFilename()));
                         info.setETag(item.getETag());
-                        info.setLastModified(item.getLastModified());
+                        info.setLastModified(item.getLastModified().toInstant()
+                                .atZone(ZoneId.systemDefault())
+                                .toLocalDateTime());
                         info.setOriginal(item);
                         return info;
                     })
@@ -360,7 +363,9 @@ public class BaiduBosFileStorage implements FileStorage {
             info.setContentDisposition(metadata.getContentDisposition());
             info.setContentType(metadata.getContentType());
             info.setContentMd5(metadata.getContentMd5());
-            info.setLastModified(metadata.getLastModified());
+            info.setLastModified(metadata.getLastModified().toInstant()
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDateTime());
             info.setMetadata(BeanUtil.beanToMap(metadata, false, true));
             info.getMetadata().remove("userMetadata");
             if (metadata.getUserMetadata() != null) info.setUserMetadata(new HashMap<>(metadata.getUserMetadata()));
@@ -537,7 +542,7 @@ public class BaiduBosFileStorage implements FileStorage {
 
     @Override
     public void downloadTh(FileInfo fileInfo, Consumer<InputStream> consumer) {
-        Check.downloadThBlankThFilename(platform, fileInfo);
+        ExceptionCheck.downloadThBlankThFilename(platform, fileInfo);
 
         try (BosObject object = getClient().getObject(bucketName, getThFileKey(fileInfo));
                 InputStream in = object.getObjectContent()) {
@@ -554,7 +559,7 @@ public class BaiduBosFileStorage implements FileStorage {
 
     @Override
     public void sameCopy(FileInfo srcFileInfo, FileInfo destFileInfo, CopyPretreatment pre) {
-        Check.sameCopyBasePath(platform, basePath, srcFileInfo, destFileInfo);
+        ExceptionCheck.sameCopyBasePath(platform, basePath, srcFileInfo, destFileInfo);
 
         BosClient client = getClient();
 

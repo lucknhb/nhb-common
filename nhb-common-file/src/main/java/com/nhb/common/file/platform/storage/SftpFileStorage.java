@@ -11,7 +11,7 @@ import com.jcraft.jsch.ChannelSftp.LsEntry;
 import com.jcraft.jsch.SftpATTRS;
 import com.jcraft.jsch.SftpException;
 import com.nhb.common.file.core.*;
-import com.nhb.common.file.exception.Check;
+import com.nhb.common.file.exception.ExceptionCheck;
 import com.nhb.common.file.exception.ExceptionFactory;
 import com.nhb.common.file.platform.FileStorage;
 import com.nhb.common.file.platform.FileStorageClientFactory;
@@ -88,8 +88,8 @@ public class SftpFileStorage implements FileStorage {
         fileInfo.setBasePath(basePath);
         String newFileKey = getFileKey(fileInfo);
         fileInfo.setUrl(domain + newFileKey);
-        Check.uploadNotSupportAcl(platform, fileInfo, pre);
-        Check.uploadNotSupportMetadata(platform, fileInfo, pre);
+        ExceptionCheck.uploadNotSupportAcl(platform, fileInfo, pre);
+        ExceptionCheck.uploadNotSupportMetadata(platform, fileInfo, pre);
 
         Sftp client = getClient();
         try (InputStreamPlus in = pre.getInputStreamPlus()) {
@@ -161,7 +161,7 @@ public class SftpFileStorage implements FileStorage {
                         info.setUrl(domain + getFileKey(new FileInfo(basePath, info.getPath(), info.getFilename())));
                         info.setSize(item.getAttrs().getSize());
                         info.setExt(FileNameUtil.extName(info.getFilename()));
-                        info.setLastModified(DateUtil.date(item.getAttrs().getMTime() * 1000L));
+                        info.setLastModified(DateUtil.date(item.getAttrs().getMTime() * 1000L).toLocalDateTime());
                         info.setOriginal(item);
                         return info;
                     })
@@ -226,7 +226,7 @@ public class SftpFileStorage implements FileStorage {
             info.setUrl(domain + fileKey);
             info.setSize(file.getAttrs().getSize());
             info.setExt(FileNameUtil.extName(info.getFilename()));
-            info.setLastModified(DateUtil.date(file.getAttrs().getMTime() * 1000L));
+            info.setLastModified(DateUtil.date(file.getAttrs().getMTime() * 1000L).toLocalDateTime());
             info.setOriginal(file);
             return info;
         } catch (Exception e) {
@@ -288,7 +288,7 @@ public class SftpFileStorage implements FileStorage {
 
     @Override
     public void downloadTh(FileInfo fileInfo, Consumer<InputStream> consumer) {
-        Check.downloadThBlankThFilename(platform, fileInfo);
+        ExceptionCheck.downloadThBlankThFilename(platform, fileInfo);
 
         Sftp client = getClient();
         try (InputStream in = client.getClient().get(getAbsolutePath(getThFileKey(fileInfo)))) {
@@ -307,9 +307,9 @@ public class SftpFileStorage implements FileStorage {
 
     @Override
     public void sameMove(FileInfo srcFileInfo, FileInfo destFileInfo, MovePretreatment pre) {
-        Check.sameMoveNotSupportAcl(platform, srcFileInfo, destFileInfo, pre);
-        Check.sameMoveNotSupportMetadata(platform, srcFileInfo, destFileInfo, pre);
-        Check.sameMoveBasePath(platform, basePath, srcFileInfo, destFileInfo);
+        ExceptionCheck.sameMoveNotSupportAcl(platform, srcFileInfo, destFileInfo, pre);
+        ExceptionCheck.sameMoveNotSupportMetadata(platform, srcFileInfo, destFileInfo, pre);
+        ExceptionCheck.sameMoveBasePath(platform, basePath, srcFileInfo, destFileInfo);
 
         String srcPath = getAbsolutePath(srcFileInfo.getBasePath() + srcFileInfo.getPath());
         String destPath = getAbsolutePath(destFileInfo.getBasePath() + destFileInfo.getPath());

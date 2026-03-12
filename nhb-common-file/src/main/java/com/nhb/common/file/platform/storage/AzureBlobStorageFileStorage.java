@@ -37,7 +37,7 @@ import com.azure.storage.file.datalake.models.PathPermissions;
 import com.azure.storage.file.datalake.models.RolePermissions;
 import com.nhb.common.file.constant.FileStorageConstants;
 import com.nhb.common.file.core.*;
-import com.nhb.common.file.exception.Check;
+import com.nhb.common.file.exception.ExceptionCheck;
 import com.nhb.common.file.exception.ExceptionFactory;
 import com.nhb.common.file.exception.FileStorageException;
 import com.nhb.common.file.platform.FileStorage;
@@ -404,7 +404,7 @@ public class AzureBlobStorageFileStorage implements FileStorage {
                         info.setETag(properties.getETag());
                         info.setContentType(properties.getContentType());
                         info.setContentMd5(Base64.encode(properties.getContentMd5()));
-                        info.setLastModified(DateUtil.date(properties.getLastModified()));
+                        info.setLastModified(DateUtil.date(properties.getLastModified()).toLocalDateTime());
                         try {
                             info.setMetadata(BeanUtil.beanToMap(properties, false, true));
                         } catch (Exception ignored) {
@@ -452,7 +452,7 @@ public class AzureBlobStorageFileStorage implements FileStorage {
             info.setContentDisposition(file.getContentDisposition());
             info.setContentType(file.getContentType());
             info.setContentMd5(Base64.encode(file.getContentMd5()));
-            info.setLastModified(DateUtil.date(file.getLastModified()));
+            info.setLastModified(DateUtil.date(file.getLastModified()).toLocalDateTime());
             try {
                 info.setMetadata(BeanUtil.beanToMap(
                         ReflectUtil.getFieldValue(ReflectUtil.getFieldValue(file, "internalProperties"), "headers"),
@@ -608,7 +608,7 @@ public class AzureBlobStorageFileStorage implements FileStorage {
 
     @Override
     public void downloadTh(FileInfo fileInfo, Consumer<InputStream> consumer) {
-        Check.downloadThBlankThFilename(platform, fileInfo);
+        ExceptionCheck.downloadThBlankThFilename(platform, fileInfo);
         BlobClient blobClient = getBlobClient(getThFileKey(fileInfo));
         try (InputStream in = blobClient.openInputStream()) {
             consumer.accept(in);
@@ -715,8 +715,8 @@ public class AzureBlobStorageFileStorage implements FileStorage {
 
     @Override
     public void sameCopy(FileInfo srcFileInfo, FileInfo destFileInfo, CopyPretreatment pre) {
-        Check.sameCopyNotSupportAcl(platform, srcFileInfo, destFileInfo, pre);
-        Check.sameCopyBasePath(platform, basePath, srcFileInfo, destFileInfo);
+        ExceptionCheck.sameCopyNotSupportAcl(platform, srcFileInfo, destFileInfo, pre);
+        ExceptionCheck.sameCopyBasePath(platform, basePath, srcFileInfo, destFileInfo);
         // 获取远程文件信息
         String destFileKey = getFileKey(destFileInfo);
         String destThFileKey = getThFileKey(destFileInfo);

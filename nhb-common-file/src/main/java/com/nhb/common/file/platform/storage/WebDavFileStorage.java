@@ -7,7 +7,7 @@ import com.github.sardine.Sardine;
 import com.github.sardine.impl.SardineException;
 import com.nhb.common.file.core.*;
 import com.nhb.common.file.pretreatment.CopyPretreatment;
-import com.nhb.common.file.exception.Check;
+import com.nhb.common.file.exception.ExceptionCheck;
 import com.nhb.common.file.exception.ExceptionFactory;
 import com.nhb.common.file.core.ProgressListener;
 import com.nhb.common.file.pretreatment.MovePretreatment;
@@ -23,6 +23,7 @@ import lombok.Setter;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.ZoneId;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
@@ -95,8 +96,8 @@ public class WebDavFileStorage implements FileStorage {
         fileInfo.setBasePath(basePath);
         String newFileKey = getFileKey(fileInfo);
         fileInfo.setUrl(domain + newFileKey);
-        Check.uploadNotSupportAcl(platform, fileInfo, pre);
-        Check.uploadNotSupportMetadata(platform, fileInfo, pre);
+        ExceptionCheck.uploadNotSupportAcl(platform, fileInfo, pre);
+        ExceptionCheck.uploadNotSupportMetadata(platform, fileInfo, pre);
 
         Sardine client = getClient();
         try (InputStreamPlus in = pre.getInputStreamPlus()) {
@@ -169,7 +170,10 @@ public class WebDavFileStorage implements FileStorage {
                         info.setExt(FileNameUtil.extName(info.getFilename()));
                         info.setETag(item.getEtag());
                         info.setContentType(item.getContentType());
-                        info.setLastModified(item.getModified());
+                        info.setLastModified(item.getModified()
+                                .toInstant()
+                                .atZone(ZoneId.systemDefault())
+                                .toLocalDateTime());
                         info.setOriginal(item);
                         return info;
                     })
@@ -211,7 +215,10 @@ public class WebDavFileStorage implements FileStorage {
             info.setExt(FileNameUtil.extName(info.getFilename()));
             info.setETag(file.getEtag());
             info.setContentType(file.getContentType());
-            info.setLastModified(file.getModified());
+            info.setLastModified(file.getModified()
+                    .toInstant()
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDateTime());
             info.setOriginal(file);
             return info;
         } catch (Exception e) {
@@ -261,7 +268,7 @@ public class WebDavFileStorage implements FileStorage {
 
     @Override
     public void downloadTh(FileInfo fileInfo, Consumer<InputStream> consumer) {
-        Check.downloadThBlankThFilename(platform, fileInfo);
+        ExceptionCheck.downloadThBlankThFilename(platform, fileInfo);
 
         try (InputStream in = getClient().get(getUrl(getThFileKey(fileInfo)))) {
             consumer.accept(in);
@@ -277,9 +284,9 @@ public class WebDavFileStorage implements FileStorage {
 
     @Override
     public void sameCopy(FileInfo srcFileInfo, FileInfo destFileInfo, CopyPretreatment pre) {
-        Check.sameCopyNotSupportAcl(platform, srcFileInfo, destFileInfo, pre);
-        Check.sameCopyNotSupportMetadata(platform, srcFileInfo, destFileInfo, pre);
-        Check.sameCopyBasePath(platform, basePath, srcFileInfo, destFileInfo);
+        ExceptionCheck.sameCopyNotSupportAcl(platform, srcFileInfo, destFileInfo, pre);
+        ExceptionCheck.sameCopyNotSupportMetadata(platform, srcFileInfo, destFileInfo, pre);
+        ExceptionCheck.sameCopyBasePath(platform, basePath, srcFileInfo, destFileInfo);
 
         Sardine client = getClient();
 
@@ -340,9 +347,9 @@ public class WebDavFileStorage implements FileStorage {
 
     @Override
     public void sameMove(FileInfo srcFileInfo, FileInfo destFileInfo, MovePretreatment pre) {
-        Check.sameMoveNotSupportAcl(platform, srcFileInfo, destFileInfo, pre);
-        Check.sameMoveNotSupportMetadata(platform, srcFileInfo, destFileInfo, pre);
-        Check.sameMoveBasePath(platform, basePath, srcFileInfo, destFileInfo);
+        ExceptionCheck.sameMoveNotSupportAcl(platform, srcFileInfo, destFileInfo, pre);
+        ExceptionCheck.sameMoveNotSupportMetadata(platform, srcFileInfo, destFileInfo, pre);
+        ExceptionCheck.sameMoveBasePath(platform, basePath, srcFileInfo, destFileInfo);
 
         Sardine client = getClient();
 

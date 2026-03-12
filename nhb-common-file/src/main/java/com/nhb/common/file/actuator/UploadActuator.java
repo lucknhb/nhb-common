@@ -9,11 +9,11 @@ import com.nhb.common.file.core.FileInfo;
 import com.nhb.common.file.core.FileStorageService;
 import com.nhb.common.file.exception.FileStorageException;
 import com.nhb.common.file.platform.FileStorage;
-import com.nhb.common.file.recorder.FileRecorder;
 import com.nhb.common.file.pretreatment.UploadPretreatment;
+import com.nhb.common.file.recorder.FileRecorder;
 import com.nhb.common.file.wrapper.FileWrapper;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -48,15 +48,18 @@ public class UploadActuator {
      * 上传文件，成功返回文件信息，失败返回 null
      */
     public FileInfo execute(FileStorage fileStorage, FileRecorder fileRecorder, List<FileStorageAspect> aspectList) {
-        if (fileStorage == null)
-            throw new FileStorageException(StrUtil.format("没有找到对应的存储平台！platform:{}", pre.getPlatform()));
-
+        if (fileStorage == null) {
+            throw new FileStorageException(StrUtil.format("没有找到对应的存储平台！Platform:{}", pre.getPlatform()));
+        }
         FileWrapper file = pre.getFileWrapper();
-        if (file == null) throw new FileStorageException("文件不允许为 null ！");
-        if (pre.getPlatform() == null) throw new FileStorageException("platform 不允许为 null ！");
-
+        if (file == null) {
+            throw new FileStorageException("文件不允许为 null ！");
+        }
+        if (pre.getPlatform() == null) {
+            throw new FileStorageException("platform 不允许为 null ！");
+        }
         FileInfo fileInfo = new FileInfo();
-        fileInfo.setCreateTime(new Date());
+        fileInfo.setCreateTime(LocalDateTime.now());
         fileInfo.setSize(file.getSize());
         fileInfo.setOriginalFileName(file.getName());
         fileInfo.setExt(FileNameUtil.getSuffix(file.getName()));
@@ -74,8 +77,7 @@ public class UploadActuator {
         if (StrUtil.isNotBlank(pre.getSaveFileName())) {
             fileInfo.setFileName(pre.getSaveFileName());
         } else {
-            fileInfo.setFileName(
-                    IdUtil.objectId() + (StrUtil.isEmpty(fileInfo.getExt()) ? StrUtil.EMPTY : "." + fileInfo.getExt()));
+            fileInfo.setFileName(IdUtil.objectId() + (StrUtil.isEmpty(fileInfo.getExt()) ? StrUtil.EMPTY : "." + fileInfo.getExt()));
         }
         fileInfo.setContentType(file.getContentType());
 
@@ -90,8 +92,8 @@ public class UploadActuator {
             if (StrUtil.isNotBlank(pre.getThumbnailContentType())) {
                 fileInfo.setThumbnailContentType(pre.getThumbnailContentType());
             } else {
-                fileInfo.setThumbnailContentType(
-                        fileStorageService.getContentTypeDetect().detect(thumbnailBytes, fileInfo.getThumbnailFileName()));
+                fileInfo.setThumbnailContentType(fileStorageService.getContentTypeDetect()
+                        .detect(thumbnailBytes, fileInfo.getThumbnailFileName()));
             }
         }
 

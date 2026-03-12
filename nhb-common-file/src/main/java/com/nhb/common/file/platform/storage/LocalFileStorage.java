@@ -7,7 +7,7 @@ import cn.hutool.core.io.file.FileNameUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import com.nhb.common.file.core.*;
-import com.nhb.common.file.exception.Check;
+import com.nhb.common.file.exception.ExceptionCheck;
 import com.nhb.common.file.exception.ExceptionFactory;
 import com.nhb.common.file.platform.FileStorage;
 import com.nhb.common.file.pretreatment.*;
@@ -19,6 +19,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.StandardCopyOption;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
@@ -60,8 +63,8 @@ public class LocalFileStorage implements FileStorage {
         fileInfo.setBasePath(basePath);
         String newFileKey = getFileKey(fileInfo);
         fileInfo.setUrl(domain + newFileKey);
-        Check.uploadNotSupportAcl(platform, fileInfo, pre);
-        Check.uploadNotSupportMetadata(platform, fileInfo, pre);
+        ExceptionCheck.uploadNotSupportAcl(platform, fileInfo, pre);
+        ExceptionCheck.uploadNotSupportMetadata(platform, fileInfo, pre);
 
         try {
             File newFile = FileUtil.touch(getAbsolutePath(newFileKey));
@@ -104,8 +107,8 @@ public class LocalFileStorage implements FileStorage {
         fileInfo.setBasePath(basePath);
         String newFileKey = getFileKey(fileInfo);
         fileInfo.setUrl(domain + newFileKey);
-        Check.uploadNotSupportAcl(platform, fileInfo, pre);
-        Check.uploadNotSupportMetadata(platform, fileInfo, pre);
+        ExceptionCheck.uploadNotSupportAcl(platform, fileInfo, pre);
+        ExceptionCheck.uploadNotSupportMetadata(platform, fileInfo, pre);
         try {
             String uploadId = IdUtil.objectId();
             String parent = FileUtil.file(getAbsolutePath(newFileKey)).getParent();
@@ -298,7 +301,8 @@ public class LocalFileStorage implements FileStorage {
                         info.setUrl(domain + getFileKey(new FileInfo(basePath, info.getPath(), info.getFilename())));
                         info.setSize(item.length());
                         info.setExt(FileNameUtil.extName(info.getFilename()));
-                        info.setLastModified(new Date(item.lastModified()));
+                        Instant instant = Instant.ofEpochMilli(item.lastModified());
+                        info.setLastModified(LocalDateTime.ofInstant(instant, ZoneId.systemDefault()));
                         info.setOriginal(item);
                         return info;
                     })
@@ -322,8 +326,12 @@ public class LocalFileStorage implements FileStorage {
         String fileKey = getFileKey(new FileInfo(basePath, pre.getPath(), pre.getFilename()));
         try {
             File file = new File(getAbsolutePath(fileKey));
-            if (!file.exists()) return null;
-            if (!file.isFile()) return null;
+            if (!file.exists()) {
+                return null;
+            }
+            if (!file.isFile()) {
+                return null;
+            }
             RemoteFileInfo info = new RemoteFileInfo();
             info.setPlatform(pre.getPlatform());
             info.setBasePath(basePath);
@@ -332,7 +340,8 @@ public class LocalFileStorage implements FileStorage {
             info.setUrl(domain + fileKey);
             info.setSize(file.length());
             info.setExt(FileNameUtil.extName(info.getFilename()));
-            info.setLastModified(new Date(file.lastModified()));
+            Instant instant = Instant.ofEpochMilli(file.lastModified());
+            info.setLastModified(LocalDateTime.ofInstant(instant, ZoneId.systemDefault()));
             info.setOriginal(file);
             return info;
         } catch (Exception e) {
@@ -372,7 +381,7 @@ public class LocalFileStorage implements FileStorage {
 
     @Override
     public void downloadTh(FileInfo fileInfo, Consumer<InputStream> consumer) {
-        Check.downloadThBlankThFilename(platform, fileInfo);
+        ExceptionCheck.downloadThBlankThFilename(platform, fileInfo);
 
         try (InputStream in = FileUtil.getInputStream(getAbsolutePath(getThFileKey(fileInfo)))) {
             consumer.accept(in);
@@ -388,9 +397,9 @@ public class LocalFileStorage implements FileStorage {
 
     @Override
     public void sameCopy(FileInfo srcFileInfo, FileInfo destFileInfo, CopyPretreatment pre) {
-        Check.sameCopyNotSupportAcl(platform, srcFileInfo, destFileInfo, pre);
-        Check.sameCopyNotSupportMetadata(platform, srcFileInfo, destFileInfo, pre);
-        Check.sameCopyBasePath(platform, basePath, srcFileInfo, destFileInfo);
+        ExceptionCheck.sameCopyNotSupportAcl(platform, srcFileInfo, destFileInfo, pre);
+        ExceptionCheck.sameCopyNotSupportMetadata(platform, srcFileInfo, destFileInfo, pre);
+        ExceptionCheck.sameCopyBasePath(platform, basePath, srcFileInfo, destFileInfo);
 
         File srcFile = new File(getAbsolutePath(getFileKey(srcFileInfo)));
         if (!srcFile.exists()) {
@@ -448,9 +457,9 @@ public class LocalFileStorage implements FileStorage {
 
     @Override
     public void sameMove(FileInfo srcFileInfo, FileInfo destFileInfo, MovePretreatment pre) {
-        Check.sameMoveNotSupportAcl(platform, srcFileInfo, destFileInfo, pre);
-        Check.sameMoveNotSupportMetadata(platform, srcFileInfo, destFileInfo, pre);
-        Check.sameMoveBasePath(platform, basePath, srcFileInfo, destFileInfo);
+        ExceptionCheck.sameMoveNotSupportAcl(platform, srcFileInfo, destFileInfo, pre);
+        ExceptionCheck.sameMoveNotSupportMetadata(platform, srcFileInfo, destFileInfo, pre);
+        ExceptionCheck.sameMoveBasePath(platform, basePath, srcFileInfo, destFileInfo);
 
         File srcFile = new File(getAbsolutePath(getFileKey(srcFileInfo)));
         if (!srcFile.exists()) {

@@ -10,10 +10,10 @@ import com.nhb.common.file.core.FileInfo;
 import com.nhb.common.file.core.FileStorageService;
 import com.nhb.common.file.exception.ExceptionFactory;
 import com.nhb.common.file.platform.FileStorage;
-import com.nhb.common.file.recorder.FileRecorder;
 import com.nhb.common.file.pretreatment.InitiateMultipartUploadPretreatment;
+import com.nhb.common.file.recorder.FileRecorder;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -37,7 +37,7 @@ public class InitiateMultipartUploadActuator {
     public FileInfo execute() {
         FileStorage fileStorage = fileStorageService.getFileStorageVerify(pre.getPlatform());
         FileInfo fileInfo = new FileInfo();
-        fileInfo.setCreateTime(new Date());
+        fileInfo.setCreateTime(LocalDateTime.now());
         fileInfo.setSize(pre.getSize());
         fileInfo.setOriginalFileName(pre.getOriginalFilename());
         fileInfo.setExt(FileNameUtil.getSuffix(pre.getOriginalFilename()));

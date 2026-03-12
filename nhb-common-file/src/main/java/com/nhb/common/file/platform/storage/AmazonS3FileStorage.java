@@ -11,7 +11,7 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.*;
 import com.nhb.common.file.core.*;
 import com.nhb.common.file.core.ProgressListener;
-import com.nhb.common.file.exception.Check;
+import com.nhb.common.file.exception.ExceptionCheck;
 import com.nhb.common.file.exception.ExceptionFactory;
 import com.nhb.common.file.platform.FileStorage;
 import com.nhb.common.file.platform.FileStorageClientFactory;
@@ -26,6 +26,7 @@ import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.URL;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
@@ -320,7 +321,9 @@ public class AmazonS3FileStorage implements FileStorage {
                         info.setSize(item.getSize());
                         info.setExt(FileNameUtil.extName(info.getFilename()));
                         info.setETag(item.getETag());
-                        info.setLastModified(item.getLastModified());
+                        info.setLastModified(item.getLastModified().toInstant()
+                                .atZone(ZoneId.systemDefault())
+                                .toLocalDateTime());
                         info.setOriginal(item);
                         return info;
                     })
@@ -367,7 +370,9 @@ public class AmazonS3FileStorage implements FileStorage {
             info.setContentDisposition(metadata.getContentDisposition());
             info.setContentType(metadata.getContentType());
             info.setContentMd5(metadata.getContentMD5());
-            info.setLastModified(metadata.getLastModified());
+            info.setLastModified(metadata.getLastModified().toInstant()
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDateTime());
             if (metadata.getRawMetadata() != null) info.setMetadata(new HashMap<>(metadata.getRawMetadata()));
             if (metadata.getUserMetadata() != null) info.setUserMetadata(new HashMap<>(metadata.getUserMetadata()));
             info.setOriginal(file);
@@ -526,7 +531,7 @@ public class AmazonS3FileStorage implements FileStorage {
 
     @Override
     public void downloadTh(FileInfo fileInfo, Consumer<InputStream> consumer) {
-        Check.downloadThBlankThFilename(platform, fileInfo);
+        ExceptionCheck.downloadThBlankThFilename(platform, fileInfo);
 
         try (S3Object object = getClient().getObject(bucketName, getThFileKey(fileInfo));
                 InputStream in = object.getObjectContent()) {
@@ -543,7 +548,7 @@ public class AmazonS3FileStorage implements FileStorage {
 
     @Override
     public void sameCopy(FileInfo srcFileInfo, FileInfo destFileInfo, CopyPretreatment pre) {
-        Check.sameCopyBasePath(platform, basePath, srcFileInfo, destFileInfo);
+        ExceptionCheck.sameCopyBasePath(platform, basePath, srcFileInfo, destFileInfo);
 
         AmazonS3 client = getClient();
 

@@ -11,7 +11,7 @@ import cn.hutool.core.util.CharUtil;
 import cn.hutool.core.util.StrUtil;
 import com.nhb.common.file.constant.FileStorageConstants;
 import com.nhb.common.file.core.*;
-import com.nhb.common.file.exception.Check;
+import com.nhb.common.file.exception.ExceptionCheck;
 import com.nhb.common.file.exception.ExceptionFactory;
 import com.nhb.common.file.platform.FileStorage;
 import com.nhb.common.file.platform.FileStorageClientFactory;
@@ -34,6 +34,7 @@ import software.amazon.awssdk.services.s3.presigner.model.*;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.time.Duration;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
@@ -364,7 +365,9 @@ public class AmazonS3V2FileStorage implements FileStorage {
                         info.setSize(item.size());
                         info.setExt(FileNameUtil.extName(info.getFilename()));
                         info.setETag(item.eTag());
-                        info.setLastModified(Date.from(item.lastModified()));
+                        info.setLastModified(item.lastModified()
+                                .atZone(ZoneId.systemDefault())
+                                .toLocalDateTime());
                         info.setOriginal(item);
                         return info;
                     })
@@ -414,7 +417,9 @@ public class AmazonS3V2FileStorage implements FileStorage {
             info.setContentDisposition(file.contentDisposition());
             info.setContentType(file.contentType());
             info.setContentMd5(headersProxy.getStr(FileStorageConstants.Metadata.CONTENT_MD5));
-            info.setLastModified(Date.from(file.lastModified()));
+            info.setLastModified(file.lastModified()
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDateTime());
             info.setMetadata(headers.entrySet().stream()
                     .filter(e -> !e.getKey().startsWith("x-amz-meta-"))
                     .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
@@ -727,7 +732,7 @@ public class AmazonS3V2FileStorage implements FileStorage {
 
     @Override
     public void downloadTh(FileInfo fileInfo, Consumer<InputStream> consumer) {
-        Check.downloadThBlankThFilename(platform, fileInfo);
+        ExceptionCheck.downloadThBlankThFilename(platform, fileInfo);
 
         S3Client client = getClient().getClient();
         try {
@@ -752,7 +757,7 @@ public class AmazonS3V2FileStorage implements FileStorage {
 
     @Override
     public void sameCopy(FileInfo srcFileInfo, FileInfo destFileInfo, CopyPretreatment pre) {
-        Check.sameCopyBasePath(platform, basePath, srcFileInfo, destFileInfo);
+        ExceptionCheck.sameCopyBasePath(platform, basePath, srcFileInfo, destFileInfo);
 
         S3Client client = getClient().getClient();
 

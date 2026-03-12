@@ -9,7 +9,7 @@ import cn.hutool.core.util.StrUtil;
 import com.google.common.collect.Multimap;
 import com.nhb.common.file.constant.FileStorageConstants;
 import com.nhb.common.file.core.*;
-import com.nhb.common.file.exception.Check;
+import com.nhb.common.file.exception.ExceptionCheck;
 import com.nhb.common.file.exception.ExceptionFactory;
 import com.nhb.common.file.platform.FileStorage;
 import com.nhb.common.file.platform.FileStorageClientFactory;
@@ -80,7 +80,7 @@ public class MinioFileStorage implements FileStorage {
         fileInfo.setBasePath(basePath);
         String newFileKey = getFileKey(fileInfo);
         fileInfo.setUrl(domain + newFileKey);
-        Check.uploadNotSupportAcl(platform, fileInfo, pre);
+        ExceptionCheck.uploadNotSupportAcl(platform, fileInfo, pre);
         MinioClient client = getClient();
         try (InputStreamPlus in = pre.getInputStreamPlus()) {
             // MinIO 的 SDK 内部会自动分片上传
@@ -110,7 +110,6 @@ public class MinioFileStorage implements FileStorage {
                         .userMetadata(fileInfo.getThumbnailUserMetadata())
                         .build());
             }
-
             return true;
         } catch (Exception e) {
             try {
@@ -119,6 +118,7 @@ public class MinioFileStorage implements FileStorage {
                         .object(newFileKey)
                         .build());
             } catch (Exception ignored) {
+
             }
             throw ExceptionFactory.upload(fileInfo, platform, e);
         }
@@ -160,7 +160,7 @@ public class MinioFileStorage implements FileStorage {
         fileInfo.setBasePath(basePath);
         String newFileKey = getFileKey(fileInfo);
         fileInfo.setUrl(domain + newFileKey);
-        Check.uploadNotSupportAcl(platform, fileInfo, pre);
+        ExceptionCheck.uploadNotSupportAcl(platform, fileInfo, pre);
         MinioClient client = getClient();
         try {
             PutObjectArgs.Builder builder =
@@ -449,7 +449,7 @@ public class MinioFileStorage implements FileStorage {
                         info.setSize(item.size());
                         info.setExt(FileNameUtil.extName(info.getFilename()));
                         info.setETag(item.etag());
-                        info.setLastModified(DateUtil.date(item.lastModified()));
+                        info.setLastModified(item.lastModified().toLocalDateTime());
                         info.setOriginal(item);
                         return info;
                     })
@@ -501,7 +501,7 @@ public class MinioFileStorage implements FileStorage {
             info.setContentDisposition(headersProxy.getStr(FileStorageConstants.Metadata.CONTENT_DISPOSITION));
             info.setContentType(file.contentType());
             info.setContentMd5(headersProxy.getStr(FileStorageConstants.Metadata.CONTENT_MD5));
-            info.setLastModified(DateUtil.date(file.lastModified()));
+            info.setLastModified(file.lastModified().toLocalDateTime());
             info.setMetadata(headers.entrySet().stream()
                     .filter(e -> !e.getKey().startsWith("x-amz-meta-"))
                     .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
@@ -607,7 +607,7 @@ public class MinioFileStorage implements FileStorage {
 
     @Override
     public void downloadTh(FileInfo fileInfo, Consumer<InputStream> consumer) {
-        Check.downloadThBlankThFilename(platform, fileInfo);
+        ExceptionCheck.downloadThBlankThFilename(platform, fileInfo);
 
         MinioClient client = getClient();
         try (InputStream in = client.getObject(GetObjectArgs.builder()
@@ -627,8 +627,8 @@ public class MinioFileStorage implements FileStorage {
 
     @Override
     public void sameCopy(FileInfo srcFileInfo, FileInfo destFileInfo, CopyPretreatment pre) {
-        Check.sameCopyNotSupportAcl(platform, srcFileInfo, destFileInfo, pre);
-        Check.sameCopyBasePath(platform, basePath, srcFileInfo, destFileInfo);
+        ExceptionCheck.sameCopyNotSupportAcl(platform, srcFileInfo, destFileInfo, pre);
+        ExceptionCheck.sameCopyBasePath(platform, basePath, srcFileInfo, destFileInfo);
         MinioClient client = getClient();
 
         // 获取远程文件信息

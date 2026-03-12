@@ -7,7 +7,7 @@ import com.mongodb.client.gridfs.model.GridFSFile;
 import com.mongodb.client.gridfs.model.GridFSUploadOptions;
 import com.mongodb.client.model.Filters;
 import com.nhb.common.file.core.*;
-import com.nhb.common.file.exception.Check;
+import com.nhb.common.file.exception.ExceptionCheck;
 import com.nhb.common.file.exception.ExceptionFactory;
 import com.nhb.common.file.platform.FileStorage;
 import com.nhb.common.file.platform.FileStorageClientFactory;
@@ -28,6 +28,7 @@ import org.bson.types.ObjectId;
 import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -73,7 +74,7 @@ public class MongoGridFsFileStorage implements FileStorage {
         fileInfo.setBasePath(basePath);
         String newFileKey = getFileKey(fileInfo);
         fileInfo.setUrl(domain + newFileKey);
-        Check.uploadNotSupportAcl(platform, fileInfo, pre);
+        ExceptionCheck.uploadNotSupportAcl(platform, fileInfo, pre);
         Document metadata = getObjectMetadata(fileInfo);
         GridFSBucket gridFsBucket = getClient().getGridFsBucket();
         ObjectId objectId = null;
@@ -173,7 +174,10 @@ public class MongoGridFsFileStorage implements FileStorage {
                         info.setUrl(domain + getFileKey(new FileInfo(basePath, info.getPath(), info.getFilename())));
                         info.setSize(item.getLength());
                         info.setExt(FileNameUtil.extName(info.getFilename()));
-                        info.setLastModified(item.getUploadDate());
+                        info.setLastModified(item.getUploadDate()
+                                .toInstant()
+                                .atZone(ZoneId.systemDefault())
+                                .toLocalDateTime());
                         Document metadata = item.getMetadata();
                         info.setMetadata(ToolUtil.stream(
                                 metadata, s -> s.filter(e -> !e.getKey().startsWith("x-amz-meta-"))));
@@ -217,7 +221,10 @@ public class MongoGridFsFileStorage implements FileStorage {
             info.setUrl(domain + fileKey);
             info.setSize(file.getLength());
             info.setExt(FileNameUtil.extName(info.getFilename()));
-            info.setLastModified(file.getUploadDate());
+            info.setLastModified(file.getUploadDate()
+                    .toInstant()
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDateTime());
             Document metadata = file.getMetadata();
             if (metadata != null) {
                 info.setMetadata(
@@ -305,7 +312,7 @@ public class MongoGridFsFileStorage implements FileStorage {
 
     @Override
     public void downloadTh(FileInfo fileInfo, Consumer<InputStream> consumer) {
-        Check.downloadThBlankThFilename(platform, fileInfo);
+        ExceptionCheck.downloadThBlankThFilename(platform, fileInfo);
         try (InputStream in = getClient().getGridFsBucket().openDownloadStream(getThFileKey(fileInfo))) {
             consumer.accept(in);
         } catch (Exception e) {
@@ -320,8 +327,8 @@ public class MongoGridFsFileStorage implements FileStorage {
 
     @Override
     public void sameMove(FileInfo srcFileInfo, FileInfo destFileInfo, MovePretreatment pre) {
-        Check.sameMoveNotSupportAcl(platform, srcFileInfo, destFileInfo, pre);
-        Check.sameMoveBasePath(platform, basePath, srcFileInfo, destFileInfo);
+        ExceptionCheck.sameMoveNotSupportAcl(platform, srcFileInfo, destFileInfo, pre);
+        ExceptionCheck.sameMoveBasePath(platform, basePath, srcFileInfo, destFileInfo);
         GridFSBucket gridFsBucket = getClient().getGridFsBucket();
 
         // 获取远程文件信息

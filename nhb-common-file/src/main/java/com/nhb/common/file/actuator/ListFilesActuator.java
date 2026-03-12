@@ -4,7 +4,7 @@ package com.nhb.common.file.actuator;
 import com.nhb.common.file.aspect.FileStorageAspect;
 import com.nhb.common.file.aspect.chain.ListFilesAspectChain;
 import com.nhb.common.file.core.FileStorageService;
-import com.nhb.common.file.exception.Check;
+import com.nhb.common.file.exception.ExceptionCheck;
 import com.nhb.common.file.pretreatment.ListFilesPretreatment;
 import com.nhb.common.file.core.ListFilesResult;
 import com.nhb.common.file.core.ListFilesSupportInfo;
@@ -41,7 +41,7 @@ public class ListFilesActuator {
      * 执行列举文件
      */
     public ListFilesResult execute(FileStorage fileStorage, List<FileStorageAspect> aspectList) {
-        Check.listFiles(pre);
+        ExceptionCheck.listFiles(pre);
         return new ListFilesAspectChain(aspectList, (_pre, _fileStorage) -> {
                     _pre = new ListFilesPretreatment(_pre);
                     ListFilesSupportInfo supportInfo = fileStorageService.isSupportListFiles(_fileStorage);

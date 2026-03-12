@@ -24,8 +24,7 @@ public class HttpServletRequestFileWrapper implements FileWrapper {
     private Long size;
     private MultipartFormDataReader.MultipartFormData multipartFormData;
 
-    public HttpServletRequestFileWrapper(
-            InputStream inputStream, String name, String contentType, Long size, MultipartFormDataReader.MultipartFormData multipartFormData) {
+    public HttpServletRequestFileWrapper(InputStream inputStream, String name, String contentType, Long size, MultipartFormDataReader.MultipartFormData multipartFormData) {
         this.name = name;
         this.contentType = contentType;
         this.inputStream = IoUtil.toMarkSupportStream(inputStream);

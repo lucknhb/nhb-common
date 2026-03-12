@@ -11,11 +11,11 @@ import com.nhb.common.file.core.FileInfo;
 import com.nhb.common.file.core.FileStorageService;
 import com.nhb.common.file.exception.FileStorageException;
 import com.nhb.common.file.hash.HashInfo;
-import com.nhb.common.file.pretreatment.MovePretreatment;
 import com.nhb.common.file.platform.FileStorage;
+import com.nhb.common.file.pretreatment.MovePretreatment;
 import com.nhb.common.file.recorder.FileRecorder;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -140,7 +140,7 @@ public class MoveActuator {
         }
         destFileInfo.setFileAcl(srcFileInfo.getFileAcl());
         destFileInfo.setThumbnailFileAcl(srcFileInfo.getThumbnailFileAcl());
-        destFileInfo.setCreateTime(new Date());
+        destFileInfo.setCreateTime(LocalDateTime.now());
 
         return new SameMoveAspectChain(aspectList, (_srcFileInfo, _destFileInfo, _pre, _fileStorage, _fileRecorder) -> {
                     _fileStorage.sameMove(_srcFileInfo, _destFileInfo, _pre);
@@ -150,7 +150,6 @@ public class MoveActuator {
                     if (!fileStorageService.delete(_srcFileInfo, _fileStorage, _fileRecorder, aspectList)) {
                         throw new FileStorageException("移动文件失败，源文件删除失败");
                     }
-
                     return _destFileInfo;
                 })
                 .next(srcFileInfo, destFileInfo, pre, fileStorage, fileRecorder);

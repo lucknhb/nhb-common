@@ -18,7 +18,7 @@ import com.google.cloud.storage.Storage.PredefinedAcl;
 import com.google.cloud.storage.Storage.SignUrlOption;
 import com.nhb.common.file.constant.FileStorageConstants;
 import com.nhb.common.file.core.*;
-import com.nhb.common.file.exception.Check;
+import com.nhb.common.file.exception.ExceptionCheck;
 import com.nhb.common.file.exception.ExceptionFactory;
 import com.nhb.common.file.exception.FileStorageException;
 import com.nhb.common.file.platform.FileStorage;
@@ -345,7 +345,7 @@ public class GoogleCloudStorageFileStorage implements FileStorage {
                         info.setContentDisposition(item.getContentDisposition());
                         info.setContentType(item.getContentType());
                         info.setContentMd5(item.getMd5());
-                        info.setLastModified(DateUtil.date(item.getUpdateTimeOffsetDateTime()));
+                        info.setLastModified(DateUtil.date(item.getUpdateTimeOffsetDateTime()).toLocalDateTime());
                         HashMap<String, Object> metadata = new HashMap<>();
                         if (item.getContentType() != null)
                             metadata.put(FileStorageConstants.Metadata.CONTENT_TYPE, item.getContentType());
@@ -408,7 +408,7 @@ public class GoogleCloudStorageFileStorage implements FileStorage {
             info.setContentDisposition(file.getContentDisposition());
             info.setContentType(file.getContentType());
             info.setContentMd5(file.getMd5());
-            info.setLastModified(DateUtil.date(file.getUpdateTimeOffsetDateTime()));
+            info.setLastModified(DateUtil.date(file.getUpdateTimeOffsetDateTime()).toLocalDateTime());
             HashMap<String, Object> metadata = new HashMap<>();
             if (file.getContentType() != null) metadata.put(FileStorageConstants.Metadata.CONTENT_TYPE, file.getContentType());
             if (file.getContentEncoding() != null)
@@ -716,7 +716,7 @@ public class GoogleCloudStorageFileStorage implements FileStorage {
 
     @Override
     public void sameCopy(FileInfo srcFileInfo, FileInfo destFileInfo, CopyPretreatment pre) {
-        Check.sameCopyBasePath(platform, basePath, srcFileInfo, destFileInfo);
+        ExceptionCheck.sameCopyBasePath(platform, basePath, srcFileInfo, destFileInfo);
 
         Storage client = getClient();
 

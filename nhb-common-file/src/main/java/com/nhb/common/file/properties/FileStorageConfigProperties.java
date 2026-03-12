@@ -178,20 +178,27 @@ public class FileStorageConfigProperties {
         properties.setTencentCos(tencentCos.stream()
                 .filter(TencentCosConfigProperties::getEnableStorage)
                 .collect(Collectors.toList()));
-        properties.setBaiduBos(
-                baiduBos.stream().filter(BaiduBosConfigProperties::getEnableStorage).collect(Collectors.toList()));
-        properties.setMinio(
-                minio.stream().filter(MinioConfigProperties::getEnableStorage).collect(Collectors.toList()));
-        properties.setAmazonS3(
-                amazonS3.stream().filter(SpringAmazonS3Config::getEnableStorage).collect(Collectors.toList()));
+        properties.setBaiduBos(baiduBos.stream()
+                 .filter(BaiduBosConfigProperties::getEnableStorage)
+                .collect(Collectors.toList()));
+        properties.setMinio(minio.stream()
+                .filter(MinioConfigProperties::getEnableStorage)
+                .collect(Collectors.toList()));
+        properties.setAmazonS3(amazonS3.stream()
+                .filter(SpringAmazonS3Config::getEnableStorage)
+                .collect(Collectors.toList()));
         properties.setAmazonS3V2(amazonS3V2.stream()
                 .filter(AmazonS3V2ConfigProperties::getEnableStorage)
                 .collect(Collectors.toList()));
-        properties.setFtp(ftp.stream().filter(FtpConfigProperties::getEnableStorage).collect(Collectors.toList()));
-        properties.setSftp(
-                sftp.stream().filter(SftpConfigProperties::getEnableStorage).collect(Collectors.toList()));
-        properties.setWebdav(
-                webdav.stream().filter(SpringWebDavConfig::getEnableStorage).collect(Collectors.toList()));
+        properties.setFtp(ftp.stream()
+                .filter(FtpConfigProperties::getEnableStorage)
+                .collect(Collectors.toList()));
+        properties.setSftp(sftp.stream()
+                .filter(SftpConfigProperties::getEnableStorage)
+                .collect(Collectors.toList()));
+        properties.setWebdav(webdav.stream()
+                .filter(SpringWebDavConfig::getEnableStorage)
+                .collect(Collectors.toList()));
         properties.setGoogleCloudStorage(googleCloudStorage.stream()
                 .filter(GoogleCloudStorageConfigProperties::getEnableStorage)
                 .collect(Collectors.toList()));

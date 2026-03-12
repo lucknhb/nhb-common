@@ -3,7 +3,7 @@ package com.nhb.common.file.actuator;
 import com.nhb.common.file.aspect.FileStorageAspect;
 import com.nhb.common.file.aspect.chain.GeneratePresignedUrlAspectChain;
 import com.nhb.common.file.core.FileStorageService;
-import com.nhb.common.file.exception.Check;
+import com.nhb.common.file.exception.ExceptionCheck;
 import com.nhb.common.file.platform.FileStorage;
 import com.nhb.common.file.pretreatment.GeneratePresignedUrlPretreatment;
 import com.nhb.common.file.core.GeneratePresignedUrlResult;
@@ -37,12 +37,13 @@ public class GeneratePresignedUrlActuator {
      * 执行生成预签名 URL
      */
     public GeneratePresignedUrlResult execute(FileStorage fileStorage, List<FileStorageAspect> aspectList) {
-        Check.generatePresignedUrl(pre);
+        ExceptionCheck.generatePresignedUrl(pre);
         return new GeneratePresignedUrlAspectChain(aspectList, (_pre, _fileStorage) -> {
             GeneratePresignedUrlResult result = _fileStorage.generatePresignedUrl(_pre);
-            if (result.getHeaders() == null) result.setHeaders(new HashMap<>());
+            if (result.getHeaders() == null) {
+                result.setHeaders(new HashMap<>());
+            }
             return result;
-        })
-                .next(pre, fileStorage);
+        }).next(pre, fileStorage);
     }
 }

@@ -10,7 +10,7 @@ import cn.hutool.core.text.NamingCase;
 import cn.hutool.core.util.CharUtil;
 import cn.hutool.core.util.StrUtil;
 import com.nhb.common.file.core.*;
-import com.nhb.common.file.exception.Check;
+import com.nhb.common.file.exception.ExceptionCheck;
 import com.nhb.common.file.exception.ExceptionFactory;
 import com.nhb.common.file.platform.FileStorage;
 import com.nhb.common.file.platform.FileStorageClientFactory;
@@ -27,6 +27,7 @@ import lombok.Setter;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
@@ -351,7 +352,10 @@ public class VolcengineTosFileStorage implements FileStorage {
                             info.setSize(item.getSize());
                             info.setExt(FileNameUtil.extName(info.getFilename()));
                             info.setETag(item.getEtag());
-                            info.setLastModified(item.getLastModified());
+                            info.setLastModified(item.getLastModified()
+                                    .toInstant()
+                                    .atZone(ZoneId.systemDefault())
+                                    .toLocalDateTime());
                             info.setOriginal(item);
                             return info;
                         })
@@ -398,7 +402,7 @@ public class VolcengineTosFileStorage implements FileStorage {
             info.setContentDisposition(file.getContentDisposition());
             info.setContentType(file.getContentType());
             info.setContentMd5(file.getContentMD5());
-            info.setLastModified(DateUtil.parse(file.getLastModified()));
+            info.setLastModified(DateUtil.parse(file.getLastModified()).toLocalDateTime());
             info.setMetadata(file.getRequestInfo().getHeader().entrySet().stream()
                     .filter(e -> !e.getKey().startsWith("x-tos-meta-"))
                     .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
@@ -601,7 +605,7 @@ public class VolcengineTosFileStorage implements FileStorage {
 
     @Override
     public void downloadTh(FileInfo fileInfo, Consumer<InputStream> consumer) {
-        Check.downloadThBlankThFilename(platform, fileInfo);
+        ExceptionCheck.downloadThBlankThFilename(platform, fileInfo);
         try {
             try (GetObjectV2Output output = getClient()
                             .getObject(
@@ -621,7 +625,7 @@ public class VolcengineTosFileStorage implements FileStorage {
 
     @Override
     public void sameCopy(FileInfo srcFileInfo, FileInfo destFileInfo, CopyPretreatment pre) {
-        Check.sameCopyBasePath(platform, basePath, srcFileInfo, destFileInfo);
+        ExceptionCheck.sameCopyBasePath(platform, basePath, srcFileInfo, destFileInfo);
 
         TOSV2 client = getClient();
 

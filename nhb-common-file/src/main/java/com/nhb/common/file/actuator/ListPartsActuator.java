@@ -5,7 +5,7 @@ import com.nhb.common.file.aspect.FileStorageAspect;
 import com.nhb.common.file.aspect.chain.ListPartsAspectChain;
 import com.nhb.common.file.core.FilePartInfoList;
 import com.nhb.common.file.core.FileStorageService;
-import com.nhb.common.file.exception.Check;
+import com.nhb.common.file.exception.ExceptionCheck;
 import com.nhb.common.file.platform.FileStorage;
 import com.nhb.common.file.pretreatment.ListPartsPretreatment;
 import com.nhb.common.file.core.MultipartUploadSupportInfo;
@@ -41,7 +41,7 @@ public class ListPartsActuator {
      * 执行列举已上传的分片
      */
     public FilePartInfoList execute(FileStorage fileStorage, List<FileStorageAspect> aspectList) {
-        Check.listParts(pre.getFileInfo());
+        ExceptionCheck.listParts(pre.getFileInfo());
         return new ListPartsAspectChain(aspectList, (_pre, _fileStorage) -> {
                     MultipartUploadSupportInfo supportInfo = fileStorageService.isSupportMultipartUpload(_fileStorage);
 

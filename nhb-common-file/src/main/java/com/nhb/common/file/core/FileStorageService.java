@@ -43,22 +43,6 @@ public class FileStorageService {
     private ContentTypeDetect contentTypeDetect;
 
     /**
-     * 获取默认的存储平台，请使用 getProperties().getDefaultPlatform() 代替
-     */
-    @Deprecated
-    public String getDefaultPlatform() {
-        return properties.getDefaultPlatform();
-    }
-
-    /**
-     * 缩略图后缀，例如【.min.jpg】【.png】，请使用 getProperties().getThumbnailSuffix() 代替
-     */
-    @Deprecated
-    public String getThumbnailSuffix() {
-        return properties.getThumbnailSuffix();
-    }
-
-    /**
      * 获取默认的存储平台
      */
     public <T extends FileStorage> T getFileStorage() {
@@ -92,14 +76,6 @@ public class FileStorageService {
         if (fileStorage == null)
             throw new FileStorageException(StrUtil.format("没有找到对应的存储平台！platform:{}", platform));
         return fileStorage;
-    }
-
-    /**
-     * 上传文件，成功返回文件信息，失败返回 null，请使用 pre.upload() 代替
-     */
-    @Deprecated
-    public FileInfo upload(UploadPretreatment pre) {
-        return pre.upload();
     }
 
     /**
@@ -188,15 +164,15 @@ public class FileStorageService {
     /**
      * 获取缩略图文件下载器
      */
-    public Downloader downloadTh(FileInfo fileInfo) {
+    public Downloader downloadThumbnail(FileInfo fileInfo) {
         return new Downloader(fileInfo, aspectList, getFileStorageVerify(fileInfo), Downloader.TARGET_TH_FILE);
     }
 
     /**
      * 获取缩略图文件下载器
      */
-    public Downloader downloadTh(String url) {
-        return self.downloadTh(getFileInfoByUrl(url));
+    public Downloader downloadThumbnail(String url) {
+        return self.downloadThumbnail(getFileInfoByUrl(url));
     }
 
     /**
@@ -314,7 +290,7 @@ public class FileStorageService {
      * 设置缩略图文件的访问控制列表，一般情况下只有对象存储支持该功能
      * 详情见{@link FileInfo#setFileAcl}
      */
-    public boolean setThFileAcl(FileInfo fileInfo, Object acl) {
+    public boolean setThumbnailFileAcl(FileInfo fileInfo, Object acl) {
         if (fileInfo == null) return false;
         return new SetThFileAclAspectChain(
                         aspectList, (_fileInfo, _acl, _fileStorage) -> _fileStorage.setThFileAcl(_fileInfo, _acl))
@@ -552,7 +528,7 @@ public class FileStorageService {
      * @param fileInfo 文件信息
      * @return 远程文件信息
      */
-    public RemoteFileInfo getThFile(FileInfo fileInfo) {
+    public RemoteFileInfo getThumbnailFile(FileInfo fileInfo) {
         return getFile()
                 .setPlatform(fileInfo.getPlatform())
                 .setPath(fileInfo.getPath() != null, fileInfo.getPath())

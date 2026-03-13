@@ -86,6 +86,11 @@
             </dependency>
             <dependency>
                 <groupId>com.nhb</groupId>
+                <artifactId>nhb-common-rocketmq</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.nhb</groupId>
                 <artifactId>nhb-common-security</artifactId>
                 <version>${revision}</version>
             </dependency>

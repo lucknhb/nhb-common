@@ -29,6 +29,7 @@
         <module>nhb-common-nacos</module>
         <module>nhb-common-sse</module>
         <module>nhb-common-file</module>
+        <module>nhb-common-rocketmq</module>
     </modules>
 
     <properties>
@@ -39,6 +40,7 @@
         <sa-token.version>1.44.0</sa-token.version>
         <lock4j.version>2.2.7</lock4j.version>
         <xxl-job.version>3.3.2</xxl-job.version>
+        <rocketmq.version>5.4.0</rocketmq.version>
         <redisson.version>3.52.0</redisson.version>
         <hutool.version>5.8.43</hutool.version>
         <ip2region.version>3.3.4</ip2region.version>
@@ -129,6 +131,12 @@
                 <version>${sa-token.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <!--rocketmq 使用兼容4.X/5.X版本客户端 如果有高需求可考虑 rocketmq-client-Java仅支持5.X的grpc版本客户端-->
+            <dependency>
+                <groupId>org.apache.rocketmq</groupId>
+                <artifactId>rocketmq-client</artifactId>
+                <version>${rocketmq.version}</version>
             </dependency>
             <!--XXL_JOB-->
             <dependency>

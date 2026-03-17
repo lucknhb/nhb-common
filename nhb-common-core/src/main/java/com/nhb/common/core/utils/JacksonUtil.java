@@ -56,6 +56,22 @@ public class JacksonUtil {
     }
 
     /**
+     * 将对象转换为字节数组
+     * @param object  对象
+     * @return        字节数组
+     */
+    public static byte[] toByte(Object object) {
+        if (ObjectUtil.isNull(object)) {
+            return null;
+        }
+        try {
+            return OBJECT_MAPPER.writeValueAsBytes(object);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
      * 将JSON格式的字符串转换为指定类型的对象
      *
      * @param text  JSON格式的字符串

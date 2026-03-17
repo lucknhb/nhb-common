@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
  * @description: 自实现字符串工具类
  */
 @Slf4j
-public class StringUtil {
+public class StringUtil extends StringUtils{
     public static final String SEPARATOR = ",";
 
     /**

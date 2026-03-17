@@ -1,6 +1,6 @@
 package com.nhb.common.rocketmq.annotation;
 
-import org.apache.rocketmq.remoting.protocol.heartbeat.MessageModel;
+import com.nhb.common.rocketmq.enums.ConsumeMode;
 
 import java.lang.annotation.*;
 
@@ -15,6 +15,10 @@ import java.lang.annotation.*;
 @Documented
 public @interface RocketMQConsumer {
     /**
+     * 消费模式 默认并发模式消费
+     */
+    ConsumeMode consumeMode() default ConsumeMode.CONCURRENTLY;
+    /**
      * 需要消费的topic
      * 尽量保持一个 Topic 一种消息类型
      */
@@ -27,49 +31,4 @@ public @interface RocketMQConsumer {
      * 标识一类Consumer的集合名称
      */
     String consumerGroup();
-    /**
-     * 消费超时时间 minutes
-     */
-    int consumeTimeout() default -1;
-    /**
-     * 最大重试次数
-     */
-    int maxReconsumeTimes() default 16;
-    /**
-     * 最大线程数
-     */
-    int consumeMaxThread() default -1;
-    /**
-     * 最大拉取数量 仅在ConsumerType=PULL时有效
-     */
-    int maxPullNum() default 16;
-    /**
-     * 拉取间隔 建议大于5秒避免重复拉取
-     */
-    int pullNextDelayTimeMillis() default 10 * 1000;
-    /**
-     * 消费者第一次消费的时间点
-     */
-    String consumeTimestamp() default "";
-    /**
-     * 消费模式,默认为集群模式
-     */
-    MessageModel consumeMessageModel() default MessageModel.CLUSTERING;
-    /**
-     * Whether the unit of subscription group
-     */
-    boolean unitMode() default false;
-
-    String unitName() default "";
-
-    /**
-     * The socket timeout in milliseconds
-     */
-    long consumerPullTimeoutMillis() default 1000 * 10;
-
-    boolean vipChannelEnabled() default false;
-
-    boolean repeatCheck() default false;
-
-    boolean withProfile() default true;
 }

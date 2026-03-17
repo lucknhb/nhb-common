@@ -2,7 +2,7 @@ package com.nhb.common.rocketmq.builder;
 
 import cn.hutool.core.collection.CollUtil;
 import com.nhb.common.core.utils.SpringContextUtil;
-import com.nhb.common.fory.factory.ForyFactory;
+import com.nhb.common.rocketmq.converter.MessageConverter;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import org.apache.commons.lang3.StringUtils;
@@ -50,9 +50,13 @@ public class MessageBuilder {
         Message message = new Message();
         message.setTopic(getTopic());
         message.setTags(getTags());
-        //使用FORY进行序列化
-        ForyFactory foryFactory = SpringContextUtil.getBean(ForyFactory.class);
-        message.setBody(foryFactory.serialize(getBody()));
+        MessageConverter messageConverter = SpringContextUtil.getBean(MessageConverter.class);
+        try {
+            byte[] bytes = messageConverter.toByte(getBody());
+            message.setBody(bytes);
+        } catch (Exception e) {
+            throw new RuntimeException("Body " + getBody() + " To Byte Error",e);
+        }
         if (StringUtils.isNotBlank(getKey())) {
             message.setKeys(getKey());
         }

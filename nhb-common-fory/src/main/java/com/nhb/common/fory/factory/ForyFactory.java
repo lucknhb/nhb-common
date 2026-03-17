@@ -66,4 +66,15 @@ public class ForyFactory {
     public Object deserialize(byte[] bytes) {
         return fory.deserialize(bytes);
     }
+
+    /**
+     * 反序列化对象
+     * @param bytes       字节数组
+     * @param targetType  目标类型
+     * @return            实际对象
+     * @param <T>         泛型类型
+     */
+    public <T> T deserialize(byte[] bytes, Class<T> targetType) {
+        return fory.deserialize(bytes,targetType);
+    }
 }

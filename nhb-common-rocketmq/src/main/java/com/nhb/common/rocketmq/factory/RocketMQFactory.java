@@ -119,11 +119,11 @@ public class RocketMQFactory {
         if (consumerConfig.getConsumeTimeout() > 0) {
             pushConsumer.setConsumeTimeout(consumerConfig.getConsumeTimeout());
         }
-        pushConsumer.setMessageModel(consumerConfig.getConsumeMessageModel());
         pushConsumer.setUnitMode(consumerConfig.getUnitMode());
         if (StringUtils.isNotBlank(consumerConfig.getUnitName())) {
             pushConsumer.setUnitName(consumerConfig.getUnitName());
         }
+        pushConsumer.setMessageModel(consumerConfig.getConsumeMessageModel());
         pushConsumer.setVipChannelEnabled(consumerConfig.getVipChannelEnabled());
         pushConsumer.setNamesrvAddr(consumerConfig.getNameServerAddress());
         return pushConsumer;

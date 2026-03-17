@@ -1,6 +1,7 @@
 package com.nhb.common.rocketmq.utils;
 
 import com.nhb.common.core.utils.SpringContextUtil;
+import com.nhb.common.core.utils.StringUtil;
 import com.nhb.common.rocketmq.properties.RocketMQConfigProperties;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -18,7 +19,8 @@ import org.springframework.core.env.Environment;
 public class TopicUtil {
 
     /**
-     * 如果开启了使用根据项目的环境来区分 则为topic加上后缀
+     * 如果开启了使用根据项目的环境来区分 则为topic加上后缀<BR/>
+     * 如果环境值为空则返回原始值
      * @param topic  原始topic
      * @return       处理后的topic
      */
@@ -28,7 +30,10 @@ public class TopicUtil {
         if (flag) {
             Environment environment = SpringContextUtil.getBean(Environment.class);
             String profile = environment.getProperty("spring.profiles.active");
-            return topic + "_"+ profile;
+            //只有当有环境值时才会加上后缀
+            if (StringUtil.isNotBlank(profile)) {
+                return topic + "_"+ profile;
+            }
         }
         return topic;
     }

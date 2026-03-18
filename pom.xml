@@ -30,6 +30,7 @@
         <module>nhb-common-sse</module>
         <module>nhb-common-file</module>
         <module>nhb-common-rocketmq</module>
+        <module>nhb-common-websocket</module>
     </modules>
 
     <properties>

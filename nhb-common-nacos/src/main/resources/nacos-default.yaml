@@ -1,0 +1,6 @@
+spring:
+  cloud:
+    nacos:
+      discovery:
+        # 关闭自动注册
+        register-enabled: false

@@ -42,9 +42,9 @@ public class RouteApplicationReadyEventListener implements ApplicationListener<A
             map.put("serviceId", serviceId);
             String router = getRouter(map);
             log.info("""
-                    \n----------Nacos路由配置开始(请复制到router.json)----------
+                    \n----------首次启动服务请复制以下配置到router.json----------
                     {}
-                    ----------Nacos路由配置结束(请复制到router.json)----------""", router);
+                   """, router);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

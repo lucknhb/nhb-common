@@ -1,0 +1,7 @@
+server:
+  #开启优雅停机
+  shutdown: graceful
+spring:
+  lifecycle:
+    #设置缓冲时间 默认30s
+    timeout-per-shutdown-phase: 30s

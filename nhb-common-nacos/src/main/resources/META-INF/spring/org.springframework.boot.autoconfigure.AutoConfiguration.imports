@@ -1,1 +1,1 @@
-com.nhb.common.nacos.config.RouteTemplateAutoConfiguration
+com.nhb.common.nacos.config.NacosAutoConfiguration

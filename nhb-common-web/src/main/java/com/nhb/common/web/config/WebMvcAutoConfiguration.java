@@ -1,5 +1,6 @@
 package com.nhb.common.web.config;
 
+import com.nhb.common.core.factory.YamlPropertySourceFactory;
 import com.nhb.common.web.handler.GlobalExceptionHandler;
 import com.nhb.common.web.handler.ResponseBodyHandler;
 import lombok.extern.slf4j.Slf4j;
@@ -8,6 +9,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
@@ -22,6 +24,7 @@ import java.util.TimeZone;
  */
 @Slf4j
 @AutoConfiguration
+@PropertySource(value = "classpath:web-default.yaml", factory = YamlPropertySourceFactory.class)
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
 public class WebMvcAutoConfiguration {
 

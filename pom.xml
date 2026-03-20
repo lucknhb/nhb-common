@@ -31,6 +31,7 @@
         <module>nhb-common-file</module>
         <module>nhb-common-rocketmq</module>
         <module>nhb-common-websocket</module>
+        <module>nhb-common-mybatis</module>
     </modules>
 
     <properties>
@@ -67,6 +68,9 @@
         <jsch.version>2.27.8</jsch.version>
         <commons-net.version>3.12.0</commons-net.version>
         <thumbnailator.version>0.4.21</thumbnailator.version>
+        <p6spy.version>3.9.1</p6spy.version>
+        <dynamic-ds.version>4.3.1</dynamic-ds.version>
+        <mybatis-plus.version>3.5.16</mybatis-plus.version>
         <dubbo.version>3.3.6</dubbo.version>
         <dubbo-extensions.version>3.3.1</dubbo-extensions.version>
         <mapstruct-plus.version>1.5.0</mapstruct-plus.version>
@@ -132,6 +136,28 @@
                 <version>${sa-token.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <!-- sql性能分析插件 -->
+            <dependency>
+                <groupId>p6spy</groupId>
+                <artifactId>p6spy</artifactId>
+                <version>${p6spy.version}</version>
+            </dependency>
+            <!--mybatis plus 依赖-->
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
+                <version>${mybatis-plus.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-jsqlparser</artifactId>
+                <version>${mybatis-plus.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>dynamic-datasource-spring-boot3-starter</artifactId>
+                <version>${dynamic-ds.version}</version>
             </dependency>
             <!--rocketmq 使用兼容4.X/5.X版本客户端 如果有高需求可考虑 rocketmq-client-Java仅支持5.X的grpc版本客户端-->
             <dependency>

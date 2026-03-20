@@ -1,0 +1,1 @@
+dubboDataPermissionFilter=com.nhb.common.mybatis.filter.DubboDataPermissionFilter

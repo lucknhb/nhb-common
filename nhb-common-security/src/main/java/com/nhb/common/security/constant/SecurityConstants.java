@@ -8,17 +8,17 @@ package com.nhb.common.security.constant;
  */
 public interface SecurityConstants {
     /**
-     * 用户角色列表key
+     * 用户角色CODE
      */
-    String USER_ROLES = "USER_ROLES";
+    String USER_ROLE_CODES = "USER_ROLE_CODES";
 
     /**
-     * 指定角色ID 如 USER_ROLE_XXX
+     * 指定角色CODE 如 USER_ROLE_XXX
      */
     String USER_ROLE = "USER_ROLE_";
 
     /**
      * 用户权限列表key
      */
-    String USER_PERMISSIONS = "USER_PERMISSIONS";
+    String USER_ROLE_PERMISSIONS = "USER_ROLE_PERMISSIONS";
 }

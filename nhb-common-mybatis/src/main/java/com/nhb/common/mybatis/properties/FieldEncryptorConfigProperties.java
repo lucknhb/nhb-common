@@ -12,8 +12,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * @description:
  */
 @Data
-@ConfigurationProperties(prefix = FieldEncryptorProperties.PREFIX)
-public class FieldEncryptorProperties {
+@ConfigurationProperties(prefix = FieldEncryptorConfigProperties.PREFIX)
+public class FieldEncryptorConfigProperties {
     public static final String PREFIX = "mybatis-plus.field-encryptor";
 
     /**

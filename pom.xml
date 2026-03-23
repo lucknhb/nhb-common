@@ -32,11 +32,13 @@
         <module>nhb-common-rocketmq</module>
         <module>nhb-common-websocket</module>
         <module>nhb-common-mybatis</module>
+        <module>nhb-common-sms</module>
     </modules>
 
     <properties>
         <revision>1.0.0</revision>
         <java.version>21</java.version>
+        <sms.version>3.3.5</sms.version>
         <tika.version>3.2.3</tika.version>
         <fory.version>0.15.0</fory.version>
         <sa-token.version>1.44.0</sa-token.version>
@@ -136,6 +138,12 @@
                 <version>${sa-token.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <!--SMS依赖-->
+            <dependency>
+                <groupId>org.dromara.sms4j</groupId>
+                <artifactId>sms4j-spring-boot-starter</artifactId>
+                <version>${sms.version}</version>
             </dependency>
             <!-- sql性能分析插件 -->
             <dependency>

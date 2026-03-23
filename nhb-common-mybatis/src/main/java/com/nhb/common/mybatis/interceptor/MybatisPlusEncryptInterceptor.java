@@ -9,7 +9,7 @@ import com.nhb.common.encrypt.core.EncryptContext;
 import com.nhb.common.encrypt.enums.AlgorithmType;
 import com.nhb.common.encrypt.enums.EncodeType;
 import com.nhb.common.mybatis.core.FieldEncryptorManager;
-import com.nhb.common.mybatis.properties.FieldEncryptorProperties;
+import com.nhb.common.mybatis.properties.FieldEncryptorConfigProperties;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.executor.parameter.ParameterHandler;
@@ -38,7 +38,7 @@ import java.util.*;
 public class MybatisPlusEncryptInterceptor implements Interceptor {
 
     private final FieldEncryptorManager fieldEncryptorManager;
-    private final FieldEncryptorProperties fieldEncryptorProperties;
+    private final FieldEncryptorConfigProperties fieldEncryptorConfigProperties;
 
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
@@ -109,11 +109,11 @@ public class MybatisPlusEncryptInterceptor implements Interceptor {
         }
         FieldEncrypt encryptField = field.getAnnotation(FieldEncrypt.class);
         EncryptContext encryptContext = new EncryptContext();
-        encryptContext.setAlgorithm(encryptField.algorithm() == AlgorithmType.DEFAULT ? fieldEncryptorProperties.getAlgorithm() : encryptField.algorithm());
-        encryptContext.setEncode(encryptField.encode() == EncodeType.DEFAULT ? fieldEncryptorProperties.getEncode() : encryptField.encode());
-        encryptContext.setPassword(StringUtil.isBlank(encryptField.password()) ? fieldEncryptorProperties.getPassword() : encryptField.password());
-        encryptContext.setPrivateKey(StringUtil.isBlank(encryptField.privateKey()) ? fieldEncryptorProperties.getPrivateKey() : encryptField.privateKey());
-        encryptContext.setPublicKey(StringUtil.isBlank(encryptField.publicKey()) ? fieldEncryptorProperties.getPublicKey() : encryptField.publicKey());
+        encryptContext.setAlgorithm(encryptField.algorithm() == AlgorithmType.DEFAULT ? fieldEncryptorConfigProperties.getAlgorithm() : encryptField.algorithm());
+        encryptContext.setEncode(encryptField.encode() == EncodeType.DEFAULT ? fieldEncryptorConfigProperties.getEncode() : encryptField.encode());
+        encryptContext.setPassword(StringUtil.isBlank(encryptField.password()) ? fieldEncryptorConfigProperties.getPassword() : encryptField.password());
+        encryptContext.setPrivateKey(StringUtil.isBlank(encryptField.privateKey()) ? fieldEncryptorConfigProperties.getPrivateKey() : encryptField.privateKey());
+        encryptContext.setPublicKey(StringUtil.isBlank(encryptField.publicKey()) ? fieldEncryptorConfigProperties.getPublicKey() : encryptField.publicKey());
         return this.fieldEncryptorManager.encrypt(value, encryptContext);
     }
 

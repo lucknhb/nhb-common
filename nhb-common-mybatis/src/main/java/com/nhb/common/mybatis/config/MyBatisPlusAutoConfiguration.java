@@ -1,5 +1,6 @@
 package com.nhb.common.mybatis.config;
 
+import com.baomidou.mybatisplus.autoconfigure.MybatisPlusProperties;
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import com.baomidou.mybatisplus.core.handlers.PostInitTableInfoHandler;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
@@ -8,14 +9,20 @@ import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerIntercept
 import com.baomidou.mybatisplus.extension.plugins.inner.TenantLineInnerInterceptor;
 import com.nhb.common.core.utils.SpringContextUtil;
 import com.nhb.common.mybatis.aspectj.DataPermissionPointcutAdvisorAspect;
+import com.nhb.common.mybatis.core.FieldEncryptorManager;
 import com.nhb.common.mybatis.handler.InjectionMetaObjectHandler;
 import com.nhb.common.mybatis.handler.MybatisPlusExceptionHandler;
 import com.nhb.common.mybatis.handler.PostInitTableInfoPlusHandler;
 import com.nhb.common.mybatis.interceptor.DataPermissionInterceptor;
+import com.nhb.common.mybatis.interceptor.MybatisPlusDecryptInterceptor;
+import com.nhb.common.mybatis.interceptor.MybatisPlusEncryptInterceptor;
+import com.nhb.common.mybatis.properties.FieldEncryptorProperties;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBooleanProperty;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Role;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -30,6 +37,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
 @EnableTransactionManagement(proxyTargetClass = true)
 @MapperScan("${mybatis-plus.mapperPackage}")
+@EnableConfigurationProperties({FieldEncryptorProperties.class,MybatisPlusProperties.class})
 public class MyBatisPlusAutoConfiguration {
 
     @Bean
@@ -105,6 +113,27 @@ public class MyBatisPlusAutoConfiguration {
     public PostInitTableInfoHandler postInitTableInfoHandler() {
         return new PostInitTableInfoPlusHandler();
     }
+
+    @Bean
+    @ConditionalOnBooleanProperty(prefix = FieldEncryptorProperties.PREFIX,name = "enabled",matchIfMissing = true)
+    public FieldEncryptorManager fieldEncryptorManager(MybatisPlusProperties mybatisPlusProperties) {
+        return new FieldEncryptorManager(mybatisPlusProperties.getTypeAliasesPackage());
+    }
+
+    @Bean
+    @ConditionalOnBooleanProperty(prefix = FieldEncryptorProperties.PREFIX,name = "enabled",matchIfMissing = true)
+    public MybatisPlusEncryptInterceptor mybatisEncryptInterceptor(FieldEncryptorManager fieldEncryptorManager,
+                                                                   FieldEncryptorProperties  fieldEncryptorProperties) {
+        return new MybatisPlusEncryptInterceptor(fieldEncryptorManager, fieldEncryptorProperties);
+    }
+
+    @Bean
+    @ConditionalOnBooleanProperty(prefix = FieldEncryptorProperties.PREFIX,name = "enabled",matchIfMissing = true)
+    public MybatisPlusDecryptInterceptor mybatisDecryptInterceptor(FieldEncryptorManager fieldEncryptorManager,
+                                                                   FieldEncryptorProperties  fieldEncryptorProperties) {
+        return new MybatisPlusDecryptInterceptor(fieldEncryptorManager, fieldEncryptorProperties);
+    }
+
 
 
 }

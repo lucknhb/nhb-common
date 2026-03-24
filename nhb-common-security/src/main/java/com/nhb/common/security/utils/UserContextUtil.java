@@ -58,7 +58,7 @@ public class UserContextUtil {
     /**
      * 获取用户(多级缓存)
      */
-    @SuppressWarnings("unchecked cast")
+    @SuppressWarnings("unchecked")
     public static <T extends UserDetail> T getCurrentUserDetail() {
         SaSession session = StpUtil.getSession();
         if (ObjectUtil.isNull(session)) {

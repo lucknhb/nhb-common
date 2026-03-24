@@ -14,16 +14,17 @@
 
 <dependencies>
     <dependency>
-        <groupId>cn.hutool</groupId>
-        <artifactId>hutool-core</artifactId>
-    </dependency>
-    <dependency>
-        <groupId>org.projectlombok</groupId>
-        <artifactId>lombok</artifactId>
+        <groupId>com.nhb</groupId>
+        <artifactId>nhb-common-core</artifactId>
+        <version>${revision}</version>
     </dependency>
     <dependency>
         <groupId>io.swagger.core.v3</groupId>
         <artifactId>swagger-annotations</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>cn.dev33</groupId>
+        <artifactId>sa-token-core</artifactId>
     </dependency>
     <dependency>
         <groupId>org.springdoc</groupId>

@@ -40,6 +40,7 @@
         <revision>1.0.0</revision>
         <java.version>21</java.version>
         <sms.version>3.3.5</sms.version>
+        <fesod.version>2.0.1-incubating</fesod.version>
         <tika.version>3.2.3</tika.version>
         <fory.version>0.15.0</fory.version>
         <sa-token.version>1.44.0</sa-token.version>
@@ -49,7 +50,7 @@
         <redisson.version>3.52.0</redisson.version>
         <hutool.version>5.8.43</hutool.version>
         <ip2region.version>3.3.4</ip2region.version>
-        <spring-boot.version>3.5.10</spring-boot.version>
+        <spring-boot.version>3.5.11</spring-boot.version>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <nacos.client.version>3.0.3</nacos.client.version>
@@ -139,6 +140,12 @@
                 <version>${sa-token.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <!--   excel依赖  -->
+            <dependency>
+                <groupId>org.apache.fesod</groupId>
+                <artifactId>fesod-sheet</artifactId>
+                <version>${fesod.version}</version>
             </dependency>
             <!--SMS依赖-->
             <dependency>

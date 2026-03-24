@@ -1,7 +1,10 @@
 package com.nhb.common.api.config;
 
+import com.nhb.common.api.core.JavadocResolver;
+import com.nhb.common.api.core.SaTokenAnnotationMetadataJavadocResolver;
 import com.nhb.common.api.handler.OpenApiHandler;
 import com.nhb.common.api.properties.ApiProperties;
+import com.nhb.common.core.factory.YamlPropertySourceFactory;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Paths;
 import io.swagger.v3.oas.models.info.Info;
@@ -23,6 +26,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -40,6 +44,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 @AutoConfigureBefore(SpringDocConfigProperties.class)
 @EnableConfigurationProperties(ApiProperties.class)
+@PropertySource(value = "classpath:api-default.yaml", factory = YamlPropertySourceFactory.class)
 @ConditionalOnBooleanProperty(prefix = ApiProperties.PREFIX, name = "api-docs.enabled", havingValue = true, matchIfMissing = true)
 public class ApiAutoConfiguration {
     private final ServerProperties serverProperties;
@@ -88,8 +93,9 @@ public class ApiAutoConfiguration {
                                          PropertyResolverUtils propertyResolverUtils,
                                          Optional<List<OpenApiBuilderCustomizer>> openApiBuilderCustomisers,
                                          Optional<List<ServerBaseUrlCustomizer>> serverBaseUrlCustomisers,
-                                         Optional<JavadocProvider> javadocProvider) {
-        return new OpenApiHandler(openApi, securityParser, springDocConfigProperties, propertyResolverUtils, openApiBuilderCustomisers, serverBaseUrlCustomisers, javadocProvider);
+                                         Optional<JavadocProvider> javadocProvider,
+                                         List<JavadocResolver> javadocResolvers) {
+        return new OpenApiHandler(openApi, securityParser, springDocConfigProperties, propertyResolverUtils, openApiBuilderCustomisers, serverBaseUrlCustomisers, javadocProvider, javadocResolvers);
     }
 
     /**
@@ -99,14 +105,14 @@ public class ApiAutoConfiguration {
     public OpenApiCustomizer openApiCustomizer(ApiProperties properties) {
         String finalContextPath;
         //判断是否是单体应用 既无微服务架构时的api获取路径
-        if (Boolean.TRUE.equals(properties.getSingleFlag())){
+        if (Boolean.TRUE.equals(properties.getSingleFlag())) {
             String contextPath = serverProperties.getServlet().getContextPath();
             if (StringUtils.isBlank(contextPath) || "/".equals(contextPath)) {
                 finalContextPath = "";
             } else {
                 finalContextPath = contextPath;
             }
-        }else {
+        } else {
             HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
             // 从请求头获取gateway转发的服务前缀
             finalContextPath = StringUtils.defaultIfBlank(request.getHeader("X-Forwarded-Prefix"), "");
@@ -130,4 +136,13 @@ public class ApiAutoConfiguration {
             super();
         }
     }
+
+    /**
+     * 注册SaToken JavaDoc权限注解解析器
+     */
+    @Bean
+    public JavadocResolver saTokenAnnotationJavadocResolver() {
+        return new SaTokenAnnotationMetadataJavadocResolver();
+    }
+
 }

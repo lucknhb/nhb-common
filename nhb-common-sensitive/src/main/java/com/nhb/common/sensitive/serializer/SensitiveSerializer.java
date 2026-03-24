@@ -1,14 +1,13 @@
 package com.nhb.common.sensitive.serializer;
 
-import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.extra.spring.SpringUtil;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.BeanProperty;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.ContextualSerializer;
-import com.nhb.common.core.utils.SpringContextUtil;
 import com.nhb.common.sensitive.annotation.Sensitive;
 import com.nhb.common.sensitive.service.SensitiveService;
 import com.nhb.common.sensitive.strategy.SensitiveStrategy;
@@ -26,28 +25,36 @@ import java.util.Objects;
  */
 @Slf4j
 public class SensitiveSerializer extends JsonSerializer<String> implements ContextualSerializer {
-    private SensitiveStrategy strategy;
-    private String[] roleKey;
-    private String[] permissions;
+    private final SensitiveStrategy strategy;
+    private final String[] roleKey;
+    private final String[] perms;
+
+    /**
+     * 提供给 jackson 创建上下文序列化器时使用 不然会报错
+     */
+    public SensitiveSerializer() {
+        this.strategy = null;
+        this.roleKey = null;
+        this.perms = null;
+    }
+
+    public SensitiveSerializer(SensitiveStrategy strategy, String[] roleKey, String[] perms) {
+        this.strategy = strategy;
+        this.roleKey = roleKey;
+        this.perms = perms;
+    }
 
     @Override
     public void serialize(String value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
         try {
-            //先判断是否明确角色或权限
-            //都为空时 直接脱敏处理  如果存在其中一个不为空 则使用自实现的类进行权限判断
-            if (ArrayUtil.isEmpty(roleKey) && ArrayUtil.isEmpty(permissions)) {
+            SensitiveService sensitiveService = SpringUtil.getBean(SensitiveService.class);
+            if (ObjectUtil.isNotNull(sensitiveService) && sensitiveService.isSensitive(roleKey, perms)) {
                 gen.writeString(strategy.desensitizer().apply(value));
-            }else {
-                SensitiveService sensitiveService = SpringContextUtil.getBean(SensitiveService.class);
-                //不需要脱敏处理的话 则直接json化
-                if (ObjectUtil.isNotNull(sensitiveService) && sensitiveService.isSensitive(roleKey, permissions)) {
-                    gen.writeString(strategy.desensitizer().apply(value));
-                } else {
-                    gen.writeString(value);
-                }
+            } else {
+                gen.writeString(value);
             }
         } catch (BeansException e) {
-            log.error("Not found SensitiveService Implementation class. Now use default mode  => {}", e.getMessage());
+            log.error("脱敏实现不存在, 采用默认处理 => {}", e.getMessage());
             gen.writeString(value);
         }
     }
@@ -56,10 +63,7 @@ public class SensitiveSerializer extends JsonSerializer<String> implements Conte
     public JsonSerializer<?> createContextual(SerializerProvider prov, BeanProperty property) throws JsonMappingException {
         Sensitive annotation = property.getAnnotation(Sensitive.class);
         if (Objects.nonNull(annotation) && Objects.equals(String.class, property.getType().getRawClass())) {
-            this.strategy = annotation.strategy();
-            this.roleKey = annotation.roleKeys();
-            this.permissions = annotation.permissions();
-            return this;
+            return new SensitiveSerializer(annotation.strategy(), annotation.roleKeys(), annotation.permissions());
         }
         return prov.findValueSerializer(property.getType(), property);
     }

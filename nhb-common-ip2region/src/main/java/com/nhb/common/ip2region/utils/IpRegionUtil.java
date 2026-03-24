@@ -4,6 +4,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HtmlUtil;
 import com.nhb.common.core.utils.IpUtil;
 import com.nhb.common.core.utils.SpringContextUtil;
+import com.nhb.common.core.utils.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.lionsoul.ip2region.service.Ip2Region;
@@ -50,9 +51,9 @@ public class IpRegionUtil {
             }
             String region = IP_2_REGION.search(ip);
             if (StringUtils.isBlank(region)) {
-                region = UNKNOWN_ADDRESS;
+                return UNKNOWN_ADDRESS;
             }
-            return region;
+            return StringUtil.replace(region, "0", UNKNOWN_ADDRESS);
         } catch (Exception e) {
             log.error("Ip region find happen exception {}", ip,e);
             return UNKNOWN_ADDRESS;

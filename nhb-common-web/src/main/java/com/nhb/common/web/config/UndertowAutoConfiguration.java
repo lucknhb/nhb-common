@@ -1,9 +1,12 @@
 package com.nhb.common.web.config;
 
 import com.nhb.common.core.utils.SpringContextUtil;
+import io.undertow.UndertowOptions;
 import io.undertow.server.handlers.DisallowedMethodsHandler;
 import io.undertow.util.HttpString;
+import jakarta.annotation.Resource;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.boot.web.embedded.undertow.UndertowServletWebServerFactory;
 import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.core.task.VirtualThreadTaskExecutor;
@@ -16,6 +19,8 @@ import org.springframework.core.task.VirtualThreadTaskExecutor;
  */
 @AutoConfiguration
 public class UndertowAutoConfiguration implements WebServerFactoryCustomizer<UndertowServletWebServerFactory> {
+    @Resource
+    private ServerProperties serverProperties;
 
     /**
      * 自定义 Undertow 配置
@@ -30,6 +35,8 @@ public class UndertowAutoConfiguration implements WebServerFactoryCustomizer<Und
      */
     @Override
     public void customize(UndertowServletWebServerFactory factory) {
+        long bytes = serverProperties.getUndertow().getMaxHttpPostSize().toBytes();
+        factory.addBuilderCustomizers(builder -> builder.setServerOption(UndertowOptions.MULTIPART_MAX_ENTITY_SIZE, bytes));
         // 默认不直接分配内存 如果项目中使用了 websocket 建议直接分配
         factory.addDeploymentInfoCustomizers(deploymentInfo -> {
             // 如果启用了虚拟线程，配置 Undertow 使用虚拟线程池

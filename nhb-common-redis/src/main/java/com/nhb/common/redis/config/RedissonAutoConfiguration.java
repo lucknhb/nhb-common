@@ -1,6 +1,7 @@
 package com.nhb.common.redis.config;
 
 import cn.hutool.core.util.ObjectUtil;
+import com.nhb.common.core.factory.YamlPropertySourceFactory;
 import com.nhb.common.core.utils.SpringContextUtil;
 import com.nhb.common.redis.handler.KeyPrefixHandler;
 import com.nhb.common.redis.handler.RedisExceptionHandler;
@@ -14,6 +15,7 @@ import org.redisson.spring.starter.RedissonAutoConfigurationCustomizer;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.task.VirtualThreadTaskExecutor;
 
 /**
@@ -25,6 +27,7 @@ import org.springframework.core.task.VirtualThreadTaskExecutor;
 @Slf4j
 @AutoConfiguration
 @EnableConfigurationProperties(RedissonConfigProperties.class)
+@PropertySource(value = "classpath:redis-default.yaml", factory = YamlPropertySourceFactory.class)
 public class RedissonAutoConfiguration {
 
     @Bean

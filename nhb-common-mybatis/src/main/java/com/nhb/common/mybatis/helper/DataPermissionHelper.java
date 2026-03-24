@@ -25,7 +25,7 @@ import java.util.function.Supplier;
  * @description: 数据权限助手
  */
 @Slf4j
-@SuppressWarnings("unchecked cast")
+@SuppressWarnings("unchecked")
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class DataPermissionHelper {
     public static final String DATA_PERMISSION_KEY = "data:permission";

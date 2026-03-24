@@ -33,6 +33,7 @@
         <module>nhb-common-websocket</module>
         <module>nhb-common-mybatis</module>
         <module>nhb-common-sms</module>
+        <module>nhb-common-translation</module>
     </modules>
 
     <properties>

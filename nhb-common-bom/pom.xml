@@ -121,6 +121,11 @@
             </dependency>
             <dependency>
                 <groupId>com.nhb</groupId>
+                <artifactId>nhb-common-translation</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.nhb</groupId>
                 <artifactId>nhb-common-web</artifactId>
                 <version>${revision}</version>
             </dependency>

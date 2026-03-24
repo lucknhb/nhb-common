@@ -3,6 +3,7 @@ package com.nhb.common.mybatis.core;
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * @author luck_nhb
@@ -11,6 +12,7 @@ import lombok.Data;
  * @description: 包含租户Id的基础类
  */
 @Data
+@EqualsAndHashCode(callSuper=false)
 public class TenantEntity extends BaseEntity {
     @TableField(fill = FieldFill.INSERT)
     private Long tenantId;

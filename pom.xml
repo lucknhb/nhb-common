@@ -50,11 +50,11 @@
         <redisson.version>3.52.0</redisson.version>
         <hutool.version>5.8.43</hutool.version>
         <ip2region.version>3.3.4</ip2region.version>
-        <spring-boot.version>3.5.11</spring-boot.version>
+        <spring-boot.version>3.5.12</spring-boot.version>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <nacos.client.version>3.0.3</nacos.client.version>
-        <bouncycastle.version>1.80</bouncycastle.version>
+        <bouncycastle.version>1.83</bouncycastle.version>
         <!--文件存储版本依赖-->
         <sardine.version>5.13</sardine.version>
         <esdk-obs.version>3.25.10</esdk-obs.version>
@@ -190,7 +190,7 @@
             <!-- 加密包引入 -->
             <dependency>
                 <groupId>org.bouncycastle</groupId>
-                <artifactId>bcprov-jdk15to18</artifactId>
+                <artifactId>bcpkix-jdk18on</artifactId>
                 <version>${bouncycastle.version}</version>
             </dependency>
             <!-- 离线IP地址定位库 -->

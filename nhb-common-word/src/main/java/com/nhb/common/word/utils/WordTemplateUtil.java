@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author luck_nhb
@@ -29,7 +30,7 @@ public class WordTemplateUtil {
     /**
      * 渲染模板并输出到指定文件
      *
-     * @param templatePath 模板路径（支持 classpath: 前缀或绝对路径）
+     * @param templatePath 模板路径 仅支持resources下的文件
      * @param data         数据模型
      * @param outputFile   输出文件
      */
@@ -49,11 +50,11 @@ public class WordTemplateUtil {
      * @return 生成的 Word 文档字节数组
      */
     public static byte[] exportToBytes(String templatePath, Map<String, Object> data) {
-        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-            export(templatePath, data, baos);
-            return baos.toByteArray();
+        try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
+            export(templatePath, data, bos);
+            return bos.toByteArray();
         } catch (IOException e) {
-            throw new RuntimeException("导出到字节数组失败", e);
+            throw new RuntimeException("Exporting To ByteArrays Failed", e);
         }
     }
 
@@ -71,14 +72,14 @@ public class WordTemplateUtil {
             FileExportUtil.setAttachmentResponseHeader(response, fileName, FileContentType.WORD);
             export(templatePath, data, os);
         } catch (IOException e) {
-            throw new RuntimeException("导出到 HttpServletResponse 失败", e);
+            throw new RuntimeException("Export To HttpServletResponse Failed", e);
         }
     }
 
     /**
      * 核心导出方法：渲染模板并将结果写入输出流
      *
-     * @param templatePath 模板路径（支持 classpath: 前缀或绝对路径）
+     * @param templatePath 模板路径 仅支持resources文件夹下的文件
      * @param data         数据模型
      * @param os           输出流（调用方负责关闭）
      */
@@ -88,7 +89,7 @@ public class WordTemplateUtil {
             template.render(data).write(os);
             os.flush();
         } catch (IOException e) {
-            throw new RuntimeException("渲染模板并写入流失败", e);
+            throw new RuntimeException("Rendering The Template And Writing To The Stream Failed", e);
         } finally {
             closeTemplate(template);
         }
@@ -109,7 +110,7 @@ public class WordTemplateUtil {
             template.render(data).write(os);
             os.flush();
         } catch (IOException e) {
-            throw new RuntimeException("带配置的渲染失败", e);
+            throw new RuntimeException("Render With Configuration Failed", e);
         } finally {
             closeTemplate(template);
         }
@@ -120,7 +121,7 @@ public class WordTemplateUtil {
     /**
      * 从文件路径创建图片渲染数据
      *
-     * @param imagePath 图片文件路径（支持 classpath: 前缀或绝对路径）
+     * @param imagePath 图片文件路径 仅支持resources 文件夹下的图片
      * @param width     图片宽度（单位：毫米，可设为 null 使用原尺寸）
      * @param height    图片高度（单位：毫米，可设为 null 使用原尺寸）
      * @return PictureRenderData 对象，可直接放入数据模型
@@ -133,7 +134,7 @@ public class WordTemplateUtil {
                 return Pictures.ofBytes(is.readAllBytes()).create();
             }
         } catch (IOException e) {
-            throw new RuntimeException("读取图片文件失败: " + imagePath, e);
+            throw new RuntimeException("Failed To Read The Image File: " + imagePath, e);
         }
     }
 
@@ -176,7 +177,7 @@ public class WordTemplateUtil {
     /**
      * 加载模板
      *
-     * @param templatePath 路径，支持 classpath: 前缀或绝对路径
+     * @param templatePath 路径 仅支持resources文件夹下的文件
      * @param config       poi-tl 配置，可为 null
      * @return XWPFTemplate 实例
      */
@@ -189,23 +190,18 @@ public class WordTemplateUtil {
     }
 
     /**
-     * 获取资源输入流（支持 classpath 和文件系统）
+     * 获取资源输入流（仅支持resources文件夹下的文件
      *
      * @param path 资源路径
      * @return InputStream
      * @throws FileNotFoundException 如果资源不存在
      */
     private static InputStream getResourceStream(String path) throws IOException {
-        if (path.startsWith("classpath:")) {
-            String resourcePath = path.substring("classpath:".length());
-            InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(resourcePath);
-            if (is == null) {
-                throw new FileNotFoundException("classpath 中未找到资源: " + resourcePath);
-            }
-            return is;
-        } else {
-            return new FileInputStream(path);
+        InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(path);
+        if (Objects.isNull(is)) {
+            throw new FileNotFoundException("Not Found Resource From: " + path);
         }
+        return is;
     }
 
     /**
@@ -216,7 +212,7 @@ public class WordTemplateUtil {
             try {
                 template.close();
             } catch (IOException e) {
-                log.warn("关闭 XWPFTemplate 时发生异常", e);
+                log.warn("Close XWPFTemplate Happen Exception", e);
             }
         }
     }

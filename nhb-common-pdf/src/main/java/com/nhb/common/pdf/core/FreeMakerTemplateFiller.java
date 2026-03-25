@@ -4,7 +4,6 @@ import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateExceptionHandler;
 import lombok.extern.slf4j.Slf4j;
-import org.openpdf.pdf.ITextFontResolver;
 import org.openpdf.pdf.ITextRenderer;
 import org.openpdf.text.pdf.BaseFont;
 import org.springframework.core.io.ClassPathResource;
@@ -82,8 +81,6 @@ public class FreeMakerTemplateFiller {
     private byte[] convertHtmlToPDF(String htmlContent) {
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
             ITextRenderer renderer = new ITextRenderer();
-            // 添加自定义字体
-            ITextFontResolver fontResolver = renderer.getFontResolver();
             // 从 classpath 加载字体
             ClassPathResource fontResource = new ClassPathResource("fonts/simsun.ttc");
             if (!fontResource.exists()) {

@@ -81,7 +81,7 @@
             </dependency>
             <dependency>
                 <groupId>com.nhb</groupId>
-                <artifactId>nhb-common-office</artifactId>
+                <artifactId>nhb-common-excel</artifactId>
                 <version>${revision}</version>
             </dependency>
             <dependency>

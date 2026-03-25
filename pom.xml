@@ -10,7 +10,7 @@
     <name>nhb-common</name>
     <modules>
         <module>nhb-common-core</module>
-        <module>nhb-common-office</module>
+        <module>nhb-common-excel</module>
         <module>nhb-common-web</module>
         <module>nhb-common-ip2region</module>
         <module>nhb-common-sensitive</module>
@@ -40,6 +40,8 @@
         <revision>1.0.0</revision>
         <java.version>21</java.version>
         <sms.version>3.3.5</sms.version>
+        <openpdf.version>3.0.3</openpdf.version>
+        <poi-tl.version>1.12.2</poi-tl.version>
         <fesod.version>2.0.1-incubating</fesod.version>
         <tika.version>3.2.3</tika.version>
         <fory.version>0.15.0</fory.version>
@@ -146,6 +148,18 @@
                 <groupId>org.apache.fesod</groupId>
                 <artifactId>fesod-sheet</artifactId>
                 <version>${fesod.version}</version>
+            </dependency>
+            <!-- word填充依赖 -->
+            <dependency>
+                <groupId>com.deepoove</groupId>
+                <artifactId>poi-tl</artifactId>
+                <version>${poi-tl.version}</version>
+            </dependency>
+            <!--PDF操作依赖-->
+            <dependency>
+                <groupId>com.github.librepdf</groupId>
+                <artifactId>openpdf</artifactId>
+                <version>${openpdf.version}</version>
             </dependency>
             <!--SMS依赖-->
             <dependency>

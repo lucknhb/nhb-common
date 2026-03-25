@@ -7,9 +7,9 @@
         <version>${revision}</version>
     </parent>
 
-    <artifactId>nhb-common-office</artifactId>
+    <artifactId>nhb-common-excel</artifactId>
     <packaging>jar</packaging>
-    <name>nhb-common-export</name>
+    <name>nhb-common-excel</name>
 
     <dependencies>
         <dependency>

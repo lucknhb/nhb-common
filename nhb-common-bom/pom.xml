@@ -134,6 +134,16 @@
                 <artifactId>nhb-common-websocket</artifactId>
                 <version>${revision}</version>
             </dependency>
+            <dependency>
+                <groupId>com.nhb</groupId>
+                <artifactId>nhb-common-pdf</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.nhb</groupId>
+                <artifactId>nhb-common-word</artifactId>
+                <version>${revision}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 </project>

@@ -34,6 +34,8 @@
         <module>nhb-common-mybatis</module>
         <module>nhb-common-sms</module>
         <module>nhb-common-translation</module>
+        <module>nhb-common-pdf</module>
+        <module>nhb-common-word</module>
     </modules>
 
     <properties>
@@ -161,17 +163,21 @@
                 <artifactId>openpdf</artifactId>
                 <version>${openpdf.version}</version>
             </dependency>
+            <dependency>
+                <groupId>com.github.librepdf</groupId>
+                <artifactId>openpdf-html</artifactId>
+                <version>${openpdf.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.librepdf</groupId>
+                <artifactId>openpdf-renderer</artifactId>
+                <version>${openpdf.version}</version>
+            </dependency>
             <!--SMS依赖-->
             <dependency>
                 <groupId>org.dromara.sms4j</groupId>
                 <artifactId>sms4j-spring-boot-starter</artifactId>
                 <version>${sms.version}</version>
-            </dependency>
-            <!-- sql性能分析插件 -->
-            <dependency>
-                <groupId>p6spy</groupId>
-                <artifactId>p6spy</artifactId>
-                <version>${p6spy.version}</version>
             </dependency>
             <!--mybatis plus 依赖-->
             <dependency>

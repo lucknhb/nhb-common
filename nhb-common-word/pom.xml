@@ -13,6 +13,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.nhb</groupId>
+            <artifactId>nhb-common-core</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
             <groupId>com.deepoove</groupId>
             <artifactId>poi-tl</artifactId>
         </dependency>

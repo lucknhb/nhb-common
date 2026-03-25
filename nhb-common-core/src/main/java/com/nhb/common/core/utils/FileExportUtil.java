@@ -1,4 +1,4 @@
-package com.nhb.common.excel.utils;
+package com.nhb.common.core.utils;
 
 import com.nhb.common.core.enums.FileContentType;
 import jakarta.servlet.http.HttpServletResponse;

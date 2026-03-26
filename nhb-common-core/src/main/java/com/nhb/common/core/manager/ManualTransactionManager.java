@@ -39,7 +39,7 @@ public class ManualTransactionManager {
      */
     public void begin() {
         if (currentTransactionStatus.get() != null) {
-            throw new IllegalStateException("当前线程已有一个未提交或回滚的手动事务，请先提交或回滚");
+            throw new IllegalStateException("The current thread already has an uncommitted or rolled back manual transaction, please commit or roll back first");
         }
         TransactionStatus status = transactionManager.getTransaction(transactionDefinition);
         currentTransactionStatus.set(status);
@@ -52,7 +52,7 @@ public class ManualTransactionManager {
     public void commit() {
         TransactionStatus status = currentTransactionStatus.get();
         if (status == null) {
-            throw new IllegalStateException("没有活跃的手动事务可提交");
+            throw new IllegalStateException("There are no active manual transactions to commit");
         }
         try {
             transactionManager.commit(status);
@@ -69,7 +69,7 @@ public class ManualTransactionManager {
     public void rollback() {
         TransactionStatus status = currentTransactionStatus.get();
         if (status == null) {
-            throw new IllegalStateException("没有活跃的手动事务可回滚");
+            throw new IllegalStateException("There are no active manual transactions to roll back");
         }
         try {
             transactionManager.rollback(status);

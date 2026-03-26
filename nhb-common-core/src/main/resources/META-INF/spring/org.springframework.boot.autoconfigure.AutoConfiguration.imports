@@ -2,3 +2,4 @@ com.nhb.common.core.config.ThreadPoolAutoConfiguration
 com.nhb.common.core.config.ValidatorAutoConfiguration
 com.nhb.common.core.config.JacksonAutoConfiguration
 com.nhb.common.core.config.ApplicationAutoConfiguration
+com.nhb.common.core.config.TransactionTemplateAutoConfiguration

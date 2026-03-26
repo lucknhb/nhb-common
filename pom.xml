@@ -36,6 +36,7 @@
         <module>nhb-common-translation</module>
         <module>nhb-common-pdf</module>
         <module>nhb-common-word</module>
+        <module>nhb-common-ai</module>
     </modules>
 
     <properties>

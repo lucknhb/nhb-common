@@ -13,6 +13,11 @@
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>com.nhb</groupId>
+                <artifactId>nhb-common-ai</artifactId>
+                <version>${revision}</version>
+            </dependency>
             <!--API DOC 模块-->
             <dependency>
                 <groupId>com.nhb</groupId>

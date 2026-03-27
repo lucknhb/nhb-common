@@ -35,7 +35,6 @@
         <module>nhb-common-sms</module>
         <module>nhb-common-translation</module>
         <module>nhb-common-pdf</module>
-        <module>nhb-common-word</module>
         <module>nhb-common-ai</module>
     </modules>
 
@@ -60,6 +59,8 @@
         <maven.compiler.target>21</maven.compiler.target>
         <nacos.client.version>3.0.3</nacos.client.version>
         <bouncycastle.version>1.83</bouncycastle.version>
+        <jlama.version>0.8.4</jlama.version>
+        <langchain4j.version>1.12.2-beta22</langchain4j.version>
         <!--文件存储版本依赖-->
         <sardine.version>5.13</sardine.version>
         <esdk-obs.version>3.25.10</esdk-obs.version>
@@ -88,6 +89,7 @@
         <swagger.core.version>2.2.43</swagger.core.version>
         <springdoc.version>2.8.15</springdoc.version>
         <therapi-javadoc.version>0.15.0</therapi-javadoc.version>
+        <os-maven-plugin.version>1.7.1</os-maven-plugin.version>
         <maven-compiler-plugin.version>3.15.0</maven-compiler-plugin.version>
         <maven-resources-plugin.version>3.4.0</maven-resources-plugin.version>
         <flatten-maven-plugin.version>1.7.3</flatten-maven-plugin.version>
@@ -361,10 +363,44 @@
                 <artifactId>thumbnailator</artifactId>
                 <version>${thumbnailator.version}</version>
             </dependency>
+            <dependency>
+                <groupId>dev.langchain4j</groupId>
+                <artifactId>langchain4j-open-ai-spring-boot-starter</artifactId>
+                <version>${langchain4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>dev.langchain4j</groupId>
+                <artifactId>langchain4j-spring-boot-starter</artifactId>
+                <version>${langchain4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>dev.langchain4j</groupId>
+                <artifactId>langchain4j-micrometer-metrics</artifactId>
+                <version>${langchain4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>dev.langchain4j</groupId>
+                <artifactId>langchain4j-jlama</artifactId>
+                <version>${langchain4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.tjake</groupId>
+                <artifactId>jlama-native</artifactId>
+                <classifier>${os.detected.name}-${os.detected.arch}</classifier>
+                <version>${jlama.version}</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
     <build>
+        <extensions>
+            <extension>
+                <groupId>kr.motd.maven</groupId>
+                <artifactId>os-maven-plugin</artifactId>
+                <version>${os-maven-plugin.version}</version>
+            </extension>
+        </extensions>
         <plugins>
             <!--Checkstyle 代码检查的插件-->
             <!--<plugin>

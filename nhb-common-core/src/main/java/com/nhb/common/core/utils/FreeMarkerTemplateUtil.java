@@ -51,7 +51,7 @@ public class FreeMarkerTemplateUtil extends FreeMarkerTemplateUtils {
      * @return 模板
      * @throws IOException 异常
      */
-    private static Template getTemplate(String template) throws IOException {
+    public static Template getTemplate(String template) throws IOException {
         return new Template("template", template, CONFIGURATION);
     }
 }

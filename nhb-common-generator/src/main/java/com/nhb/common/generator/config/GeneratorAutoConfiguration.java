@@ -1,6 +1,7 @@
 package com.nhb.common.generator.config;
 
 import com.nhb.common.core.factory.YamlPropertySourceFactory;
+import com.nhb.common.generator.core.MybatisEntityTableGenerator;
 import com.nhb.common.generator.core.MybatisTableEntityGenerator;
 import com.nhb.common.generator.monitor.MyBatisDataSourceMonitor;
 import com.nhb.common.generator.properties.GeneratorConfigProperties;
@@ -31,5 +32,11 @@ public class GeneratorAutoConfiguration {
     @ConditionalOnBooleanProperty(prefix = GeneratorConfigProperties.PREFIX, name = "tableConfig.enabled", matchIfMissing = true)
     public MybatisTableEntityGenerator mybatisTableEntityGenerator() {
         return new MybatisTableEntityGenerator();
+    }
+
+    @Bean
+    @ConditionalOnBooleanProperty(prefix = GeneratorConfigProperties.PREFIX, name = "tableConfig.enabled", matchIfMissing = true)
+    public MybatisEntityTableGenerator mybatisEntityTableGenerator() {
+        return new MybatisEntityTableGenerator();
     }
 }

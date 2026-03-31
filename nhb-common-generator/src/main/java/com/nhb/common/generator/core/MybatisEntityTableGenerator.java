@@ -1,10 +1,21 @@
 package com.nhb.common.generator.core;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.text.StrPool;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.annotation.*;
+import com.github.therapi.runtimejavadoc.ClassJavadoc;
+import com.github.therapi.runtimejavadoc.CommentFormatter;
+import com.github.therapi.runtimejavadoc.OtherJavadoc;
+import com.github.therapi.runtimejavadoc.RuntimeJavadoc;
 import com.nhb.common.core.utils.SpringContextUtil;
+import com.nhb.common.core.utils.StringUtil;
 import com.nhb.common.generator.properties.GeneratorConfigProperties;
 import com.nhb.common.generator.utils.TableConvertUtil;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import org.anyline.metadata.Column;
 import org.anyline.metadata.Table;
 import org.anyline.service.AnylineService;
@@ -18,8 +29,7 @@ import org.springframework.util.ClassUtils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author luck_nhb
@@ -28,6 +38,9 @@ import java.util.Set;
  * @description: 实体类转表结构
  */
 public class MybatisEntityTableGenerator implements TableEntityGenerator {
+
+    private static final CommentFormatter COMMENT_FORMATTER = new CommentFormatter();
+
     /**
      * 生成对应的模板
      */
@@ -44,17 +57,27 @@ public class MybatisEntityTableGenerator implements TableEntityGenerator {
                 throw new RuntimeException(e);
             }
         }
-
     }
 
     /**
      * 将实体类转换为 Anyline 的 Table 对象
      */
     private Table buildTableFromEntity(Class<?> entityClass) {
+        Map<String, String> commentMap = TableConvertUtil.parseFieldComments(entityClass);
         // 获取表名
         TableName tableNameAnno = entityClass.getAnnotation(TableName.class);
         String tableName = (tableNameAnno != null) ? tableNameAnno.value() : entityClass.getSimpleName().toLowerCase();
         Table table = new Table(tableName);
+        ClassJavadoc classDoc = RuntimeJavadoc.getJavadoc(entityClass);
+        String comment = COMMENT_FORMATTER.format(classDoc.getComment());
+        if (StringUtil.isBlank(comment) && CollUtil.isNotEmpty(classDoc.getOther())) {
+            List<String> otherJavadocs = new ArrayList<>();
+            for (OtherJavadoc otherJavadoc : classDoc.getOther()) {
+                otherJavadocs.add(StrUtil.format("{} {}", otherJavadoc.getName(), otherJavadoc.getComment()));
+            }
+            comment = String.join(StrPool.LF,otherJavadocs);
+        }
+        table.setComment(comment);
         if (tableNameAnno != null && !tableNameAnno.schema().isEmpty()) {
             table.setSchema(tableNameAnno.schema());
         }
@@ -74,7 +97,7 @@ public class MybatisEntityTableGenerator implements TableEntityGenerator {
                 continue;
             }
             //填充获取字段
-            Column column = fillColumn(field, columnName);
+            Column column = fillColumn(field, columnName, commentMap);
             table.addColumn(column);
         }
 
@@ -83,27 +106,35 @@ public class MybatisEntityTableGenerator implements TableEntityGenerator {
 
     /**
      * 根据实体类属性名转换为表对应的字段
-     * @param field        实体属性
-     * @param columnName   字段名
+     *
+     * @param field      实体属性
+     * @param columnName 字段名
+     * @param commentMap 备注信息
      * @return
      */
-    private Column fillColumn(Field field, String columnName) {
+    private Column fillColumn(Field field, String columnName, Map<String, String> commentMap) {
         // 映射 Java 类型到 Anyline DataType
         String dataType = TableConvertUtil.javaTypeToJdbcType(field.getType());
         // 创建 Column 对象
         Column column = new Column(columnName, dataType);
-        column.setComment(field.getName()); // 可替换为更友好的注释
+        column.setComment(commentMap.getOrDefault(field.getName(),field.getName())); // 可替换为更友好的注释
         // 处理主键
         if (field.isAnnotationPresent(TableId.class)) {
             column.setPrimaryKey(true);
+            column.setUnique(true);
             TableId idAnno = field.getAnnotation(TableId.class);
             if (idAnno.type() == IdType.AUTO) {
                 column.setAutoIncrement(true);
             }
         }
-        // 可根据需要设置其他属性，如长度、是否可空等
-        // column.setLength(50);
-        // column.setNullable(false);
+        // 可根据需要设置其他属性
+        if (field.isAnnotationPresent(NotBlank.class) || field.isAnnotationPresent(NotEmpty.class) || field.isAnnotationPresent(NotNull.class)) {
+            column.setNullable(false);
+        }
+        if (field.isAnnotationPresent(Size.class)) {
+            Size size = field.getAnnotation(Size.class);
+            column.setLength(size.max());
+        }
         return column;
     }
 

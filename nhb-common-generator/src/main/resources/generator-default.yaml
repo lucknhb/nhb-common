@@ -1,3 +1,5 @@
-generator:
-  table-config:
-    author: luck_nhb
+spring:
+  datasource:
+    generator:
+      table-config:
+        author: luck_nhb

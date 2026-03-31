@@ -12,7 +12,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Data
 @ConfigurationProperties(prefix = GeneratorConfigProperties.PREFIX)
 public class GeneratorConfigProperties {
-    public static final String PREFIX = "generator";
+    public static final String PREFIX = "spring.datasource.generator";
 
     private TableConfigProperties tableConfig;
 
@@ -22,7 +22,7 @@ public class GeneratorConfigProperties {
      */
     @Data
     public static class TableConfigProperties {
-        private boolean enabled = false;
+        private Boolean enabled = false;
         /**
          * 作者
          */
@@ -31,10 +31,6 @@ public class GeneratorConfigProperties {
          * 生成包路径
          */
         private String packageName;
-        /**
-         * 自动去除表前缀，默认是false
-         */
-        private boolean autoRemovePrefix = false;
         /**
          * 表前缀(类名不会包含表前缀)
          */

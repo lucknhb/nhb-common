@@ -1,6 +1,11 @@
 spring:
   datasource:
+    generator:
+      table-config:
+        enabled: true
+        package-name: com.nhb.common.generator.test
     dynamic:
+      enabled: false
       # 设置默认的数据源或者数据源组,默认值即为 master
       primary: master
       datasource:
@@ -11,8 +16,7 @@ spring:
           url: jdbc:mysql://localhost:3306/four_port_config_dev?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&rewriteBatchedStatements=true&allowPublicKeyRetrieval=true
           username: root
           password: 123456
-
-generator:
-  table-config:
-    enabled: true
-    package-name: com.nhb.common.generator.test
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/four_port_config_dev?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&rewriteBatchedStatements=true&allowPublicKeyRetrieval=true
+    username: root
+    password: 123456

@@ -23,19 +23,20 @@ import org.springframework.context.annotation.PropertySource;
 public class GeneratorAutoConfiguration {
 
     @Bean
-    @ConditionalOnBooleanProperty(prefix = GeneratorConfigProperties.PREFIX, name = "tableConfig.enabled", matchIfMissing = true)
+    @ConditionalOnBooleanProperty(name = "spring.datasource.dynamic.enabled", havingValue = true, matchIfMissing = true)
+    @ConditionalOnBooleanProperty(prefix = GeneratorConfigProperties.PREFIX, name = "table-config.enabled", havingValue = true, matchIfMissing = true)
     public MyBatisDataSourceMonitor myBatisDataSourceMonitor() {
         return new MyBatisDataSourceMonitor();
     }
 
     @Bean
-    @ConditionalOnBooleanProperty(prefix = GeneratorConfigProperties.PREFIX, name = "tableConfig.enabled", matchIfMissing = true)
+    @ConditionalOnBooleanProperty(prefix = GeneratorConfigProperties.PREFIX, name = "table-config.enabled", matchIfMissing = true)
     public MybatisTableEntityGenerator mybatisTableEntityGenerator() {
         return new MybatisTableEntityGenerator();
     }
 
     @Bean
-    @ConditionalOnBooleanProperty(prefix = GeneratorConfigProperties.PREFIX, name = "tableConfig.enabled", matchIfMissing = true)
+    @ConditionalOnBooleanProperty(prefix = GeneratorConfigProperties.PREFIX, name = "table-config.enabled", matchIfMissing = true)
     public MybatisEntityTableGenerator mybatisEntityTableGenerator() {
         return new MybatisEntityTableGenerator();
     }

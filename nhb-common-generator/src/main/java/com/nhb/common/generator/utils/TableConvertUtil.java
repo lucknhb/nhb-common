@@ -1,6 +1,10 @@
 package com.nhb.common.generator.utils;
 
 import cn.hutool.core.util.StrUtil;
+import com.github.therapi.runtimejavadoc.ClassJavadoc;
+import com.github.therapi.runtimejavadoc.CommentFormatter;
+import com.github.therapi.runtimejavadoc.FieldJavadoc;
+import com.github.therapi.runtimejavadoc.RuntimeJavadoc;
 import com.nhb.common.core.utils.StringUtil;
 import com.nhb.common.generator.core.TableInfo;
 import lombok.extern.slf4j.Slf4j;
@@ -10,6 +14,8 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author luck_nhb
@@ -27,6 +33,9 @@ public class TableConvertUtil {
      * mybatis空间路径
      */
     public static final String MAPPER_PATH = "main/resources/mapper";
+
+    private static final CommentFormatter COMMENT_FORMATTER = new CommentFormatter();
+
 
     /**
      * 根据模板名及表信息生成对应的路径
@@ -120,6 +129,21 @@ public class TableConvertUtil {
             }
         }
         return text;
+    }
+
+    /**
+     * 获取类中所有字段的注释（字段名 -> 注释）
+     */
+    public static Map<String, String> parseFieldComments(Class<?> clazz) {
+        Map<String, String> map = new HashMap<>();
+        ClassJavadoc classDoc = RuntimeJavadoc.getJavadoc(clazz);
+        for (FieldJavadoc fieldDoc : classDoc.getFields()) {
+            String comment = COMMENT_FORMATTER.format(fieldDoc.getComment());
+            if (StringUtil.isNotBlank(comment)) {
+                map.put(fieldDoc.getName(), comment);
+            }
+        }
+        return map;
     }
 
 }

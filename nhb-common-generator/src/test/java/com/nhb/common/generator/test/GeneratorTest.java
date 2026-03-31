@@ -1,11 +1,13 @@
 package com.nhb.common.generator.test;
 
+import com.nhb.common.core.factory.YamlPropertySourceFactory;
 import com.nhb.common.core.utils.SpringContextUtil;
 import com.nhb.common.generator.core.MybatisEntityTableGenerator;
 import com.nhb.common.generator.core.MybatisTableEntityGenerator;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.PropertySource;
 
 /**
  * @author luck_nhb
@@ -20,6 +22,7 @@ public class GeneratorTest {
      * 内嵌启动类，用于启动 Spring Boot 上下文
      */
     @SpringBootApplication
+    @PropertySource(value = "classpath:test.yaml",factory = YamlPropertySourceFactory.class)
     public static class TestApplication {
         // 空类即可，用于触发自动配置扫描
     }

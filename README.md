@@ -1,91 +1,26 @@
 
-apidoc可考虑smart-doc
 
-https://x-file-storage.xuyanwu.cn/
+### Generator模块
 
-### Redis模块
+目前实现以下功能
 
-该模块整合了<font color='red'>redisson</font>以及<font color='red'>lock4j(分布式锁)</font>  配置项如下
+1. 将数据库中的表结构转换为实体类/Vo(MapStructPlus可转换的VO)/Mapper接口/Mapper.xml文件
+2. 将指定包下的实体类(@TableName 注解)转换为表结构且通过实体类属性上的@NotBlank/@NotEmpty/@NotNull来判断表字段是否必填、根据属性上@Size中max值来约定最大值
+
+
 
 ```yaml
-# redis 单机配置(单机与集群只能开启一个另一个需要注释掉)
-spring.data:
-  redis:
-    # 地址
-    host: localhost
-    # 端口，默认为6379
-    port: 
-    # 数据库索引
-    database: 0
-    # redis 密码必须配置
-    password: 
-    # 连接超时时间
-    timeout: 10s
-    # 是否开启ssl
-    ssl.enabled: false
-# redisson 配置
-redisson:
-  # redis key前缀
-  keyPrefix:
-  # 线程池数量
-  threads: 16
-  # Netty线程池数量
-  nettyThreads: 32
-  # 单节点配置
-  singleServerConfig:
-    # 客户端名称 不能用中文
-    clientName: 
-    # 最小空闲连接数
-    connectionMinimumIdleSize: 32
-    # 连接池大小
-    connectionPoolSize: 64
-    # 连接空闲超时，单位：毫秒
-    idleConnectionTimeout: 10000
-    # 命令等待超时，单位：毫秒
-    timeout: 3000
-    # 发布和订阅连接池大小
-    subscriptionConnectionPoolSize: 50
-    
- # redis 集群配置(单机与集群只能开启一个另一个需要注释掉)
- spring.data:
-   redis:
-     cluster:
-       nodes:
-         - 192.168.0.100:6379
-         - 192.168.0.101:6379
-         - 192.168.0.102:6379
-     # 密码
-     password:
-     # 连接超时时间
-     timeout: 10s
-     # 是否开启ssl
-     ssl.enabled: false
- redisson:
-   # 线程池数量
-   threads: 16# Netty线程池数量
-   nettyThreads: 32
-   # 集群配置
-   clusterServersConfig:
-     # 客户端名称
-     clientName: 
-     # master最小空闲连接数
-     masterConnectionMinimumIdleSize: 32
-     # master连接池大小 masterConnectionPoolSize: 64
-     # slave最小空闲连接数
-     slaveConnectionMinimumIdleSize: 32
-     # slave连接池大小
-     slaveConnectionPoolSize: 64
-     # 连接空闲超时，单位：毫秒
-     idleConnectionTimeout: 10000
-     # 命令等待超时，单位：毫秒
-     timeout: 3000
-     # 发布和订阅连接池大小
-     subscriptionConnectionPoolSize: 50
-     # 读取模式
-     readMode: "SLAVE"
-     # 订阅模式
-     subscriptionMode: "MASTER"
+spring:
+  datasource:
+    #以下为自定义配置项
+    generator:
+      table-config:
+        enabled: false/true #是否开启表结构 <---> 实体类 互转功能
+        author: luck_nhb  #默认值 可自行配置覆盖
+        package-name: #如果是实体类转表结构 此处表示实体类所在包路径/ 如果是表结构转实体类 此处表示生成的实体类包路径的上一级  例如 XXX.package 则生成实体类包路径为  XXX.package.entity/XXX.package.vo
+        table-prefix: #表结构转实体类时 实体类名需要剔除掉的表名前缀  tb_XXX -> XXX
+    dynamic:  #支持动态数据库
+      enabled: false  #在该模块中虽然支持 但是默认未不开启  需要开启可自行覆盖该配置为true 并配置动态数据源
+        
 ```
-
-
 

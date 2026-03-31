@@ -3,3 +3,5 @@ spring:
     generator:
       table-config:
         author: luck_nhb
+    dynamic:
+      enabled: false

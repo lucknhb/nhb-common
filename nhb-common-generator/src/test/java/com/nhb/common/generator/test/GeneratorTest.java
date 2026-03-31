@@ -2,12 +2,15 @@ package com.nhb.common.generator.test;
 
 import com.nhb.common.core.factory.YamlPropertySourceFactory;
 import com.nhb.common.core.utils.SpringContextUtil;
+import com.nhb.common.generator.core.MapStructPlusGenerator;
 import com.nhb.common.generator.core.MybatisEntityTableGenerator;
 import com.nhb.common.generator.core.MybatisTableEntityGenerator;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.PropertySource;
+
+import java.util.List;
 
 /**
  * @author luck_nhb
@@ -30,12 +33,18 @@ public class GeneratorTest {
     @Test
     public void testMybatisTableEntityGenerator() {
         MybatisTableEntityGenerator mybatisTableEntityGenerator = SpringContextUtil.getBean(MybatisTableEntityGenerator.class);
-        mybatisTableEntityGenerator.generate();
+        mybatisTableEntityGenerator.generate(List.of("config_info"));
     }
 
     @Test
     public void testMybatisEntityTableGenerator() {
         MybatisEntityTableGenerator mybatisEntityTableGenerator = SpringContextUtil.getBean(MybatisEntityTableGenerator.class);
-        mybatisEntityTableGenerator.generate();
+        mybatisEntityTableGenerator.generate(null);
+    }
+
+    @Test
+    public void testMapStructPlusGenerator(){
+        MapStructPlusGenerator mapStructPlusGenerator = SpringContextUtil.getBean(MapStructPlusGenerator.class);
+        mapStructPlusGenerator.generate(null);
     }
 }

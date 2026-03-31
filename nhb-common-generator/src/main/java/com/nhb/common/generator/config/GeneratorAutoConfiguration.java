@@ -1,12 +1,14 @@
 package com.nhb.common.generator.config;
 
 import com.nhb.common.core.factory.YamlPropertySourceFactory;
+import com.nhb.common.generator.core.MapStructPlusGenerator;
 import com.nhb.common.generator.core.MybatisEntityTableGenerator;
 import com.nhb.common.generator.core.MybatisTableEntityGenerator;
 import com.nhb.common.generator.monitor.MyBatisDataSourceMonitor;
 import com.nhb.common.generator.properties.GeneratorConfigProperties;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBooleanProperty;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.PropertySource;
@@ -39,5 +41,11 @@ public class GeneratorAutoConfiguration {
     @ConditionalOnBooleanProperty(prefix = GeneratorConfigProperties.PREFIX, name = "table-config.enabled", matchIfMissing = true)
     public MybatisEntityTableGenerator mybatisEntityTableGenerator() {
         return new MybatisEntityTableGenerator();
+    }
+
+    @Bean
+    @ConditionalOnExpression("!'${spring.datasource.generator.table-config.package-name:}'.isEmpty()")
+    public MapStructPlusGenerator mapStructPlusGenerator(){
+        return new MapStructPlusGenerator();
     }
 }

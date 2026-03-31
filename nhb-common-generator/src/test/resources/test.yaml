@@ -3,6 +3,7 @@ spring:
     generator:
       table-config:
         enabled: true
+        author: luck_nhb
         package-name: com.nhb.common.generator.test
     dynamic:
       enabled: false

@@ -9,6 +9,7 @@ import com.nhb.common.core.utils.StringUtil;
 import com.nhb.common.generator.core.TableInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.Assert;
 
 import java.io.File;
 import java.math.BigDecimal;
@@ -44,6 +45,7 @@ public class TableConvertUtil {
      * @return
      */
     public static String writePath(String templateName, TableInfo tableInfo) {
+        Assert.hasLength(tableInfo.getPackageName(),"包路径[spring.datasource.generator.table-config.package-name]配置项不能为空");
         String javaPath = System.getProperty("user.dir") + File.separator + "src" + File.separator + PROJECT_PATH + "/" + StringUtils.replace(tableInfo.getPackageName(), ".", "/");
         String mapperPath = System.getProperty("user.dir") + File.separator + "src" + File.separator + MAPPER_PATH;
         String fileName = null;

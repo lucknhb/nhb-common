@@ -2,6 +2,7 @@ package com.nhb.common.generator.core;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.text.StrPool;
+import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.annotation.*;
 import com.github.therapi.runtimejavadoc.ClassJavadoc;
@@ -19,17 +20,13 @@ import jakarta.validation.constraints.Size;
 import org.anyline.metadata.Column;
 import org.anyline.metadata.Table;
 import org.anyline.service.AnylineService;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
-import org.springframework.core.io.support.ResourcePatternResolver;
-import org.springframework.core.type.classreading.CachingMetadataReaderFactory;
-import org.springframework.core.type.classreading.MetadataReader;
-import org.springframework.core.type.classreading.MetadataReaderFactory;
-import org.springframework.util.ClassUtils;
+import org.springframework.util.Assert;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author luck_nhb
@@ -37,18 +34,21 @@ import java.util.*;
  * @date 2026/3/30 13:15
  * @description: 实体类转表结构
  */
-public class MybatisEntityTableGenerator implements TableEntityGenerator {
+public class MybatisEntityTableGenerator{
 
     private static final CommentFormatter COMMENT_FORMATTER = new CommentFormatter();
 
     /**
-     * 生成对应的模板
+     * 根据需要生成的实体类生成表结构
+     * @param classes 实体类 如果为空的话 则通过获取配置项中的包路径下的所有类(类上需有@TableName 注解)来生成表结构
      */
-    @Override
-    public void generate() {
+    public void generate(Set<Class<?>> classes) {
         GeneratorConfigProperties generatorConfigProperties = SpringContextUtil.getBean(GeneratorConfigProperties.class);
         AnylineService anylineService = SpringContextUtil.getBean(AnylineService.class);
-        Set<Class<?>> classes = scanEntities(generatorConfigProperties.getTableConfig().getPackageName());
+        if (CollUtil.isEmpty(classes)) {
+            Assert.hasLength(generatorConfigProperties.getTableConfig().getPackageName(),"spring.datasource.generator.table-config.package-name 配置项为空");
+            classes =  ClassUtil.scanPackageByAnnotation(generatorConfigProperties.getTableConfig().getPackageName(),TableName.class);
+        }
         for (Class<?> aClass : classes) {
             Table table = buildTableFromEntity(aClass);
             try {
@@ -136,44 +136,5 @@ public class MybatisEntityTableGenerator implements TableEntityGenerator {
             column.setLength(size.max());
         }
         return column;
-    }
-
-    /**
-     * 扫描包下所有带有 @TableName 注解的类
-     *
-     * @param basePackage 包名
-     * @return 实体类集合
-     */
-    private Set<Class<?>> scanEntities(String basePackage) {
-        try {
-            Set<Class<?>> classes = new HashSet<>();
-            ResourcePatternResolver resourceResolver = new PathMatchingResourcePatternResolver();
-            MetadataReaderFactory readerFactory = new CachingMetadataReaderFactory(resourceResolver);
-            // 将包名转换为资源路径
-            String packageSearchPath = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX +
-                    ClassUtils.convertClassNameToResourcePath(basePackage) + "/**/*.class";
-            Resource[] resources = resourceResolver.getResources(packageSearchPath);
-            for (Resource resource : resources) {
-                if (resource.isReadable()) {
-                    MetadataReader reader = readerFactory.getMetadataReader(resource);
-                    String className = reader.getClassMetadata().getClassName();
-                    Class<?> clazz;
-                    try {
-                        clazz = Class.forName(className);
-                    } catch (ClassNotFoundException e) {
-                        continue;
-                    }
-                    // 过滤：不是接口、不是抽象类，且有 @TableName 注解
-                    if (!clazz.isInterface() && !Modifier.isAbstract(clazz.getModifiers())
-                            && clazz.isAnnotationPresent(TableName.class)) {
-                        classes.add(clazz);
-                    }
-                }
-            }
-            return classes;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-
     }
 }

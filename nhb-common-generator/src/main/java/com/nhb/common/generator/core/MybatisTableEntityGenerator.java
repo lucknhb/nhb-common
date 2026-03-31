@@ -1,5 +1,6 @@
 package com.nhb.common.generator.core;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -28,16 +29,18 @@ import java.util.*;
  */
 @Slf4j
 @RequiredArgsConstructor
-public class MybatisTableEntityGenerator implements TableEntityGenerator {
+public class MybatisTableEntityGenerator {
 
     /**
-     * 生成对应的模板
+     * 根据表名生成对应的实体类/VO/Mapper
+     * @param tableNames 需要处理的表名  如果为空 则处理数据库下所有表
      */
-    @Override
-    public void generate() {
+    public void generate(List<Object> tableNames) {
         AnylineService anylineService = SpringContextUtil.getBean(AnylineService.class);
         GeneratorConfigProperties generatorConfigProperties = SpringContextUtil.getBean(GeneratorConfigProperties.class);
-        List tableNames = anylineService.tables();
+        if (CollUtil.isEmpty(tableNames)) {
+            tableNames = anylineService.tables();
+        }
         for (Object tableName : tableNames ) {
             //获取表格详细信息
             Table table = anylineService.metadata().table(tableName.toString());

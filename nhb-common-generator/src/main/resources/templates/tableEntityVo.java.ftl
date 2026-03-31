@@ -17,7 +17,6 @@ import java.util.Date;
 * @description: ${functionInfo}视图对象 ${tableName}
 */
 @Data
-@ExcelIgnoreUnannotated
 @AutoMapper(target = ${entityName}.class)
 public class ${entityName}Vo implements Serializable {
 <#list columns as column>

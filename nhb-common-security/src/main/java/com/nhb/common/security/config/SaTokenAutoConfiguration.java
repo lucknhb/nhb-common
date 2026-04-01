@@ -5,10 +5,12 @@ import cn.dev33.satoken.jwt.StpLogicJwtForSimple;
 import cn.dev33.satoken.stp.StpInterface;
 import cn.dev33.satoken.stp.StpLogic;
 import com.nhb.common.core.factory.YamlPropertySourceFactory;
+import com.nhb.common.redis.config.RedissonAutoConfiguration;
 import com.nhb.common.security.handler.SaTokenExceptionHandler;
 import com.nhb.common.security.service.DefaultSaTokenDao;
 import com.nhb.common.security.service.DefaultSaTokenPermissionService;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.PropertySource;
 
@@ -35,6 +37,7 @@ public class SaTokenAutoConfiguration {
      * 自定义dao层存储
      */
     @Bean
+    @ConditionalOnBean(RedissonAutoConfiguration.class)
     public SaTokenDao saTokenDao() {
         return new DefaultSaTokenDao();
     }

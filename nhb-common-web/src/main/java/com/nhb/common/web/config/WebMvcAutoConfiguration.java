@@ -5,6 +5,7 @@ import com.nhb.common.web.handler.GlobalExceptionHandler;
 import com.nhb.common.web.handler.ResponseBodyHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
@@ -13,6 +14,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
 import java.util.TimeZone;
 
@@ -41,6 +43,7 @@ public class WebMvcAutoConfiguration {
      * 请求响应拦截处理器
      */
     @Bean
+    @ConditionalOnClass(ResponseBodyAdvice.class)
     public ResponseBodyHandler responseBodyHandler() {
         return new ResponseBodyHandler();
     }

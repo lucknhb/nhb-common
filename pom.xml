@@ -56,7 +56,7 @@
         <redisson.version>3.52.0</redisson.version>
         <hutool.version>5.8.43</hutool.version>
         <ip2region.version>3.3.4</ip2region.version>
-        <spring-boot.version>3.5.12</spring-boot.version>
+        <spring-boot.version>3.5.13</spring-boot.version>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <nacos.client.version>3.0.3</nacos.client.version>

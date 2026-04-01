@@ -2,13 +2,11 @@ package com.nhb.common.core.config;
 
 import com.nhb.common.core.manager.ManualTransactionManager;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionOperations;
-
-import javax.sql.DataSource;
 
 /**
  * @author luck_nhb
@@ -17,7 +15,7 @@ import javax.sql.DataSource;
  * @description:
  */
 @AutoConfiguration
-@ConditionalOnClass({ DataSource.class })
+@ConditionalOnBean({ PlatformTransactionManager.class })
 public class TransactionTemplateAutoConfiguration {
 
     @Bean

@@ -41,6 +41,7 @@ import java.util.stream.Stream;
 @SuppressWarnings("all")
 public class OpenApiHandler extends OpenAPIService {
 
+
     /**
      * The Basic error controller.
      */
@@ -90,7 +91,6 @@ public class OpenApiHandler extends OpenAPIService {
      * Javadoc解析器接口
      */
     private final List<JavadocResolver> javadocResolvers;
-
 
     /**
      * The javadoc provider.
@@ -189,6 +189,8 @@ public class OpenApiHandler extends OpenAPIService {
         }
 
         if (isAutoTagClasses(operation)) {
+
+
             if (javadocProvider.isPresent()) {
                 String description = javadocProvider.get().getClassJavadoc(handlerMethod.getBeanType());
                 if (StringUtils.isNotBlank(description)) {

@@ -5,6 +5,7 @@ import com.nhb.common.api.core.SaTokenAnnotationMetadataJavadocResolver;
 import com.nhb.common.api.handler.OpenApiHandler;
 import com.nhb.common.api.properties.ApiProperties;
 import com.nhb.common.core.factory.YamlPropertySourceFactory;
+import com.nhb.common.core.utils.StringUtil;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Paths;
 import io.swagger.v3.oas.models.info.Info;
@@ -30,10 +31,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author luck_nhb
@@ -91,11 +89,11 @@ public class ApiAutoConfiguration {
                                          SecurityService securityParser,
                                          SpringDocConfigProperties springDocConfigProperties,
                                          PropertyResolverUtils propertyResolverUtils,
-                                         Optional<List<OpenApiBuilderCustomizer>> openApiBuilderCustomisers,
-                                         Optional<List<ServerBaseUrlCustomizer>> serverBaseUrlCustomisers,
+                                         Optional<List<OpenApiBuilderCustomizer>> openApiBuilderCustomizers,
+                                         Optional<List<ServerBaseUrlCustomizer>> serverBaseUrlCustomizers,
                                          Optional<JavadocProvider> javadocProvider,
                                          List<JavadocResolver> javadocResolvers) {
-        return new OpenApiHandler(openApi, securityParser, springDocConfigProperties, propertyResolverUtils, openApiBuilderCustomisers, serverBaseUrlCustomisers, javadocProvider, javadocResolvers);
+        return new OpenApiHandler(openApi, securityParser, springDocConfigProperties, propertyResolverUtils, openApiBuilderCustomizers, serverBaseUrlCustomizers, javadocProvider, javadocResolvers);
     }
 
     /**
@@ -113,9 +111,15 @@ public class ApiAutoConfiguration {
                 finalContextPath = contextPath;
             }
         } else {
-            HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-            // 从请求头获取gateway转发的服务前缀
-            finalContextPath = StringUtils.defaultIfBlank(request.getHeader("X-Forwarded-Prefix"), "");
+            ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+            if (Objects.nonNull(requestAttributes)) {
+                HttpServletRequest request = requestAttributes.getRequest();
+                // 从请求头获取gateway转发的服务前缀
+                finalContextPath = StringUtil.defaultIfBlank(request.getHeader("X-Forwarded-Prefix"), "");
+            }else {
+                finalContextPath = "";
+            }
+
         }
         return openApi -> {
             Paths oldPaths = openApi.getPaths();

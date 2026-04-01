@@ -31,7 +31,7 @@ public class SaTokenSecurityMetadata {
     /**
      * 是否忽略校验（对应 @SaIgnore 注解）
      */
-    private boolean ignore = false;
+    private Boolean ignore = false;
 
     /**
      * 添加权限信息

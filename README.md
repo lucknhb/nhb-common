@@ -1,5 +1,226 @@
 
 
+### Core模块
+
+依赖如下：
+
+```xml
+<dependency>
+    <groupId>com.nhb</groupId>
+    <artifactId>nhb-common-core</artifactId>
+    <version>${version}</version>
+</dependency>
+```
+
+提供了通用的工具类、配置类、常量定义、枚举类型、异常处理等核心功能
+
+#### 1. 配置类 (config)
+
+提供 Spring Boot 自动配置功能，包括：
+
+- **ThreadPoolAutoConfiguration** - 线程池自动配置
+  - 自动创建 ScheduledExecutorService 定时任务线程池
+  - 支持虚拟线程（Virtual Threads）
+  - 包含异常处理和优雅关闭机制
+  
+- **JacksonAutoConfiguration** - Jackson JSON 序列化配置
+- **ValidatorAutoConfiguration** - 参数校验器配置
+- **TransactionTemplateAutoConfiguration** - 事务模板配置
+- **ApplicationAutoConfiguration** - 应用配置
+
+#### 2. 常量类 (constant)
+
+定义系统通用常量：
+
+- **CacheConstants** - 缓存相关常量
+- **GlobalConstants** - 全局通用常量
+- **RegexConstants** - 正则表达式常量
+- **StringPoolConstants** - 字符串常量池
+
+#### 3. 领域模型
+
+- **ResultMessage<T>** - 统一 API 响应结果封装
+  - 支持泛型数据返回
+  - 内置成功 (200)/失败 (500) 状态码
+  - 提供丰富的静态构造方法
+
+#### 4. 枚举类 (enums)
+
+- **DateTimeFormatType** - 日期时间格式化类型
+- **DeviceType** - 设备类型枚举
+- **FileContentType** - 文件内容类型枚举
+- **LoginType** - 登录类型枚举
+
+#### 5. 异常处理 (exception)
+
+- **ServiceException** - 业务异常类
+  - 支持错误码和错误消息
+  - 支持详细错误信息
+  - 支持参数化消息格式化
+- **I18nBaseException** - 国际化基础异常
+
+#### 6. YamlPropertySourceFactory
+
+yaml类型配置文件加载转换为spring环境中可通过@value取值类型
+
+```java
+//例如
+@PropertySource(value = "classpath:XXXX.yaml", factory = YamlPropertySourceFactory.class)
+```
+
+#### 7.ManualTransactionManager
+
+手动事务工具类
+	支持在任意地方手动开启、提交、回滚事务，且不会影响 Spring 默认的声明式事务。
+	每个线程最多只能有一个活跃的手动事务，重复开启会抛出异常
+
+#### 8.工具类
+
+##### BeanUtil
+
+Bean对象相关操作 继承自org.springframework.beans.BeanUtils并进行了功能扩展
+
+##### CharsetKitUtil
+
+字符集工具
+
+##### ConvertUtil
+
+对象转换工具 例如转字符串、转BigDecimal等
+
+##### DesensitizeUtil
+
+脱敏工具 继承自cn.hutool.core.util.DesensitizedUtil 并进行了扩展
+
+##### FileExportUtil
+
+文件导出基础工具类 设置下载响应头
+
+##### FreeMarkerTemplateUtil
+
+FreeMarker模板操作工具类  继承自org.springframework.ui.freemarker.FreeMarkerTemplateUtils并功能扩展两个基础方法
+
+```java
+    /**
+     * 根据模板获取内容
+     *
+     * @param template 模板
+     * @param params   参数
+     * @return 内容
+     */
+    public static String getContent(String template, Map<String, Object> params)
+
+    /**
+     * 获取模板
+     *
+     * @param template 模板名称
+     * @return 模板
+     * @throws IOException 异常
+     */
+    public static Template getTemplate(String template)
+```
+
+##### I18MessageUtil
+
+国际化工具类 切记不可在初始化中使用该方法 此时容器中的数据并未初始化完成 无法获取到 MessageSource
+
+##### IpUtil
+
+继承自cn.hutool.core.net.NetUtil
+
+IP工具类 进行IP转换  注意该工具类不包含通过HTTP请求获取请求方IP地址
+
+##### JacksonUtil
+
+jackson操作json数据工具类 包含转换json字符串、字符串转对象等
+
+##### MapStructUtil
+
+对MapStructPlus的操作工具类 可代替BeanUtil进行对象属性复制 性能原高于BeanUtil
+
+参考文档：<a href="https://mapstruct.plus/introduction/quick-start.html">mapstruct-plus</a>
+
+##### MapUtil
+
+Map集合操作工具类
+
+##### ObjectSelfUtil
+
+对象工具类 继承自cn.hutool.core.util.ObjectUtil
+
+##### ReflectSelfUtil
+
+反射工具类 继承自cn.hutool.core.util.ReflectUtil 并 实现获取getter setter
+
+##### ResourceFileUtil
+
+Spring环境下 获取文件工具类 继承自org.springframework.util.ResourceUtils
+
+##### SpringContextUtil
+
+Spring容器工具类
+
+##### SpringExpressionUtil
+
+表达式工具类
+提供高效、线程安全的表达式解析、求值、模板处理等功能
+内部缓存已编译的表达式，避免重复解析开销
+
+##### SqlUtil
+
+防止SQL注入语句检测工具类
+
+##### SslUtil
+
+SSL 工具类
+
+##### StreamUtil
+
+Stream流工具类
+
+##### StringUtil
+
+String相关操作类 继承自org.apache.commons.lang3.StringUtils
+
+##### ThreadPoolUtil
+
+线程池操作工具类 继承自cn.hutool.core.thread.ThreadUtil
+
+##### TreeBuildUtil
+
+构建树工具
+
+##### ValidatorUtil
+
+校验工具类
+
+##### YamlUtil
+
+YAML文件解析
+
+#### 9.validate校验处理
+
+EnumPattern：枚举类型注解校验
+
+JsonPattern：JSON 格式校验注解
+
+Xss : 自定义xss校验注解 用于校验是否存在脚本注入风险
+
+#### 注意事项
+
+1. **线程池使用**：`ThreadPoolAutoConfiguration` 会自动创建线程池，无需手动配置
+2. **虚拟线程支持**：当 Spring Boot 3.2+ 启用虚拟线程时，线程池会自动适配
+3. **Stream 操作**：避免使用 `.toList()` 新语法，使用 `Collectors.toList()` 以保证可序列化性
+4. **JSON 处理**：`JacksonUtil` 依赖 Spring 容器中的 ObjectMapper Bean
+5. **异常处理**：`ServiceException` 支持国际化消息，建议配合 `I18nBaseException` 使用
+
+#### 最佳实践
+
+1. **类型转换优先使用 ConvertUtil**：所有转换都是安全的，不会抛出异常
+2. **统一返回格式**：所有接口返回值都应使用 `ResultMessage` 包装
+4. **Stream 工具简化代码**：优先使用 `StreamUtil` 提供的便捷方法
+5. **树形结构复用**：使用 `TreeBuildUtil` 统一树形结构构建逻辑
+
 ### Api模块
 
 依赖如下

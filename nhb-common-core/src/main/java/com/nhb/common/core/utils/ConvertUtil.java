@@ -3,7 +3,6 @@ package com.nhb.common.core.utils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -71,7 +70,7 @@ public class ConvertUtil {
         }
 
         final String valueStr = toStr(value, null);
-        return StringUtils.isEmpty(valueStr) ? defaultValue : valueStr.charAt(0);
+        return StringUtil.isEmpty(valueStr) ? defaultValue : valueStr.charAt(0);
     }
 
     /**
@@ -96,17 +95,21 @@ public class ConvertUtil {
      * @return 结果
      */
     public static Byte toByte(Object value, Byte defaultValue) {
-        if (value == null) {
-            return defaultValue;
-        }
-        if (value instanceof Byte) {
-            return (Byte) value;
-        }
-        if (value instanceof Number) {
-            return ((Number) value).byteValue();
+        switch (value) {
+            case null -> {
+                return defaultValue;
+            }
+            case Byte b -> {
+                return b;
+            }
+            case Number number -> {
+                return number.byteValue();
+            }
+            default -> {
+            }
         }
         final String valueStr = toStr(value, null);
-        if (StringUtils.isEmpty(valueStr)) {
+        if (StringUtil.isEmpty(valueStr)) {
             return defaultValue;
         }
         try {
@@ -138,17 +141,21 @@ public class ConvertUtil {
      * @return 结果
      */
     public static Short toShort(Object value, Short defaultValue) {
-        if (value == null) {
-            return defaultValue;
-        }
-        if (value instanceof Short) {
-            return (Short) value;
-        }
-        if (value instanceof Number) {
-            return ((Number) value).shortValue();
+        switch (value) {
+            case null -> {
+                return defaultValue;
+            }
+            case Short i -> {
+                return i;
+            }
+            case Number number -> {
+                return number.shortValue();
+            }
+            default -> {
+            }
         }
         final String valueStr = toStr(value, null);
-        if (StringUtils.isEmpty(valueStr)) {
+        if (StringUtil.isEmpty(valueStr)) {
             return defaultValue;
         }
         try {
@@ -187,7 +194,7 @@ public class ConvertUtil {
             return (Number) value;
         }
         final String valueStr = toStr(value, null);
-        if (StringUtils.isEmpty(valueStr)) {
+        if (StringUtil.isEmpty(valueStr)) {
             return defaultValue;
         }
         try {
@@ -219,17 +226,21 @@ public class ConvertUtil {
      * @return 结果
      */
     public static Integer toInt(Object value, Integer defaultValue) {
-        if (value == null) {
-            return defaultValue;
-        }
-        if (value instanceof Integer) {
-            return (Integer) value;
-        }
-        if (value instanceof Number) {
-            return ((Number) value).intValue();
+        switch (value) {
+            case null -> {
+                return defaultValue;
+            }
+            case Integer i -> {
+                return i;
+            }
+            case Number number -> {
+                return number.intValue();
+            }
+            default -> {
+            }
         }
         final String valueStr = toStr(value, null);
-        if (StringUtils.isEmpty(valueStr)) {
+        if (StringUtil.isEmpty(valueStr)) {
             return defaultValue;
         }
         try {
@@ -279,7 +290,7 @@ public class ConvertUtil {
      * @return 结果
      */
     public static Integer[] toIntArray(String split, String str) {
-        if (StringUtils.isEmpty(str)) {
+        if (StringUtil.isEmpty(str)) {
             return new Integer[]{};
         }
         String[] arr = str.split(split);
@@ -299,7 +310,7 @@ public class ConvertUtil {
      * @return 结果
      */
     public static Long[] toLongArray(String split, String str) {
-        if (StringUtils.isEmpty(str)) {
+        if (StringUtil.isEmpty(str)) {
             return new Long[]{};
         }
         String[] arr = str.split(split);
@@ -318,7 +329,7 @@ public class ConvertUtil {
      * @return 结果
      */
     public static String[] toStrArray(String str) {
-        if (StringUtils.isEmpty(str)) {
+        if (StringUtil.isEmpty(str)) {
             return new String[]{};
         }
         return toStrArray(",", str);
@@ -359,7 +370,7 @@ public class ConvertUtil {
             }
         }
         final String valueStr = toStr(value, null);
-        if (StringUtils.isEmpty(valueStr)) {
+        if (StringUtil.isEmpty(valueStr)) {
             return defaultValue;
         }
         try {
@@ -392,17 +403,21 @@ public class ConvertUtil {
      * @return 结果
      */
     public static Double toDouble(Object value, Double defaultValue) {
-        if (value == null) {
-            return defaultValue;
-        }
-        if (value instanceof Double) {
-            return (Double) value;
-        }
-        if (value instanceof Number) {
-            return ((Number) value).doubleValue();
+        switch (value) {
+            case null -> {
+                return defaultValue;
+            }
+            case Double v -> {
+                return v;
+            }
+            case Number number -> {
+                return number.doubleValue();
+            }
+            default -> {
+            }
         }
         final String valueStr = toStr(value, null);
-        if (StringUtils.isEmpty(valueStr)) {
+        if (StringUtil.isEmpty(valueStr)) {
             return defaultValue;
         }
         try {
@@ -435,17 +450,21 @@ public class ConvertUtil {
      * @return 结果
      */
     public static Float toFloat(Object value, Float defaultValue) {
-        if (value == null) {
-            return defaultValue;
-        }
-        if (value instanceof Float) {
-            return (Float) value;
-        }
-        if (value instanceof Number) {
-            return ((Number) value).floatValue();
+        switch (value) {
+            case null -> {
+                return defaultValue;
+            }
+            case Float v -> {
+                return v;
+            }
+            case Number number -> {
+                return number.floatValue();
+            }
+            default -> {
+            }
         }
         final String valueStr = toStr(value, null);
-        if (StringUtils.isEmpty(valueStr)) {
+        if (StringUtil.isEmpty(valueStr)) {
             return defaultValue;
         }
         try {
@@ -484,7 +503,7 @@ public class ConvertUtil {
             return (Boolean) value;
         }
         String valueStr = toStr(value, null);
-        if (StringUtils.isEmpty(valueStr)) {
+        if (StringUtil.isEmpty(valueStr)) {
             return defaultValue;
         }
         valueStr = valueStr.trim().toLowerCase();
@@ -526,7 +545,7 @@ public class ConvertUtil {
             return myE;
         }
         final String valueStr = toStr(value, null);
-        if (StringUtils.isEmpty(valueStr)) {
+        if (StringUtil.isEmpty(valueStr)) {
             return defaultValue;
         }
         try {
@@ -572,7 +591,7 @@ public class ConvertUtil {
             }
         }
         final String valueStr = toStr(value, null);
-        if (StringUtils.isEmpty(valueStr)) {
+        if (StringUtil.isEmpty(valueStr)) {
             return defaultValue;
         }
         try {
@@ -624,7 +643,7 @@ public class ConvertUtil {
             }
         }
         final String valueStr = toStr(value, null);
-        if (StringUtils.isEmpty(valueStr)) {
+        if (StringUtil.isEmpty(valueStr)) {
             return defaultValue;
         }
         try {
@@ -710,7 +729,7 @@ public class ConvertUtil {
      * @return 字符串
      */
     public static String str(byte[] bytes, String charset) {
-        return str(bytes, StringUtils.isEmpty(charset) ? Charset.defaultCharset() : Charset.forName(charset));
+        return str(bytes, StringUtil.isEmpty(charset) ? Charset.defaultCharset() : Charset.forName(charset));
     }
 
     /**

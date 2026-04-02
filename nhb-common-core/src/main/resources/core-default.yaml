@@ -1,4 +1,8 @@
-#启动时 不校验模板位置 已知该告警提示 Cannot find template location: [classpath:/templates/]
 spring:
+  #启动不校验模板位置 已知该告警提示 Cannot find template location: [classpath:/templates/]
   freemarker:
     check-template-location: false
+  #默认开启虚拟线程
+  threads:
+    virtual:
+      enabled: true

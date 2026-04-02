@@ -10,9 +10,11 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
+import com.nhb.common.core.factory.YamlPropertySourceFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.PropertySource;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
@@ -27,6 +29,7 @@ import java.time.format.DateTimeFormatter;
  * @description: 时间序列化配置
  */
 @Slf4j
+@PropertySource(value = "classpath:core-default.yaml",factory = YamlPropertySourceFactory.class)
 @AutoConfigureBefore(org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration.class)
 public class JacksonAutoConfiguration {
     /**

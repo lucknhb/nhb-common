@@ -2,8 +2,10 @@ package com.nhb.common.web.config;
 
 import com.nhb.common.core.utils.SpringContextUtil;
 import io.undertow.UndertowOptions;
+import io.undertow.server.DefaultByteBufferPool;
 import io.undertow.server.handlers.DisallowedMethodsHandler;
 import io.undertow.util.HttpString;
+import io.undertow.websockets.jsr.WebSocketDeploymentInfo;
 import jakarta.annotation.Resource;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.web.ServerProperties;
@@ -39,6 +41,10 @@ public class UndertowAutoConfiguration implements WebServerFactoryCustomizer<Und
         factory.addBuilderCustomizers(builder -> builder.setServerOption(UndertowOptions.MULTIPART_MAX_ENTITY_SIZE, bytes));
         // 默认不直接分配内存 如果项目中使用了 websocket 建议直接分配
         factory.addDeploymentInfoCustomizers(deploymentInfo -> {
+            // 配置 WebSocket 部署信息，设置 WebSocket 使用的缓冲区池
+            WebSocketDeploymentInfo webSocketDeploymentInfo = new WebSocketDeploymentInfo();
+            webSocketDeploymentInfo.setBuffers(new DefaultByteBufferPool(true, 1024 * 16));
+            deploymentInfo.addServletContextAttribute(WebSocketDeploymentInfo.ATTRIBUTE_NAME, webSocketDeploymentInfo);
             // 如果启用了虚拟线程，配置 Undertow 使用虚拟线程池
             if (SpringContextUtil.isVirtual()) {
                 // 创建虚拟线程池，线程池前缀为 "undertow-"
@@ -47,7 +53,6 @@ public class UndertowAutoConfiguration implements WebServerFactoryCustomizer<Und
                 deploymentInfo.setExecutor(executor);
                 deploymentInfo.setAsyncExecutor(executor);
             }
-
             // 配置禁止某些不安全的 HTTP 方法（如 CONNECT、TRACE、TRACK）
             deploymentInfo.addInitialHandlerChainWrapper(handler -> {
                 // 禁止三个方法 CONNECT/TRACE/TRACK 也是不安全的 避免爬虫骚扰

@@ -22,7 +22,7 @@ spring:
   threads:
     # 开启虚拟线程 仅jdk21可用
     virtual:
-      enabled: false
+      enabled: true
   task:
     execution:
       # 从 springboot 3.5 开始 spring自带线程池

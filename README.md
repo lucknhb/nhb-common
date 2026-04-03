@@ -384,3 +384,60 @@ MapStructPlusGenerator mapStructPlusGenerator = SpringContextUtil.getBean(MapStr
 mapStructPlusGenerator.generate(null);
 ```
 
+### Nacos模块
+
+依赖如下
+
+```xml
+<dependency>
+   <groupId>com.nhb</groupId>
+   <artifactId>nhb-common-nacos</artifactId>
+   <version>${version}</version>
+</dependency>
+```
+
+由于使用的是SpringBoot3.X版本环境 引用的Nacos需符合相应版本，在此版本上的配置方式与SpringBoot2.X时存在差异
+
+<font color='red'>application.yml是配置项入口文件</font>
+
+```yaml
+spring:
+  #如果在application.yml 文件中 配置了该配置项 对应的 application-${spring.profiles.active}.yml会自动加载(如果存在该配置文件的)
+  profiles:
+    active: dev
+#查看配置文件加载情况可使用该配置项开启
+logging:
+  level:
+    org:
+      springframework:
+        boot:
+          context:
+            config: trace
+```
+
+参考文档 <a href="https://nacos.io/docs/v3.1/ecology/use-nacos-with-spring-cloud">use-nacos-with-spring-cloud</a>  以及 [SpringCloud应用Nacos配置中心注解 ](https://nacos.io/blog/nacos-gvr7dx_awbbpb_mmufdmayp5dfozci/?spm=5238cd80.4ec37b78.0.0.56537e84O5kyNg)
+
+```yaml
+#配置示例
+spring:
+  cloud:
+    nacos:
+      # nacos 服务地址
+      server-addr: 127.0.0.1:8848
+      username:
+      password:
+      discovery:
+        port: 8080 #可定义实例注册到Nacos时的端口
+      config:
+        namespace: #Nacos中的Namespce名称
+  config:
+    import:
+    #以下配置项中 optional:nacos代表nacos中没有对应application-dev.yml配置项时 也不报错  如果需要校验是否存在可将optional:去掉
+    #application-dev.yml?group=组名&refreshEnabled=true 表示上面指定的namespace下的指定组名的配置文件名 refreshEnabled=true表示可动态刷新配置项
+    #另外除了可使用nacos: 还可以使用 classpath:(resouces目录下的配置文件) file:(自指定目录文件下的配置文件)
+      - optional:nacos:application-dev.yml?group=组名&refreshEnabled=true
+```
+
+
+
+### Dubbo模块

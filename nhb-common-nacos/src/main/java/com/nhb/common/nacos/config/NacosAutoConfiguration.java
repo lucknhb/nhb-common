@@ -1,7 +1,7 @@
 package com.nhb.common.nacos.config;
 
 import com.nhb.common.core.factory.YamlPropertySourceFactory;
-import com.nhb.common.nacos.condition.NoGatewayCondition;
+import com.nhb.common.nacos.condition.GatewayCondition;
 import com.nhb.common.nacos.listeners.InstanceApplicationReadyEventListener;
 import com.nhb.common.nacos.listeners.InstanceContextClosedEventListener;
 import com.nhb.common.nacos.listeners.RouteApplicationReadyEventListener;
@@ -22,7 +22,7 @@ import org.springframework.core.env.Environment;
 public class NacosAutoConfiguration {
 
     @Bean
-    @Conditional(NoGatewayCondition.class)
+    @Conditional(GatewayCondition.class)
     public RouteApplicationReadyEventListener routeApplicationReadyEventListener(Environment environment) {
         return new  RouteApplicationReadyEventListener(environment);
     }

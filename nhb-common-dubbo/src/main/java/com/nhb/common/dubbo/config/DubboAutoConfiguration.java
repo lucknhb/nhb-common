@@ -1,11 +1,13 @@
 package com.nhb.common.dubbo.config;
 
+import com.nhb.common.core.factory.YamlPropertySourceFactory;
 import com.nhb.common.dubbo.handler.DubboExceptionHandler;
 import com.nhb.common.dubbo.processor.CustomDubboBeanFactoryPostProcessor;
 import com.nhb.common.dubbo.properties.DubboCustomProperties;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.PropertySource;
 
 /**
  * @author luck_nhb
@@ -14,6 +16,7 @@ import org.springframework.context.annotation.Bean;
  * @description:
  */
 @AutoConfiguration
+@PropertySource(value = "classpath:dubbo-default.yaml",factory = YamlPropertySourceFactory.class)
 @EnableConfigurationProperties(DubboCustomProperties.class)
 public class DubboAutoConfiguration {
 

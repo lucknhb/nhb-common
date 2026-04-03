@@ -2,7 +2,14 @@ spring:
   #启动不校验模板位置 已知该告警提示 Cannot find template location: [classpath:/templates/]
   freemarker:
     check-template-location: false
-  #默认开启虚拟线程
   threads:
+    # 开启虚拟线程
     virtual:
       enabled: true
+  task:
+    execution:
+      # 从 springboot 3.5 开始 spring自带线程池
+      # 当注解@Async 时使用到该线城池  不再需要额外配置 AsyncConfig
+      thread-name-prefix: async-
+      # 由spring自己初始化线程池
+      mode: force

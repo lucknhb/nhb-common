@@ -6,6 +6,7 @@ import com.nhb.common.nacos.listeners.InstanceApplicationReadyEventListener;
 import com.nhb.common.nacos.listeners.InstanceContextClosedEventListener;
 import com.nhb.common.nacos.listeners.RouteApplicationReadyEventListener;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBooleanProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.PropertySource;
@@ -28,11 +29,13 @@ public class NacosAutoConfiguration {
     }
 
     @Bean
+    @ConditionalOnBooleanProperty(value = "spring.cloud.nacos.discovery.register-enabled",havingValue = false,matchIfMissing = true)
     public InstanceContextClosedEventListener instanceContextClosedEventListener() {
         return new InstanceContextClosedEventListener();
     }
 
     @Bean
+    @ConditionalOnBooleanProperty(value = "spring.cloud.nacos.discovery.register-enabled",havingValue = false,matchIfMissing = true)
     public InstanceApplicationReadyEventListener newInstanceApplicationReadyEventListener() {
         return new InstanceApplicationReadyEventListener();
     }

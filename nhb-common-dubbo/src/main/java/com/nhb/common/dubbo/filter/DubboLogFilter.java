@@ -32,7 +32,7 @@ public class DubboLogFilter implements Filter {
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
         DubboCustomProperties properties = SpringContextUtil.getBean(DubboCustomProperties.class);
         // 如果未开启请求日志记录，则直接执行服务调用并返回结果
-        if (!properties.isLogEnabled()) {
+        if (!properties.getLogEnabled()) {
             return invoker.invoke(invocation);
         }
         // 判断是 Provider 还是 Consumer
@@ -51,7 +51,7 @@ public class DubboLogFilter implements Filter {
         long elapsed = System.currentTimeMillis() - startTime;
         // 如果发生异常且调用的不是泛化服务，则记录异常日志
         if (result.hasException() && !invoker.getInterface().equals(GenericService.class)) {
-            log.error("DUBBO - INVOKE EXCEPTION. The Request message is :{} ,the exception message is:{}", baseLog, result.getException());
+            log.error("DUBBO - INVOKE EXCEPTION. The Request message is :{} ,the exception message is:{}", baseLog, result.getException().getMessage());
         } else {
             // 根据日志级别输出服务响应信息
             log.info("DUBBO - 服务响应: {},SpendTime=[{}ms],Response={}", baseLog, elapsed, JacksonUtil.toJsonString(new Object[]{result.getValue()}));

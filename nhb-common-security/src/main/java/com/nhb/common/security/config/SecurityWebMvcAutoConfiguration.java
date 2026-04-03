@@ -43,7 +43,8 @@ public class SecurityWebMvcAutoConfiguration implements WebMvcConfigurer {
         log.info("Security ignoreUrl list ：{}",securityConfigProperties.getPaths());
         registry.addInterceptor(new SaInterceptor(handle -> StpUtil.checkLogin()))
                 .addPathPatterns("/**")
-                .excludePathPatterns(securityConfigProperties.getPaths());
+                .excludePathPatterns(securityConfigProperties.getPaths())
+                .excludePathPatterns("/favicon.ico", "/actuator", "/actuator/**", "/resource/sse");
     }
 
     /**
@@ -54,8 +55,9 @@ public class SecurityWebMvcAutoConfiguration implements WebMvcConfigurer {
         return new SaServletFilter()
                 .addInclude("/**")
                 .setExcludeList(securityConfigProperties.getPaths())
-                .addExclude("/actuator", "/actuator/**")
+                .addExclude("/favicon.ico", "/actuator", "/actuator/**", "/resource/sse")
                 .setAuth(obj -> {
+
                     if (SaManager.getConfig().getCheckSameToken()) {
                         SaSameUtil.checkCurrentRequestToken();
                     }

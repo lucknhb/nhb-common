@@ -12,10 +12,15 @@ import org.springframework.cloud.context.config.annotation.RefreshScope;
  */
 @Data
 @RefreshScope
-@ConfigurationProperties(prefix = "dubbo.custom")
+@ConfigurationProperties(prefix = DubboCustomProperties.PREFIX)
 public class DubboCustomProperties {
+    public static final String PREFIX = "dubbo.custom";
     /**
      * 是否打印出调用日志 默认为true
      */
-    private boolean logEnabled = true;
+    private Boolean logEnabled = true;
+    /**
+     * 是否设置项目名称 可在Nacos 订阅列表中 应用名  默认开启
+     */
+    private Boolean projectNameEnabled = true;
 }

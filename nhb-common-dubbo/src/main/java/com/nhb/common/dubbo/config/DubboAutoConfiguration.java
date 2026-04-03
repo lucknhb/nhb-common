@@ -3,8 +3,10 @@ package com.nhb.common.dubbo.config;
 import com.nhb.common.core.factory.YamlPropertySourceFactory;
 import com.nhb.common.dubbo.handler.DubboExceptionHandler;
 import com.nhb.common.dubbo.processor.CustomDubboBeanFactoryPostProcessor;
+import com.nhb.common.dubbo.processor.CustomDubboProjectNameEnvironmentAware;
 import com.nhb.common.dubbo.properties.DubboCustomProperties;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBooleanProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.PropertySource;
@@ -31,5 +33,11 @@ public class DubboAutoConfiguration {
     @Bean
     public DubboExceptionHandler dubboExceptionHandler() {
         return new DubboExceptionHandler();
+    }
+
+    @Bean
+    @ConditionalOnBooleanProperty(prefix =  DubboCustomProperties.PREFIX,name = "projectNameEnabled",matchIfMissing = true)
+    public CustomDubboProjectNameEnvironmentAware customDubboProjectNameEnvironmentAware(){
+        return new CustomDubboProjectNameEnvironmentAware();
     }
 }

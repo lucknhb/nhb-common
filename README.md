@@ -405,6 +405,11 @@ spring:
   #如果在application.yml 文件中 配置了该配置项 对应的 application-${spring.profiles.active}.yml会自动加载(如果存在该配置文件的)
   profiles:
     active: dev
+  cloud:
+    nacos:
+      discovery:
+      #该模块默认值 使用模块自己实现的注册方式(服务完全启动后再进行注册) 如果使用nacos提供的服务注册功能则需要显示的更改为 true
+        register-enabled: false
 #查看配置文件加载情况可使用该配置项开启
 logging:
   level:
@@ -414,6 +419,16 @@ logging:
           context:
             config: trace
 ```
+
+```java
+//从以下日志中可看出 带有spring.profiles.active的配置文件里面的配置项优先级最高 其次是Nacos配置文件 然后是使用 classpath加入的本地文件 最后是入口配置文件
+Adding imported property source 'Config resource 'class path resource [application-dev.yaml]' via location 'optional:classpath:/''
+Adding imported property source 'test@common-test.yml'
+Adding imported property source 'Config resource 'class path resource [nacos-local.yaml]' via location 'optional:classpath:nacos-local.yaml''
+Adding imported property source 'Config resource 'class path resource [application.yaml]' via location 'optional:classpath:/''
+```
+
+
 
 参考文档 <a href="https://nacos.io/docs/v3.1/ecology/use-nacos-with-spring-cloud">use-nacos-with-spring-cloud</a>  以及 [SpringCloud应用Nacos配置中心注解 ](https://nacos.io/blog/nacos-gvr7dx_awbbpb_mmufdmayp5dfozci/?spm=5238cd80.4ec37b78.0.0.56537e84O5kyNg)
 

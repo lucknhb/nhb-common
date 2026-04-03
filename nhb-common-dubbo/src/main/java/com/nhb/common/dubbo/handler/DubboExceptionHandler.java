@@ -1,6 +1,8 @@
 package com.nhb.common.dubbo.handler;
 
 import com.nhb.common.core.domain.ResultMessage;
+import com.nhb.common.core.utils.SpringContextUtil;
+import com.nhb.common.dubbo.properties.DubboCustomProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.rpc.RpcException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -20,7 +22,8 @@ public class DubboExceptionHandler {
      */
     @ExceptionHandler(RpcException.class)
     public ResultMessage<Void> handleDubboException(RpcException e) {
-        log.error("RPC happen error: {}", e.getMessage(),e);
-        return ResultMessage.fail("服务处理异常,请联系管理员");
+        log.error("Dubbo RPC Happen Error: {}", e.getMessage(),e);
+        DubboCustomProperties dubboCustomProperties = SpringContextUtil.getBean(DubboCustomProperties.class);
+        return ResultMessage.fail(dubboCustomProperties.getFailMessage());
     }
 }

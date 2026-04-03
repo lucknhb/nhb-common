@@ -23,8 +23,9 @@ dubbo:
     address: nacos://${spring.cloud.nacos.server-addr}
     username: ${spring.cloud.nacos.username}
     password: ${spring.cloud.nacos.password}
+    group: ${spring.cloud.nacos.config.group:DEFAULT_GROUP}
     parameters:
-      namespace: ${spring.profiles.active}
+      namespace: ${spring.cloud.nacos.config.namespace}
   # 消费者相关配置
   consumer:
     # 结果缓存(LRU算法)
@@ -39,6 +40,7 @@ dubbo:
   # 自定义配置
   custom:
     # 全局请求log
-    request-log: true
-    # info 基础信息 param 参数信息 full 全部
-    log-level: info
+    log-enabled: true
+    project-name-enabled: true
+    global-error-enabled: true
+    fail-message: "服务处理异常,请联系管理员"

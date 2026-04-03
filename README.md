@@ -445,10 +445,11 @@ spring:
         port: 8080 #可定义实例注册到Nacos时的端口
       config:
         namespace: #Nacos中的Namespce名称
+        group: #对应的分组名称
+       
   config:
     import:
     #以下配置项中 optional:nacos代表nacos中没有对应application-dev.yml配置项时 也不报错  如果需要校验是否存在可将optional:去掉
-    #application-dev.yml?group=组名&refreshEnabled=true 表示上面指定的namespace下的指定组名的配置文件名 refreshEnabled=true表示可动态刷新配置项
     #另外除了可使用nacos: 还可以使用 classpath:(resouces目录下的配置文件) file:(自指定目录文件下的配置文件)
       - optional:nacos:application-dev.yml?group=组名&refreshEnabled=true
 ```
@@ -456,3 +457,75 @@ spring:
 
 
 ### Dubbo模块
+
+依赖如下
+
+```xml
+<dependency>
+   <groupId>com.nhb</groupId>
+   <artifactId>nhb-common-dubbo</artifactId>
+   <version>${version}</version>
+</dependency>
+```
+
+提供以下功能：
+
+1. 异常处理器，提示信息自定义化
+2. dubbo自定义IP注入(避免IP不正确问题)
+3. 设置dubbo的项目名称 可在Nacos 服务管理-订阅者列表中 应用名 体现
+4. 消费方/服务方日志打印
+
+```yaml
+# 默认配置 如需调整可自定义覆盖
+dubbo:
+  protocol:
+    # 使用 dubbo 协议通信
+    name: dubbo
+    # dubbo 协议端口(-1表示自增端口,从20880开始)
+    port: -1
+    # 开启虚拟线程
+    threadpool: virtual
+  # 消费者相关配置
+  application:
+    name: ${spring.application.name}
+    logger: slf4j
+    # 可选值 interface、instance、all，默认是 all，即接口级地址、应用级地址都注册
+    register-mode: instance
+    service-discovery:
+      # FORCE_INTERFACE，只消费接口级地址，如无地址则报错，单订阅 2.x 地址
+      # APPLICATION_FIRST，智能决策接口级/应用级地址，双订阅
+      # FORCE_APPLICATION，只消费应用级地址，如无地址则报错，单订阅 3.x 地址
+      migration: FORCE_APPLICATION
+  # 注册中心配置
+  registry:
+    address: nacos://${spring.cloud.nacos.server-addr}
+    username: ${spring.cloud.nacos.username}
+    password: ${spring.cloud.nacos.password}
+    #命名空间及分组与Nacos配置中心相关配置保持一致 
+    group: ${spring.cloud.nacos.config.group:DEFAULT_GROUP}
+    parameters:
+      namespace: ${spring.cloud.nacos.config.namespace}
+  # 消费者相关配置
+  consumer:
+    # 结果缓存(LRU算法)
+    # 会有数据不一致问题 建议在注解局部开启
+    cache: false
+    # 支持校验注解
+    validation: jvalidationNew
+    # 调用重试 不包括第一次 0为不需要重试
+    retries: 0
+    # 初始化检查
+    check: false
+  # 自定义配置
+  custom:
+  	#开启消费方/生产方 参数日志
+    log-enabled: true
+    #开启使用项目名称
+    project-name-enabled: true
+    #开启全局异常统一处理
+    global-error-enabled: true
+    #RPC调用异常返回信息 需开启global-error-enabled
+    fail-message: "服务处理异常,请联系管理员"
+
+```
+

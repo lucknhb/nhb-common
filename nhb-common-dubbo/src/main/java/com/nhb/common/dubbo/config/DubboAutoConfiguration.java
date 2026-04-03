@@ -31,12 +31,13 @@ public class DubboAutoConfiguration {
      * 异常处理器
      */
     @Bean
+    @ConditionalOnBooleanProperty(prefix =  DubboCustomProperties.PREFIX,name = "global-error-enabled",matchIfMissing = true)
     public DubboExceptionHandler dubboExceptionHandler() {
         return new DubboExceptionHandler();
     }
 
     @Bean
-    @ConditionalOnBooleanProperty(prefix =  DubboCustomProperties.PREFIX,name = "projectNameEnabled",matchIfMissing = true)
+    @ConditionalOnBooleanProperty(prefix =  DubboCustomProperties.PREFIX,name = "project-name-enabled",matchIfMissing = true)
     public CustomDubboProjectNameEnvironmentAware customDubboProjectNameEnvironmentAware(){
         return new CustomDubboProjectNameEnvironmentAware();
     }

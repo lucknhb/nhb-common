@@ -23,4 +23,12 @@ public class DubboCustomProperties {
      * 是否设置项目名称 可在Nacos 订阅列表中 应用名  默认开启
      */
     private Boolean projectNameEnabled = true;
+    /**
+     * 全局异常处理是否开启
+     */
+    private Boolean globalErrorEnabled = true;
+    /**
+     * 统一返回指定异常信息
+     */
+    private String failMessage = "服务处理异常,请联系管理员";
 }

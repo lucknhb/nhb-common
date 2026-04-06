@@ -59,7 +59,7 @@
         <spring-boot.version>3.5.13</spring-boot.version>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
-        <nacos.client.version>3.0.3</nacos.client.version>
+        <nacos.version>3.1.2</nacos.version>
         <bouncycastle.version>1.83</bouncycastle.version>
         <jlama.version>0.8.4</jlama.version>
         <langchain4j.version>1.12.2-beta22</langchain4j.version>
@@ -84,7 +84,6 @@
         <dynamic-ds.version>4.3.1</dynamic-ds.version>
         <mybatis-plus.version>3.5.16</mybatis-plus.version>
         <dubbo.version>3.3.6</dubbo.version>
-        <dubbo-extensions.version>3.3.1</dubbo-extensions.version>
         <mapstruct-plus.version>1.5.0</mapstruct-plus.version>
         <spring-cloud.version>2025.0.1</spring-cloud.version>
         <spring-cloud-alibaba.version>2025.0.0.0</spring-cloud-alibaba.version>
@@ -149,6 +148,17 @@
                 <version>${sa-token.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.alibaba.nacos</groupId>
+                <artifactId>nacos-client</artifactId>
+                <version>${nacos.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>com.alibaba.nacos</groupId>
+                        <artifactId>nacos-log4j2-adapter</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <!--   excel依赖  -->
             <dependency>

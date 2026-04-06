@@ -25,7 +25,7 @@ public class InstanceApplicationReadyEventListener implements ApplicationListene
         try {
             // 应用完全就绪后注册
             if (nacosRegistration.getPort() < 0){
-                String port = event.getApplicationContext().getEnvironment().getProperty("server.port");
+                String port = event.getApplicationContext().getEnvironment().getProperty("local.server.port");
                 nacosRegistration.setPort(Integer.parseInt(port));
             }
             nacosServiceRegistry.register(nacosRegistration);

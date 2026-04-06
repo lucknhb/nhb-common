@@ -17,9 +17,9 @@ public class ApiEncryptProperties {
     public static final String PREFIX = "api-encrypt";
 
     /**
-     * 头部标识
+     * 请求时数据解密标识头
      */
-    private String headerFlag;
+    private String apiEncryptHeaderFlag;
 
     /**
      * 响应加密公钥

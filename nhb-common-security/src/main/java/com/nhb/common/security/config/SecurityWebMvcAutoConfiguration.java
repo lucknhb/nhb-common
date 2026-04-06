@@ -44,7 +44,7 @@ public class SecurityWebMvcAutoConfiguration implements WebMvcConfigurer {
         registry.addInterceptor(new SaInterceptor(handle -> StpUtil.checkLogin()))
                 .addPathPatterns("/**")
                 .excludePathPatterns(securityConfigProperties.getPaths())
-                .excludePathPatterns("/favicon.ico", "/actuator", "/actuator/**", "/resource/sse");
+                .excludePathPatterns("/favicon.ico", "/actuator", "/actuator/**", "/resource/sse","/v3/api-docs");
     }
 
     /**

@@ -78,11 +78,9 @@ public class EncryptResponseBodyWrapper extends HttpServletResponseWrapper {
         String encryptAes = EncryptUtil.encryptByBase64(aesPassword);
         // Rsa 公钥加密 Base64 编码
         String encryptPassword = EncryptUtil.encryptByRsa(encryptAes, publicKey);
-
         // 设置响应头
         servletResponse.setHeader(headerFlag, encryptPassword);
-        servletResponse.setCharacterEncoding(StandardCharsets.UTF_8.toString());
-
+        servletResponse.setCharacterEncoding(StandardCharsets.UTF_8.name());
         // 获取原始内容
         String originalBody = this.getContent();
         // 对内容进行加密

@@ -8,6 +8,7 @@ import cn.hutool.crypto.SmUtil;
 import cn.hutool.crypto.asymmetric.KeyType;
 import cn.hutool.crypto.asymmetric.RSA;
 import cn.hutool.crypto.asymmetric.SM2;
+import com.nhb.common.core.exception.ServiceException;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -64,12 +65,12 @@ public class EncryptUtil {
      */
     public static String encryptByAes(String data, String password) {
         if (StrUtil.isBlank(password)) {
-            throw new IllegalArgumentException("AES需要传入秘钥信息");
+            throw new ServiceException("AES需要传入秘钥信息");
         }
         // aes算法的秘钥要求是16位、24位、32位
         int[] array = {16, 24, 32};
         if (!ArrayUtil.contains(array, password.length())) {
-            throw new IllegalArgumentException("AES秘钥长度要求为16位、24位、32位");
+            throw new ServiceException("AES秘钥长度要求为16位、24位、32位");
         }
         return SecureUtil.aes(password.getBytes(StandardCharsets.UTF_8)).encryptBase64(data, StandardCharsets.UTF_8);
     }
@@ -83,12 +84,12 @@ public class EncryptUtil {
      */
     public static String encryptByAesHex(String data, String password) {
         if (StrUtil.isBlank(password)) {
-            throw new IllegalArgumentException("AES需要传入秘钥信息");
+            throw new ServiceException("AES需要传入秘钥信息");
         }
         // aes算法的秘钥要求是16位、24位、32位
         int[] array = {16, 24, 32};
         if (!ArrayUtil.contains(array, password.length())) {
-            throw new IllegalArgumentException("AES秘钥长度要求为16位、24位、32位");
+            throw new ServiceException("AES秘钥长度要求为16位、24位、32位");
         }
         return SecureUtil.aes(password.getBytes(StandardCharsets.UTF_8)).encryptHex(data, StandardCharsets.UTF_8);
     }
@@ -102,12 +103,12 @@ public class EncryptUtil {
      */
     public static String decryptByAes(String data, String password) {
         if (StrUtil.isBlank(password)) {
-            throw new IllegalArgumentException("AES需要传入秘钥信息");
+            throw new ServiceException("AES需要传入秘钥信息");
         }
         // aes算法的秘钥要求是16位、24位、32位
         int[] array = {16, 24, 32};
         if (!ArrayUtil.contains(array, password.length())) {
-            throw new IllegalArgumentException("AES秘钥长度要求为16位、24位、32位");
+            throw new ServiceException("AES秘钥长度要求为16位、24位、32位");
         }
         return SecureUtil.aes(password.getBytes(StandardCharsets.UTF_8)).decryptStr(data, StandardCharsets.UTF_8);
     }
@@ -121,12 +122,12 @@ public class EncryptUtil {
      */
     public static String encryptBySm4(String data, String password) {
         if (StrUtil.isBlank(password)) {
-            throw new IllegalArgumentException("SM4需要传入秘钥信息");
+            throw new ServiceException("SM4需要传入秘钥信息");
         }
         // sm4算法的秘钥要求是16位长度
         int sm4PasswordLength = 16;
         if (sm4PasswordLength != password.length()) {
-            throw new IllegalArgumentException("SM4秘钥长度要求为16位");
+            throw new ServiceException("SM4秘钥长度要求为16位");
         }
         return SmUtil.sm4(password.getBytes(StandardCharsets.UTF_8)).encryptBase64(data, StandardCharsets.UTF_8);
     }
@@ -140,12 +141,12 @@ public class EncryptUtil {
      */
     public static String encryptBySm4Hex(String data, String password) {
         if (StrUtil.isBlank(password)) {
-            throw new IllegalArgumentException("SM4需要传入秘钥信息");
+            throw new ServiceException("SM4需要传入秘钥信息");
         }
         // sm4算法的秘钥要求是16位长度
         int sm4PasswordLength = 16;
         if (sm4PasswordLength != password.length()) {
-            throw new IllegalArgumentException("SM4秘钥长度要求为16位");
+            throw new ServiceException("SM4秘钥长度要求为16位");
         }
         return SmUtil.sm4(password.getBytes(StandardCharsets.UTF_8)).encryptHex(data, StandardCharsets.UTF_8);
     }
@@ -159,12 +160,12 @@ public class EncryptUtil {
      */
     public static String decryptBySm4(String data, String password) {
         if (StrUtil.isBlank(password)) {
-            throw new IllegalArgumentException("SM4需要传入秘钥信息");
+            throw new ServiceException("SM4需要传入秘钥信息");
         }
         // sm4算法的秘钥要求是16位长度
         int sm4PasswordLength = 16;
         if (sm4PasswordLength != password.length()) {
-            throw new IllegalArgumentException("SM4秘钥长度要求为16位");
+            throw new ServiceException("SM4秘钥长度要求为16位");
         }
         return SmUtil.sm4(password.getBytes(StandardCharsets.UTF_8)).decryptStr(data, StandardCharsets.UTF_8);
     }
@@ -191,7 +192,7 @@ public class EncryptUtil {
      */
     public static String encryptBySm2(String data, String publicKey) {
         if (StrUtil.isBlank(publicKey)) {
-            throw new IllegalArgumentException("SM2需要传入公钥进行加密");
+            throw new ServiceException("SM2需要传入公钥进行加密");
         }
         SM2 sm2 = SmUtil.sm2(null, publicKey);
         return sm2.encryptBase64(data, StandardCharsets.UTF_8, KeyType.PublicKey);
@@ -206,7 +207,7 @@ public class EncryptUtil {
      */
     public static String encryptBySm2Hex(String data, String publicKey) {
         if (StrUtil.isBlank(publicKey)) {
-            throw new IllegalArgumentException("SM2需要传入公钥进行加密");
+            throw new ServiceException("SM2需要传入公钥进行加密");
         }
         SM2 sm2 = SmUtil.sm2(null, publicKey);
         return sm2.encryptHex(data, StandardCharsets.UTF_8, KeyType.PublicKey);
@@ -221,7 +222,7 @@ public class EncryptUtil {
      */
     public static String decryptBySm2(String data, String privateKey) {
         if (StrUtil.isBlank(privateKey)) {
-            throw new IllegalArgumentException("SM2需要传入私钥进行解密");
+            throw new ServiceException("SM2需要传入私钥进行解密");
         }
         SM2 sm2 = SmUtil.sm2(privateKey, null);
         return sm2.decryptStr(data, KeyType.PrivateKey, StandardCharsets.UTF_8);
@@ -249,7 +250,7 @@ public class EncryptUtil {
      */
     public static String encryptByRsa(String data, String publicKey) {
         if (StrUtil.isBlank(publicKey)) {
-            throw new IllegalArgumentException("RSA需要传入公钥进行加密");
+            throw new ServiceException("RSA需要传入公钥进行加密");
         }
         RSA rsa = SecureUtil.rsa(null, publicKey);
         return rsa.encryptBase64(data, StandardCharsets.UTF_8, KeyType.PublicKey);
@@ -264,7 +265,7 @@ public class EncryptUtil {
      */
     public static String encryptByRsaHex(String data, String publicKey) {
         if (StrUtil.isBlank(publicKey)) {
-            throw new IllegalArgumentException("RSA需要传入公钥进行加密");
+            throw new ServiceException("RSA需要传入公钥进行加密");
         }
         RSA rsa = SecureUtil.rsa(null, publicKey);
         return rsa.encryptHex(data, StandardCharsets.UTF_8, KeyType.PublicKey);
@@ -279,7 +280,7 @@ public class EncryptUtil {
      */
     public static String decryptByRsa(String data, String privateKey) {
         if (StrUtil.isBlank(privateKey)) {
-            throw new IllegalArgumentException("RSA需要传入私钥进行解密");
+            throw new ServiceException("RSA需要传入私钥进行解密");
         }
         RSA rsa = SecureUtil.rsa(privateKey, null);
         return rsa.decryptStr(data, KeyType.PrivateKey, StandardCharsets.UTF_8);

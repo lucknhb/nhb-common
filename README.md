@@ -428,8 +428,6 @@ Adding imported property source 'Config resource 'class path resource [nacos-loc
 Adding imported property source 'Config resource 'class path resource [application.yaml]' via location 'optional:classpath:/''
 ```
 
-
-
 参考文档 <a href="https://nacos.io/docs/v3.1/ecology/use-nacos-with-spring-cloud">use-nacos-with-spring-cloud</a>  以及 [SpringCloud应用Nacos配置中心注解 ](https://nacos.io/blog/nacos-gvr7dx_awbbpb_mmufdmayp5dfozci/?spm=5238cd80.4ec37b78.0.0.56537e84O5kyNg)
 
 ```yaml
@@ -437,12 +435,13 @@ Adding imported property source 'Config resource 'class path resource [applicati
 spring:
   cloud:
     nacos:
+    #该配置为在微服务下 可打印路由配置文件
+      router:
+        generate-enabled: true
       # nacos 服务地址
       server-addr: 127.0.0.1:8848
       username:
       password:
-      discovery:
-        port: 8080 #可定义实例注册到Nacos时的端口
       config:
         namespace: #Nacos中的Namespce名称
         group: #对应的分组名称
@@ -451,7 +450,7 @@ spring:
     import:
     #以下配置项中 optional:nacos代表nacos中没有对应application-dev.yml配置项时 也不报错  如果需要校验是否存在可将optional:去掉
     #另外除了可使用nacos: 还可以使用 classpath:(resouces目录下的配置文件) file:(自指定目录文件下的配置文件)
-      - optional:nacos:application-dev.yml?group=组名&refreshEnabled=true
+      - optional:nacos:application-dev.yml
 ```
 
 

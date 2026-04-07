@@ -32,7 +32,7 @@ public class EncryptRequestBodyWrapper extends HttpServletRequestWrapper {
         // 解密 AES 密码
         String aesPassword = EncryptUtil.decryptByBase64(decryptAes);
 
-        request.setCharacterEncoding(StandardCharsets.UTF_8.toString());
+        request.setCharacterEncoding(StandardCharsets.UTF_8.name());
         byte[] readBytes = IoUtil.readBytes(request.getInputStream(), false);
         String requestBody = new String(readBytes, StandardCharsets.UTF_8);
         // 解密 body 采用 AES 加密

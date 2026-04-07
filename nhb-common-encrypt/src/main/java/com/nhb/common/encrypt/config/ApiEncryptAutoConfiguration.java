@@ -1,5 +1,6 @@
 package com.nhb.common.encrypt.config;
 
+import com.nhb.common.core.factory.YamlPropertySourceFactory;
 import com.nhb.common.encrypt.filter.EncryptFilter;
 import com.nhb.common.encrypt.properties.ApiEncryptProperties;
 import jakarta.servlet.DispatcherType;
@@ -8,6 +9,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.web.servlet.FilterRegistration;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.PropertySource;
 
 /**
  * @author luck_nhb
@@ -17,6 +19,7 @@ import org.springframework.context.annotation.Bean;
  */
 @AutoConfiguration
 @EnableConfigurationProperties(ApiEncryptProperties.class)
+@PropertySource(value = "classpath:encrypt-default.yaml",factory = YamlPropertySourceFactory.class)
 public class ApiEncryptAutoConfiguration {
 
     @Bean

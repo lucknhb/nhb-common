@@ -11,7 +11,7 @@ import org.springframework.util.ClassUtils;
  * @date 2026/3/19 10:08
  * @description:  是否存在gateway环境
  */
-public class GatewayCondition implements Condition {
+public class NotGatewayCondition implements Condition {
 
     @Override
     public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
@@ -20,6 +20,6 @@ public class GatewayCondition implements Condition {
                 "org.springframework.cloud.gateway.route.RouteLocator",
                 classLoader
         );
-        return hasGatewayClass;
+        return !hasGatewayClass;
     }
 }

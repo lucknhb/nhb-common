@@ -11,7 +11,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.nio.charset.StandardCharsets;
 
 /**
  * @author luck_nhb
@@ -80,7 +79,6 @@ public class EncryptResponseBodyWrapper extends HttpServletResponseWrapper {
         String encryptPassword = EncryptUtil.encryptByRsa(encryptAes, publicKey);
         // 设置响应头
         servletResponse.setHeader(headerFlag, encryptPassword);
-        servletResponse.setCharacterEncoding(StandardCharsets.UTF_8.name());
         // 获取原始内容
         String originalBody = this.getContent();
         // 对内容进行加密

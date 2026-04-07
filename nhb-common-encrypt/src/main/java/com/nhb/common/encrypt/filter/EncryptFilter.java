@@ -18,6 +18,7 @@ import org.springframework.web.servlet.HandlerExecutionChain;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 /**
  * @author luck_nhb
@@ -42,12 +43,12 @@ public class EncryptFilter implements Filter {
         ServletResponse responseWrapper = null;
         EncryptResponseBodyWrapper responseBodyWrapper = null;
         // 是否存在加密标头
-        String headerValue = servletRequest.getHeader(apiEncryptProperties.getApiEncryptHeaderFlag());
+        String headerValue = servletRequest.getHeader(apiEncryptProperties.getHeaderFlag());
         //请求处理
         if (requestFlag) {
             if (StringUtil.isNotBlank(headerValue)) {
                 // 请求解密
-                requestWrapper = new EncryptRequestBodyWrapper(servletRequest, apiEncryptProperties.getPrivateKey(), apiEncryptProperties.getApiEncryptHeaderFlag());
+                requestWrapper = new EncryptRequestBodyWrapper(servletRequest, apiEncryptProperties.getPrivateKey(), apiEncryptProperties.getHeaderFlag());
             } else {
                 // 是否有注解，有就报错，没有放行
                 if (ObjectUtil.isNotNull(apiEncrypt)) {
@@ -74,12 +75,16 @@ public class EncryptFilter implements Filter {
             // 对原始内容加密
             String encryptContent = "";
             try {
+                servletResponse.setCharacterEncoding(StandardCharsets.UTF_8.name());
                 encryptContent = responseBodyWrapper.getEncryptContent(
-                        servletResponse, apiEncryptProperties.getPublicKey(), apiEncryptProperties.getApiEncryptHeaderFlag());
+                        servletResponse, apiEncryptProperties.getPublicKey(), apiEncryptProperties.getHeaderFlag());
             } catch (Exception e) {
+                log.error(e.getMessage(), e);
                 HandlerExceptionResolver exceptionResolver = SpringContextUtil.getBean("handlerExceptionResolver", HandlerExceptionResolver.class);
                 exceptionResolver.resolveException(
                         servletRequest, servletResponse, null, e);
+
+                return;
             }
             // 对加密后的内容写出
             servletResponse.getWriter().write(encryptContent);

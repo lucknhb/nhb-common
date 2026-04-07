@@ -1,7 +1,7 @@
 package com.nhb.common.nacos.config;
 
 import com.nhb.common.core.factory.YamlPropertySourceFactory;
-import com.nhb.common.nacos.condition.GatewayCondition;
+import com.nhb.common.nacos.condition.NotGatewayCondition;
 import com.nhb.common.nacos.listeners.InstanceApplicationReadyEventListener;
 import com.nhb.common.nacos.listeners.InstanceContextClosedEventListener;
 import com.nhb.common.nacos.listeners.RouteApplicationReadyEventListener;
@@ -23,7 +23,8 @@ import org.springframework.core.env.Environment;
 public class NacosAutoConfiguration {
 
     @Bean
-    @Conditional(GatewayCondition.class)
+    @Conditional(NotGatewayCondition.class)
+    @ConditionalOnBooleanProperty(value = "spring.cloud.nacos.router.generate-enabled",havingValue = false,matchIfMissing = true)
     public RouteApplicationReadyEventListener routeApplicationReadyEventListener(Environment environment) {
         return new  RouteApplicationReadyEventListener(environment);
     }

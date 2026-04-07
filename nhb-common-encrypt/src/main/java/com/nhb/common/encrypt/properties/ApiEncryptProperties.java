@@ -19,15 +19,15 @@ public class ApiEncryptProperties {
     /**
      * 请求时数据解密标识头
      */
-    private String apiEncryptHeaderFlag;
+    private String headerFlag;
 
     /**
-     * 响应加密公钥
+     * 响应加密公钥 非对称算法的公私钥
      */
     private String publicKey;
 
     /**
-     * 请求解密私钥
+     * 请求解密私钥 非对称算法的公私钥
      */
     private String privateKey;
 

@@ -15,11 +15,11 @@ public class ResultMessage <T> implements Serializable {
     /**
      * 成功
      */
-    public static final int SUCCESS = 200;
+    public static final int SUCCESS = 0;
     /**
      * 失败
      */
-    public static final int FAIL = 500;
+    public static final int FAIL = 1;
     /**
      * 状态码
      */

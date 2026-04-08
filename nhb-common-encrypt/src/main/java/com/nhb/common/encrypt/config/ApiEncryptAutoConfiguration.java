@@ -2,6 +2,7 @@ package com.nhb.common.encrypt.config;
 
 import com.nhb.common.core.factory.YamlPropertySourceFactory;
 import com.nhb.common.encrypt.filter.EncryptFilter;
+import com.nhb.common.encrypt.listener.ApiEncryptCheckListener;
 import com.nhb.common.encrypt.properties.ApiEncryptProperties;
 import jakarta.servlet.DispatcherType;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -31,6 +32,11 @@ public class ApiEncryptAutoConfiguration {
     )
     public EncryptFilter cryptoFilter(ApiEncryptProperties properties) {
         return new EncryptFilter(properties);
+    }
+
+    @Bean
+    public ApiEncryptCheckListener apiEncryptCheckListener(){
+        return new ApiEncryptCheckListener();
     }
 
 

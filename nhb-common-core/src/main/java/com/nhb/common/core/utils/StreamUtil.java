@@ -2,12 +2,16 @@ package com.nhb.common.core.utils;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.map.MapUtil;
+import com.nhb.common.core.function.SerializableFunction;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
+import java.lang.invoke.SerializedLambda;
+import java.lang.reflect.Method;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -326,6 +330,48 @@ public class StreamUtil {
         keySet.addAll(map1.keySet());
         keySet.addAll(map2.keySet());
         return toMap(keySet, key -> key, key -> merge.apply(map1.get(key), map2.get(key)));
+    }
+
+
+
+    private static final Map<Class<?>, SerializedLambda> CLASS_LAMBDA_CACHE = new ConcurrentHashMap<>();
+
+    /**
+     * 获取属性名
+     * @param func Lambda表达式
+     * @return 属性名
+     */
+    public static <T, R> String getFieldName(SerializableFunction<T, R> func) {
+        SerializedLambda lambda = getSerializedLambda(func);
+        String methodName = lambda.getImplMethodName();
+        // 处理getter方法名前缀
+        if (methodName.startsWith("get") && methodName.length() > 3) {
+            methodName = methodName.substring(3);
+        } else if (methodName.startsWith("is") && methodName.length() > 2) {
+            methodName = methodName.substring(2);
+        } else {
+            throw new IllegalArgumentException("无效的getter方法：" + methodName);
+        }
+        // 首字母转换为小写
+        return methodName.substring(0, 1).toLowerCase() + methodName.substring(1);
+    }
+
+    /**
+     * 获取SerializedLambda对象
+     * @param func Lambda表达式
+     * @return SerializedLambda
+     */
+    private static <T, R> SerializedLambda getSerializedLambda(SerializableFunction<T, R> func) {
+        Class<?> clazz = func.getClass();
+        return CLASS_LAMBDA_CACHE.computeIfAbsent(clazz, k -> {
+            try {
+                Method method = clazz.getDeclaredMethod("writeReplace");
+                method.setAccessible(true);
+                return (SerializedLambda) method.invoke(func);
+            } catch (Exception e) {
+                throw new RuntimeException("获取SerializedLambda失败", e);
+            }
+        });
     }
 
 }

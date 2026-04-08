@@ -22,7 +22,7 @@ public @interface FieldEncrypt {
     AlgorithmType algorithm() default AlgorithmType.DEFAULT;
 
     /**
-     * 秘钥。AES、SM4需要
+     * Base64编码后的秘钥 AES、SM4需要
      */
     String password() default "";
 

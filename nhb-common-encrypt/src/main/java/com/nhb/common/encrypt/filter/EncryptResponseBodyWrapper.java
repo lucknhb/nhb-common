@@ -1,6 +1,10 @@
 package com.nhb.common.encrypt.filter;
 
-import cn.hutool.core.util.RandomUtil;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.nhb.common.core.domain.ResultMessage;
+import com.nhb.common.core.utils.JacksonUtil;
+import com.nhb.common.core.utils.StreamUtil;
 import com.nhb.common.encrypt.utils.EncryptUtil;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.WriteListener;
@@ -11,6 +15,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 
 /**
  * @author luck_nhb
@@ -70,19 +76,34 @@ public class EncryptResponseBodyWrapper extends HttpServletResponseWrapper {
      * @return 加密内容
      * @throws IOException
      */
-    public String getEncryptContent(HttpServletResponse servletResponse, String publicKey, String headerFlag) throws IOException {
-        // 生成秘钥
-        String aesPassword = RandomUtil.randomString(32);
-        // 秘钥使用 Base64 编码
-        String encryptAes = EncryptUtil.encryptByBase64(aesPassword);
+    public String getEncryptContent(HttpServletResponse servletResponse, String publicKey, String headerFlag) throws IOException, NoSuchAlgorithmException {
+        SecureRandom secureRandom = SecureRandom.getInstanceStrong();
+        // AES-256
+        byte[] aesKey = new byte[32];
+        secureRandom.nextBytes(aesKey);
+        // AES 秘钥使用 Base64 编码
+        String encryptAes = EncryptUtil.encryptByBase64(aesKey);
         // Rsa 公钥加密 Base64 编码
         String encryptPassword = EncryptUtil.encryptByRsa(encryptAes, publicKey);
         // 设置响应头
         servletResponse.setHeader(headerFlag, encryptPassword);
         // 获取原始内容
         String originalBody = this.getContent();
-        // 对内容进行加密
-        return EncryptUtil.encryptByAes(originalBody, aesPassword);
+        //仅对有用数据进行加密
+        boolean jsonFlag = JacksonUtil.isJson(originalBody);
+        if (jsonFlag) {
+            ObjectNode jsonNode = (ObjectNode) JacksonUtil.getObjectMapper().readTree(originalBody);
+            String fieldName = StreamUtil.getFieldName(ResultMessage<String>::getData);
+            JsonNode data = jsonNode.get(fieldName);
+            if (!data.isNull()){
+                String text = data.asText();
+                //JSON数据的话 仅对data属性值进行加密
+                jsonNode.put(fieldName,EncryptUtil.encryptByAes(text, encryptAes));
+                return JacksonUtil.toJsonString(jsonNode);
+            }
+        }
+        // 非JSON数据对整体加密
+        return EncryptUtil.encryptByAes(originalBody, encryptAes);
     }
 
     @Override

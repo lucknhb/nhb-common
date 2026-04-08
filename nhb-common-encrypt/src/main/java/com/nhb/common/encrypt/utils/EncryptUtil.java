@@ -47,6 +47,16 @@ public class EncryptUtil {
     }
 
     /**
+     * Base64加密
+     *
+     * @param data 待加密数据
+     * @return 加密后字符串
+     */
+    public static String encryptByBase64(byte[] data) {
+        return Base64.encode(data);
+    }
+
+    /**
      * Base64解密
      *
      * @param data 待解密数据
@@ -60,7 +70,7 @@ public class EncryptUtil {
      * AES加密
      *
      * @param data     待加密数据
-     * @param password 秘钥字符串
+     * @param password 秘钥字符串 base64编码后的秘钥
      * @return 加密后字符串, 采用Base64编码
      */
     public static String encryptByAes(String data, String password) {
@@ -68,18 +78,19 @@ public class EncryptUtil {
             throw new ServiceException("AES需要传入秘钥信息");
         }
         // aes算法的秘钥要求是16位、24位、32位
+        byte[] aesPassword = Base64.decode(password);
         int[] array = {16, 24, 32};
-        if (!ArrayUtil.contains(array, password.length())) {
+        if (!ArrayUtil.contains(array, aesPassword.length)) {
             throw new ServiceException("AES秘钥长度要求为16位、24位、32位");
         }
-        return SecureUtil.aes(password.getBytes(StandardCharsets.UTF_8)).encryptBase64(data, StandardCharsets.UTF_8);
+        return SecureUtil.aes(aesPassword).encryptBase64(data, StandardCharsets.UTF_8);
     }
 
     /**
      * AES加密
      *
      * @param data     待加密数据
-     * @param password 秘钥字符串
+     * @param password 秘钥字符串   base64编码后的秘钥
      * @return 加密后字符串, 采用Hex编码
      */
     public static String encryptByAesHex(String data, String password) {
@@ -87,18 +98,19 @@ public class EncryptUtil {
             throw new ServiceException("AES需要传入秘钥信息");
         }
         // aes算法的秘钥要求是16位、24位、32位
+        byte[] aesPassword = Base64.decode(password);
         int[] array = {16, 24, 32};
-        if (!ArrayUtil.contains(array, password.length())) {
+        if (!ArrayUtil.contains(array, aesPassword.length)) {
             throw new ServiceException("AES秘钥长度要求为16位、24位、32位");
         }
-        return SecureUtil.aes(password.getBytes(StandardCharsets.UTF_8)).encryptHex(data, StandardCharsets.UTF_8);
+        return SecureUtil.aes(aesPassword).encryptHex(data, StandardCharsets.UTF_8);
     }
 
     /**
      * AES解密
      *
      * @param data     待解密数据
-     * @param password 秘钥字符串
+     * @param password 秘钥字符串  base64编码后的秘钥
      * @return 解密后字符串
      */
     public static String decryptByAes(String data, String password) {
@@ -106,11 +118,12 @@ public class EncryptUtil {
             throw new ServiceException("AES需要传入秘钥信息");
         }
         // aes算法的秘钥要求是16位、24位、32位
+        byte[] aesPassword = Base64.decode(password);
         int[] array = {16, 24, 32};
-        if (!ArrayUtil.contains(array, password.length())) {
+        if (!ArrayUtil.contains(array, aesPassword.length)) {
             throw new ServiceException("AES秘钥长度要求为16位、24位、32位");
         }
-        return SecureUtil.aes(password.getBytes(StandardCharsets.UTF_8)).decryptStr(data, StandardCharsets.UTF_8);
+        return SecureUtil.aes(aesPassword).decryptStr(data, StandardCharsets.UTF_8);
     }
 
     /**
@@ -235,7 +248,7 @@ public class EncryptUtil {
      */
     public static Map<String, String> generateRsaKey() {
         Map<String, String> keyMap = new HashMap<>(2);
-        RSA rsa = SecureUtil.rsa();
+        RSA rsa = rsaOaep(null,null);
         keyMap.put(PRIVATE_KEY, rsa.getPrivateKeyBase64());
         keyMap.put(PUBLIC_KEY, rsa.getPublicKeyBase64());
         return keyMap;
@@ -252,7 +265,7 @@ public class EncryptUtil {
         if (StrUtil.isBlank(publicKey)) {
             throw new ServiceException("RSA需要传入公钥进行加密");
         }
-        RSA rsa = SecureUtil.rsa(null, publicKey);
+        RSA rsa = rsaOaep(null, publicKey);
         return rsa.encryptBase64(data, StandardCharsets.UTF_8, KeyType.PublicKey);
     }
 
@@ -267,7 +280,7 @@ public class EncryptUtil {
         if (StrUtil.isBlank(publicKey)) {
             throw new ServiceException("RSA需要传入公钥进行加密");
         }
-        RSA rsa = SecureUtil.rsa(null, publicKey);
+        RSA rsa = rsaOaep(null, publicKey);
         return rsa.encryptHex(data, StandardCharsets.UTF_8, KeyType.PublicKey);
     }
 
@@ -282,7 +295,7 @@ public class EncryptUtil {
         if (StrUtil.isBlank(privateKey)) {
             throw new ServiceException("RSA需要传入私钥进行解密");
         }
-        RSA rsa = SecureUtil.rsa(privateKey, null);
+        RSA rsa = rsaOaep(privateKey, null);
         return rsa.decryptStr(data, KeyType.PrivateKey, StandardCharsets.UTF_8);
     }
 
@@ -314,5 +327,16 @@ public class EncryptUtil {
      */
     public static String encryptBySm3(String data) {
         return SmUtil.sm3(data);
+    }
+
+    /**
+     * 获取RSA/ECB/OAEPWithSHA-256AndMGF1Padding类型 RSA
+     * @param privateKey  私钥
+     * @param publicKey   公钥
+     * @return            RSA实例
+     */
+    public static RSA rsaOaep(String privateKey, String publicKey){
+        // 指定使用 OAEPWithSHA-256 填充的 RSA 算法
+        return new RSA("RSA/ECB/OAEPWithSHA-256AndMGF1Padding",privateKey,publicKey);
     }
 }

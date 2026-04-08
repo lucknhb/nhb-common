@@ -18,7 +18,7 @@ public class EncryptContext {
     private AlgorithmType algorithm;
 
     /**
-     * 安全秘钥
+     * 安全秘钥 Base64编码后的秘钥
      */
     private String password;
 

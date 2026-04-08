@@ -47,15 +47,23 @@ public class EncryptFilter implements Filter {
         //请求处理
         if (requestFlag) {
             if (StringUtil.isNotBlank(headerValue)) {
-                // 请求解密
-                requestWrapper = new EncryptRequestBodyWrapper(servletRequest, apiEncryptProperties.getPrivateKey(), apiEncryptProperties.getHeaderFlag());
+                try {
+                    // 请求解密
+                    requestWrapper = new EncryptRequestBodyWrapper(servletRequest, apiEncryptProperties.getPrivateKey(), apiEncryptProperties.getHeaderFlag());
+                }catch (Exception e){
+                    HandlerExceptionResolver exceptionResolver = SpringContextUtil.getBean("handlerExceptionResolver", HandlerExceptionResolver.class);
+                    exceptionResolver.resolveException(
+                            servletRequest, servletResponse, null,
+                            new ServiceException("非合法加密数据,无法访问资源", HttpStatus.METHOD_NOT_ALLOWED));
+                    return;
+                }
             } else {
                 // 是否有注解，有就报错，没有放行
                 if (ObjectUtil.isNotNull(apiEncrypt)) {
                     HandlerExceptionResolver exceptionResolver = SpringContextUtil.getBean("handlerExceptionResolver", HandlerExceptionResolver.class);
                     exceptionResolver.resolveException(
                             servletRequest, servletResponse, null,
-                            new ServiceException("没有访问权限，请联系授权", HttpStatus.METHOD_NOT_ALLOWED));
+                            new ServiceException("请求数据未加密,无法访问资源", HttpStatus.METHOD_NOT_ALLOWED));
                     return;
                 }
             }

@@ -1,6 +1,11 @@
 package com.nhb.common.encrypt.filter;
 
 import cn.hutool.core.io.IoUtil;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.nhb.common.core.utils.JacksonUtil;
+import com.nhb.common.core.utils.StreamUtil;
+import com.nhb.common.encrypt.core.ApiEncryptDto;
 import com.nhb.common.encrypt.utils.EncryptUtil;
 import jakarta.servlet.ReadListener;
 import jakarta.servlet.ServletInputStream;
@@ -27,16 +32,17 @@ public class EncryptRequestBodyWrapper extends HttpServletRequestWrapper {
     public EncryptRequestBodyWrapper(HttpServletRequest request, String privateKey, String headerFlag) throws IOException {
         super(request);
         // 获取 AES 密码 采用 RSA 加密
-        String headerRsa = request.getHeader(headerFlag);
-        String decryptAes = EncryptUtil.decryptByRsa(headerRsa, privateKey);
-        // 解密 AES 密码
-        String aesPassword = EncryptUtil.decryptByBase64(decryptAes);
-
+        String headerAes = request.getHeader(headerFlag);
+        //使用RSA私钥解密 获取AES秘钥
+        String aesPassword = EncryptUtil.decryptByRsa(headerAes, privateKey);
         request.setCharacterEncoding(StandardCharsets.UTF_8.name());
         byte[] readBytes = IoUtil.readBytes(request.getInputStream(), false);
         String requestBody = new String(readBytes, StandardCharsets.UTF_8);
+        ObjectNode objectNode = (ObjectNode)JacksonUtil.getObjectMapper().readTree(requestBody);
+        JsonNode jsonNode = objectNode.get(StreamUtil.getFieldName(ApiEncryptDto::getData));
+        String data = jsonNode.asText();
         // 解密 body 采用 AES 加密
-        String decryptBody = EncryptUtil.decryptByAes(requestBody, aesPassword);
+        String decryptBody = EncryptUtil.decryptByAes(data, aesPassword);
         body = decryptBody.getBytes(StandardCharsets.UTF_8);
     }
 

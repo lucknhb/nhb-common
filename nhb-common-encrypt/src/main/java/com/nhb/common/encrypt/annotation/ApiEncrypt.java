@@ -6,10 +6,10 @@ import java.lang.annotation.*;
  * @author luck_nhb
  * @version 1.0
  * @date 2026/3/2 9:54
- * @description: 接口加密注解
+ * @description: 接口/属性加密注解
  */
 @Documented
-@Target({ElementType.METHOD})
+@Target({ElementType.METHOD, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ApiEncrypt {
     /**

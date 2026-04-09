@@ -40,9 +40,9 @@ public class AesEncryptor extends AbstractEncryptor {
     @Override
     public String encrypt(String value, EncodeType encodeType) {
         if (encodeType == EncodeType.HEX) {
-            return EncryptUtil.encryptByAesHex(value, context.getPassword());
+            return EncryptUtil.encryptByAesHex(value, EncryptUtil.decryptByBase64ToByte(context.getPassword()),EncryptUtil.decryptByBase64ToByte(context.getSalt()));
         } else {
-            return EncryptUtil.encryptByAes(value, context.getPassword());
+            return EncryptUtil.encryptByAesBase64(value, EncryptUtil.decryptByBase64ToByte(context.getPassword()),EncryptUtil.decryptByBase64ToByte(context.getSalt()));
         }
     }
 
@@ -53,6 +53,6 @@ public class AesEncryptor extends AbstractEncryptor {
      */
     @Override
     public String decrypt(String value) {
-        return EncryptUtil.decryptByAes(value, context.getPassword());
+        return EncryptUtil.decryptByAes(value, EncryptUtil.decryptByBase64ToByte(context.getPassword()),EncryptUtil.decryptByBase64ToByte(context.getSalt()));
     }
 }

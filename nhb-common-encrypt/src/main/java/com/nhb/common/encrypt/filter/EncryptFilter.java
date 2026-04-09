@@ -6,16 +6,14 @@ import com.nhb.common.core.utils.SpringContextUtil;
 import com.nhb.common.core.utils.StringUtil;
 import com.nhb.common.encrypt.annotation.ApiEncrypt;
 import com.nhb.common.encrypt.properties.ApiEncryptProperties;
+import com.nhb.common.encrypt.utils.HttpRequestUtil;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerExceptionResolver;
-import org.springframework.web.servlet.HandlerExecutionChain;
-import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -36,7 +34,7 @@ public class EncryptFilter implements Filter {
         HttpServletRequest servletRequest = (HttpServletRequest) request;
         HttpServletResponse servletResponse = (HttpServletResponse) response;
         // 获取加密注解
-        ApiEncrypt apiEncrypt = this.getApiEncryptAnnotation(servletRequest);
+        ApiEncrypt apiEncrypt = HttpRequestUtil.getApiEncryptAnnotation(servletRequest);
         boolean responseFlag = apiEncrypt != null && apiEncrypt.response();
         boolean requestFlag = apiEncrypt != null && apiEncrypt.request();
         ServletRequest requestWrapper = null;
@@ -99,28 +97,6 @@ public class EncryptFilter implements Filter {
         }
     }
 
-    /**
-     * 获取 ApiEncrypt 注解
-     */
-    private ApiEncrypt getApiEncryptAnnotation(HttpServletRequest servletRequest) {
-        RequestMappingHandlerMapping handlerMapping = SpringContextUtil.getBean("requestMappingHandlerMapping", RequestMappingHandlerMapping.class);
-        // 获取注解
-        try {
-            HandlerExecutionChain mappingHandler = handlerMapping.getHandler(servletRequest);
-            if (ObjectUtil.isNotNull(mappingHandler)) {
-                Object handler = mappingHandler.getHandler();
-                if (ObjectUtil.isNotNull(handler)) {
-                    // 从handler获取注解
-                    if (handler instanceof HandlerMethod handlerMethod) {
-                        return handlerMethod.getMethodAnnotation(ApiEncrypt.class);
-                    }
-                }
-            }
-        } catch (Exception e) {
-            return null;
-        }
-        return null;
-    }
 
     @Override
     public void destroy() {

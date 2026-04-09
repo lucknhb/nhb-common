@@ -528,3 +528,49 @@ dubbo:
 
 ```
 
+### Encrypt模块
+
+依赖如下
+
+```xml
+<dependency>
+   <groupId>com.nhb</groupId>
+   <artifactId>nhb-common-encrypt</artifactId>
+   <version>${version}</version>
+</dependency>
+```
+
+提供以下两个注解
+
+1.  @ApiEncrypt注解 用于接口及参数属性上  
+
+   参数加解密过程：<font color='red'>注意: 如果接口上存在加密处理注解，则请求/返回实体类中的注解则不会被处理</font>
+
+   ```mermaid
+   graph TD
+       Start([开始]) --> CheckAnnotation{是否存在ApiEncrypt注解}
+       CheckAnnotation -- 否 --> ReturnValue[直接返回值] --> End([结束])
+       CheckAnnotation -- 是 --> ParallelStart[过滤器分别判断]
+
+       ParallelStart --> RequestBranch{request 属性是否为 true}
+       ParallelStart --> ResponseBranch{response 属性是否为 true}
+
+       RequestBranch -- 是 --> GetHeader[从请求头获取 RSA加密并BASE64编码后的AES密钥及向量 格式 密钥:向量]
+       GetHeader --> DecryptKeyIV[分别使用 RSA 私钥解密得到 AES 密钥和向量]
+       DecryptKeyIV --> DecryptParams[使用解密后的 AES 密钥和向量对请求参数进行解密] --> RequestEnd[request处理完成]
+       RequestBranch -- 否 --> RequestEnd
+   
+    ResponseBranch -- 是 --> GenAES[随机生成 AES 密钥和向量]
+       GenAES --> EncryptResponse[使用生成的 AES 密钥和向量对返回值进行加密]
+       EncryptResponse --> EncryptKeyIV[将 AES 密钥和向量分别用 RSA 公钥加密并BASE64编码 用 : 拼接]
+       EncryptKeyIV --> SetHeader[将拼接结果放入响应头] --> ResponseEnd[response处理完成]
+       ResponseBranch -- 否 --> ResponseEnd
+   
+       RequestEnd --> Join(生成结果值)
+    ResponseEnd --> Join
+       Join --> End
+   ```
+   
+2. @FieldEncrypt注解 用于属性字段上
+
+   数据库内容加解密 在mybatis模块已实现相应功能 若使用其他ORM框架 需自行实现功能

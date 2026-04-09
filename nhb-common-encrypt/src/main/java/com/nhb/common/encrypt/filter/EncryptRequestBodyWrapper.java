@@ -18,6 +18,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 /**
  * @author luck_nhb
@@ -34,15 +35,15 @@ public class EncryptRequestBodyWrapper extends HttpServletRequestWrapper {
         // 获取 AES 密码 采用 RSA 加密
         String headerAes = request.getHeader(headerFlag);
         //使用RSA私钥解密 获取AES秘钥
-        String aesPassword = EncryptUtil.decryptByRsa(headerAes, privateKey);
+        Map<String, byte[]> keyMap = EncryptUtil.parseHeaderAesWithRsa(headerAes, privateKey);
         request.setCharacterEncoding(StandardCharsets.UTF_8.name());
         byte[] readBytes = IoUtil.readBytes(request.getInputStream(), false);
         String requestBody = new String(readBytes, StandardCharsets.UTF_8);
-        ObjectNode objectNode = (ObjectNode)JacksonUtil.getObjectMapper().readTree(requestBody);
+        ObjectNode objectNode = (ObjectNode) JacksonUtil.getObjectMapper().readTree(requestBody);
         JsonNode jsonNode = objectNode.get(StreamUtil.getFieldName(ApiEncryptDto::getData));
         String data = jsonNode.asText();
         // 解密 body 采用 AES 加密
-        String decryptBody = EncryptUtil.decryptByAes(data, aesPassword);
+        String decryptBody = EncryptUtil.decryptByAes(data, keyMap.get(EncryptUtil.PASSWORD), keyMap.get(EncryptUtil.SALT));
         body = decryptBody.getBytes(StandardCharsets.UTF_8);
     }
 

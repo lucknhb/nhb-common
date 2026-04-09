@@ -16,7 +16,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
+import java.util.Map;
 
 /**
  * @author luck_nhb
@@ -77,16 +77,15 @@ public class EncryptResponseBodyWrapper extends HttpServletResponseWrapper {
      * @throws IOException
      */
     public String getEncryptContent(HttpServletResponse servletResponse, String publicKey, String headerFlag) throws IOException, NoSuchAlgorithmException {
-        SecureRandom secureRandom = SecureRandom.getInstanceStrong();
-        // AES-256
-        byte[] aesKey = new byte[32];
-        secureRandom.nextBytes(aesKey);
-        // AES 秘钥使用 Base64 编码
-        String encryptAes = EncryptUtil.encryptByBase64(aesKey);
-        // Rsa 公钥加密 Base64 编码
-        String encryptPassword = EncryptUtil.encryptByRsa(encryptAes, publicKey);
+        //随机生成AES秘钥及向量
+        Map<String, byte[]> keyMap = EncryptUtil.generateAesKey();
+        byte[] aesKey = keyMap.get(EncryptUtil.PASSWORD);
+        byte[] aesIv = keyMap.get(EncryptUtil.SALT);
+        //将秘钥和向量进行RSA加密 且 加密结果为BASE64编码后的值
+        // Rsa 公钥加密 AES秘钥及向量 且值为 加密后并base64编码后 通过 : 拼接的值
+        String headerValue = EncryptUtil.aesByRsaBase64Header(aesKey,aesIv,publicKey);
         // 设置响应头
-        servletResponse.setHeader(headerFlag, encryptPassword);
+        servletResponse.setHeader(headerFlag, headerValue);
         // 获取原始内容
         String originalBody = this.getContent();
         //仅对有用数据进行加密
@@ -95,15 +94,15 @@ public class EncryptResponseBodyWrapper extends HttpServletResponseWrapper {
             ObjectNode jsonNode = (ObjectNode) JacksonUtil.getObjectMapper().readTree(originalBody);
             String fieldName = StreamUtil.getFieldName(ResultMessage<String>::getData);
             JsonNode data = jsonNode.get(fieldName);
-            if (!data.isNull()){
+            if (!data.isNull()) {
                 String text = data.asText();
                 //JSON数据的话 仅对data属性值进行加密
-                jsonNode.put(fieldName,EncryptUtil.encryptByAes(text, encryptAes));
+                jsonNode.put(fieldName, EncryptUtil.encryptByAesBase64(text, aesKey, aesIv));
                 return JacksonUtil.toJsonString(jsonNode);
             }
         }
         // 非JSON数据对整体加密
-        return EncryptUtil.encryptByAes(originalBody, encryptAes);
+        return EncryptUtil.encryptByAesBase64(originalBody, aesKey, aesIv);
     }
 
     @Override

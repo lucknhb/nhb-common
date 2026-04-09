@@ -18,9 +18,14 @@ public class EncryptContext {
     private AlgorithmType algorithm;
 
     /**
-     * 安全秘钥 Base64编码后的秘钥
+     * Base64编码后的秘钥 对称加密时使用
      */
     private String password;
+
+    /**
+     * Base64编码后的盐值/向量值
+     */
+    private String salt;
 
     /**
      * 公钥

@@ -48,7 +48,7 @@ public class RsaEncryptor extends AbstractEncryptor {
         if (encodeType == EncodeType.HEX) {
             return EncryptUtil.encryptByRsaHex(value, context.getPublicKey());
         } else {
-            return EncryptUtil.encryptByRsa(value, context.getPublicKey());
+            return EncryptUtil.encryptByRsaBase64(value, context.getPublicKey());
         }
     }
 

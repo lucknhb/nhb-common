@@ -46,6 +46,6 @@ public class Base64Encryptor extends AbstractEncryptor {
      */
     @Override
     public String decrypt(String value) {
-        return EncryptUtil.decryptByBase64(value);
+        return EncryptUtil.decryptByBase64ToString(value);
     }
 }

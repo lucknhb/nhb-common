@@ -6,6 +6,8 @@ import com.nhb.common.encrypt.enums.AlgorithmType;
 import com.nhb.common.encrypt.enums.EncodeType;
 import com.nhb.common.encrypt.utils.EncryptUtil;
 
+import java.nio.charset.StandardCharsets;
+
 /**
  * @author luck_nhb
  * @version 1.0
@@ -38,9 +40,9 @@ public class Sm4Encryptor extends AbstractEncryptor {
     @Override
     public String encrypt(String value, EncodeType encodeType) {
         if (encodeType == EncodeType.HEX) {
-            return EncryptUtil.encryptBySm4Hex(value, context.getPassword());
+            return EncryptUtil.encryptBySm4Hex(value,EncryptUtil.decryptByBase64ToByte(context.getPassword()));
         } else {
-            return EncryptUtil.encryptBySm4(value, context.getPassword());
+            return EncryptUtil.encryptBySm4(value, EncryptUtil.decryptByBase64ToByte(context.getPassword()));
         }
     }
 
@@ -51,6 +53,6 @@ public class Sm4Encryptor extends AbstractEncryptor {
      */
     @Override
     public String decrypt(String value) {
-        return EncryptUtil.decryptBySm4(value, context.getPassword());
+        return EncryptUtil.decryptBySm4(value, context.getPassword().getBytes(StandardCharsets.UTF_8));
     }
 }

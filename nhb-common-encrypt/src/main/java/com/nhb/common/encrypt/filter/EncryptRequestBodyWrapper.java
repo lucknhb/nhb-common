@@ -41,7 +41,7 @@ public class EncryptRequestBodyWrapper extends HttpServletRequestWrapper {
         String requestBody = new String(readBytes, StandardCharsets.UTF_8);
         ObjectNode objectNode = (ObjectNode) JacksonUtil.getObjectMapper().readTree(requestBody);
         JsonNode jsonNode = objectNode.get(StreamUtil.getFieldName(ApiEncryptDto::getData));
-        String data = jsonNode.asText();
+        String data = jsonNode.toString();
         // 解密 body 采用 AES 加密
         String decryptBody = EncryptUtil.decryptByAes(data, keyMap.get(EncryptUtil.PASSWORD), keyMap.get(EncryptUtil.SALT));
         body = decryptBody.getBytes(StandardCharsets.UTF_8);

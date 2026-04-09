@@ -95,7 +95,7 @@ public class EncryptResponseBodyWrapper extends HttpServletResponseWrapper {
             String fieldName = StreamUtil.getFieldName(ResultMessage<String>::getData);
             JsonNode data = jsonNode.get(fieldName);
             if (!data.isNull()) {
-                String text = data.asText();
+                String text = data.toString();
                 //JSON数据的话 仅对data属性值进行加密
                 jsonNode.put(fieldName, EncryptUtil.encryptByAesBase64(text, aesKey, aesIv));
                 return JacksonUtil.toJsonString(jsonNode);

@@ -3,9 +3,8 @@ package com.nhb.common.encrypt.serializer;
 import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.deser.ContextualDeserializer;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.nhb.common.core.utils.JacksonUtil;
 import com.nhb.common.core.utils.SpringContextUtil;
@@ -28,11 +27,20 @@ import java.util.Objects;
  * @description: 反序列化加密数据
  */
 @Slf4j
-public class ApiEncryptDeserializer extends StdDeserializer<Object> {
+public class ApiEncryptDeserializer extends StdDeserializer<Object> implements ContextualDeserializer {
+
+    private final JavaType targetType;
 
     public ApiEncryptDeserializer() {
         // 绑定到 Object 类型，表示处理所有类型
         super(Object.class);
+        this.targetType = null;
+    }
+
+    // 带目标类型的构造器
+    private ApiEncryptDeserializer(JavaType targetType) {
+        super(targetType);
+        this.targetType = targetType;
     }
 
     @Override
@@ -47,7 +55,6 @@ public class ApiEncryptDeserializer extends StdDeserializer<Object> {
         }
         try {
             ObjectMapper objectMapper = JacksonUtil.getObjectMapper();
-            JavaType targetType = deserializationContext.getContextualType();
             //需要判断是否是HTTP请求/请求资源是否存在@ApiEncrypt注解
             HttpServletRequest httpServletRequest = HttpRequestUtil.getRequest();
             if (Objects.isNull(httpServletRequest)) {
@@ -64,11 +71,18 @@ public class ApiEncryptDeserializer extends StdDeserializer<Object> {
             Map<String, byte[]> keyMap = EncryptUtil.parseHeaderAesWithRsa(headerAes, apiEncryptProperties.getPrivateKey());
             String originalContent = EncryptUtil.decryptByAes(content, keyMap.get(EncryptUtil.PASSWORD), keyMap.get(EncryptUtil.SALT));
             //JSON 反序列化为目标类型对象
-            return objectMapper.readValue(originalContent, targetType);
+            return objectMapper.readValue(originalContent, this.targetType);
         } catch (Exception e) {
             throw new IOException("Failed to decrypt field", e);
         }
     }
 
+    @Override
+    public JsonDeserializer<?> createContextual(DeserializationContext context,
+                                                BeanProperty property) {
+        // 获取当前属性（字段/参数）的类型
+        JavaType type = property.getType();
+        return new ApiEncryptDeserializer(type);
+    }
 
 }

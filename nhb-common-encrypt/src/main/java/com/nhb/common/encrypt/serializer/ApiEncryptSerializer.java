@@ -48,10 +48,12 @@ public class ApiEncryptSerializer extends StdSerializer<Object> {
             //非HTTP请求或者请求资源已经存在@ApiEncrypt 则在此不进行加密
             if (ObjectSelfUtil.isNull(httpServletRequest)) {
                 jsonGenerator.writeString(originalJson);
+                return;
             }
             ApiEncrypt apiEncrypt = HttpRequestUtil.getApiEncryptAnnotation(httpServletRequest);
             if (Objects.nonNull(apiEncrypt) && apiEncrypt.response()) {
                 jsonGenerator.writeString(originalJson);
+                return;
             }
             //谨慎点 从响应头中获取已经存在的加密头信息 防止被自己覆盖
             ApiEncryptProperties apiEncryptProperties = SpringContextUtil.getBean(ApiEncryptProperties.class);

@@ -560,10 +560,10 @@ dubbo:
        DecryptKeyIV --> DecryptParams[使用解密后的 AES 密钥和向量对请求参数进行解密] --> RequestEnd[request处理完成]
        RequestBranch -- 否 --> RequestEnd
    
-       ResponseBranch -- 是 --> GenAES[随机生成 AES 密钥32位和向量12位]
-       GenAES --> EncryptResponse[使用生成的 AES 密钥和向量对返回值进行加密]
-       EncryptResponse --> EncryptKeyIV[将 AES 密钥和向量分别用 RSA 公钥加密并BASE64编码 用 : 拼接]
-       EncryptKeyIV --> SetHeader[将拼接结果放入响应头] --> ResponseEnd[response处理完成]
+       ResponseBranch -- 是 --> GenAES[从请求头获取 RSA加密并BASE64编码后的AES密钥及向量 格式 密钥:向量]
+       GenAES --> EncryptResponse[分别使用 RSA 私钥解密得到 AES 密钥和向量 其中AES秘钥为32位 向量为12位]
+       EncryptResponse --> EncryptKeyIV[使用获取到的秘钥及向量加密响应结果值]
+       EncryptKeyIV --> SetHeader[将请求头中的获取到的AES秘钥写入至响应头中] --> ResponseEnd[response处理完成]
        ResponseBranch -- 否 --> ResponseEnd
    
        RequestEnd --> Join(生成结果值)

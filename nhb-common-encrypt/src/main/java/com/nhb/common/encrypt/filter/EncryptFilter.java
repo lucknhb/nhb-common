@@ -56,20 +56,25 @@ public class EncryptFilter implements Filter {
                     return;
                 }
             } else {
-                // 是否有注解，有就报错，没有放行
-                if (ObjectUtil.isNotNull(apiEncrypt)) {
-                    HandlerExceptionResolver exceptionResolver = SpringContextUtil.getBean("handlerExceptionResolver", HandlerExceptionResolver.class);
-                    exceptionResolver.resolveException(
-                            servletRequest, servletResponse, null,
-                            new ServiceException("请求数据未加密,无法访问资源", HttpStatus.METHOD_NOT_ALLOWED));
-                    return;
-                }
+                HandlerExceptionResolver exceptionResolver = SpringContextUtil.getBean("handlerExceptionResolver", HandlerExceptionResolver.class);
+                exceptionResolver.resolveException(
+                        servletRequest, servletResponse, null,
+                        new ServiceException("请求数据未加密,无法访问资源", HttpStatus.METHOD_NOT_ALLOWED));
+                return;
             }
         }
         // 判断是否响应加密
         if (responseFlag) {
-            responseBodyWrapper = new EncryptResponseBodyWrapper(servletResponse);
-            responseWrapper = responseBodyWrapper;
+            if (StringUtil.isNotBlank(headerValue)) {
+                responseBodyWrapper = new EncryptResponseBodyWrapper(servletResponse);
+                responseWrapper = responseBodyWrapper;
+            }else {
+                HandlerExceptionResolver exceptionResolver = SpringContextUtil.getBean("handlerExceptionResolver", HandlerExceptionResolver.class);
+                exceptionResolver.resolveException(
+                        servletRequest, servletResponse, null,
+                        new ServiceException("无法加密响应值,请核实请求信息", HttpStatus.METHOD_NOT_ALLOWED));
+                return;
+            }
         }
         //调用链路
         chain.doFilter(ObjectUtil.defaultIfNull(requestWrapper, request),
@@ -82,14 +87,13 @@ public class EncryptFilter implements Filter {
             String encryptContent = "";
             try {
                 servletResponse.setCharacterEncoding(StandardCharsets.UTF_8.name());
-                encryptContent = responseBodyWrapper.getEncryptContent(
+                encryptContent = responseBodyWrapper.getEncryptContent(servletRequest,
                         servletResponse, apiEncryptProperties.getPublicKey(), apiEncryptProperties.getHeaderFlag());
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
                 HandlerExceptionResolver exceptionResolver = SpringContextUtil.getBean("handlerExceptionResolver", HandlerExceptionResolver.class);
                 exceptionResolver.resolveException(
                         servletRequest, servletResponse, null, e);
-
                 return;
             }
             // 对加密后的内容写出

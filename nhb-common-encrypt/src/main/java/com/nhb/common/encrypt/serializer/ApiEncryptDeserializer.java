@@ -15,6 +15,7 @@ import com.nhb.common.encrypt.utils.EncryptUtil;
 import com.nhb.common.encrypt.utils.HttpRequestUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.Assert;
 
 import java.io.IOException;
 import java.util.Map;
@@ -67,11 +68,12 @@ public class ApiEncryptDeserializer extends StdDeserializer<Object> implements C
             // 从请求头获取RSA加密后的AES秘钥
             ApiEncryptProperties apiEncryptProperties = SpringContextUtil.getBean(ApiEncryptProperties.class);
             String headerAes = httpServletRequest.getHeader(apiEncryptProperties.getHeaderFlag());
+            Assert.hasLength(headerAes,"无法解析加密属性,请核实请求信息");
             //使用RSA私钥解密 获取AES秘钥
             Map<String, byte[]> keyMap = EncryptUtil.parseHeaderAesWithRsa(headerAes, apiEncryptProperties.getPrivateKey());
             String originalContent = EncryptUtil.decryptByAes(content, keyMap.get(EncryptUtil.PASSWORD), keyMap.get(EncryptUtil.SALT));
             //JSON 反序列化为目标类型对象
-            return objectMapper.readValue(originalContent, this.targetType);
+            return objectMapper.readValue(originalContent, targetType);
         } catch (Exception e) {
             throw new IOException("Failed to decrypt field", e);
         }

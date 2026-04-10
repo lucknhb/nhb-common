@@ -6,14 +6,13 @@ import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import com.nhb.common.core.utils.JacksonUtil;
 import com.nhb.common.core.utils.ObjectSelfUtil;
 import com.nhb.common.core.utils.SpringContextUtil;
-import com.nhb.common.core.utils.StringUtil;
 import com.nhb.common.encrypt.annotation.ApiEncrypt;
 import com.nhb.common.encrypt.properties.ApiEncryptProperties;
 import com.nhb.common.encrypt.utils.EncryptUtil;
 import com.nhb.common.encrypt.utils.HttpRequestUtil;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.Assert;
 
 import java.io.IOException;
 import java.util.Map;
@@ -55,28 +54,14 @@ public class ApiEncryptSerializer extends StdSerializer<Object> {
                 jsonGenerator.writeString(originalJson);
                 return;
             }
-            //谨慎点 从响应头中获取已经存在的加密头信息 防止被自己覆盖
+            //从请求头中获取已经存在的加密头信息
             ApiEncryptProperties apiEncryptProperties = SpringContextUtil.getBean(ApiEncryptProperties.class);
-            HttpServletResponse httpServletResponse = HttpRequestUtil.getResponse();
-            String header = HttpRequestUtil.getHeader(httpServletResponse, apiEncryptProperties.getHeaderFlag());
-            //如果请求头AES秘钥为空可重新生成  不为空则解密然后使用
-            byte[] aesKey = null;
-            byte[] aesVi = null;
-            if (StringUtil.isNotBlank(header)) {
-                Map<String, byte[]> keyMap = EncryptUtil.parseHeaderAesWithRsa(header, apiEncryptProperties.getPrivateKey());
-                aesKey = keyMap.get(EncryptUtil.PASSWORD);
-                aesVi = keyMap.get(EncryptUtil.SALT);
-            } else {
-                //随机生成AES秘钥及向量
-                Map<String, byte[]> keyMap = EncryptUtil.generateAesKey();
-                aesKey = keyMap.get(EncryptUtil.PASSWORD);
-                aesVi = keyMap.get(EncryptUtil.SALT);
-                //将秘钥和向量进行RSA加密 且 加密结果为BASE64编码后的值
-                // Rsa 公钥加密 AES秘钥及向量 且值为 加密后并base64编码后 通过 : 拼接的值
-                String headerValue = EncryptUtil.aesByRsaBase64Header(aesKey, aesVi, apiEncryptProperties.getPublicKey());
-                // 设置响应头
-                httpServletResponse.setHeader(apiEncryptProperties.getHeaderFlag(), headerValue);
-            }
+            String header = HttpRequestUtil.getHeader(httpServletRequest, apiEncryptProperties.getHeaderFlag());
+            Assert.hasLength(header,"无法加密响应值,请核实请求信息");
+            //每次加密请求都有调用方生成临时AES秘钥及向量
+            Map<String, byte[]> keyMap = EncryptUtil.parseHeaderAesWithRsa(header, apiEncryptProperties.getPrivateKey());
+            byte[]  aesKey = keyMap.get(EncryptUtil.PASSWORD);
+            byte[] aesVi = keyMap.get(EncryptUtil.SALT);
             String data = EncryptUtil.encryptByAesBase64(originalJson, aesKey, aesVi);
             //输出密文字符串
             jsonGenerator.writeString(data);

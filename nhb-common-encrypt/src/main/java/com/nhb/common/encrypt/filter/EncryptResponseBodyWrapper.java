@@ -8,6 +8,7 @@ import com.nhb.common.core.utils.StreamUtil;
 import com.nhb.common.encrypt.utils.EncryptUtil;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.WriteListener;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpServletResponseWrapper;
 
@@ -68,24 +69,26 @@ public class EncryptResponseBodyWrapper extends HttpServletResponseWrapper {
     }
 
     /**
+     * 每次加密请求资源 响应结果需要加密时 需从此次请求头中获取请求方生成的临时AES秘钥(RSA公钥加密后的Base64数据)
      * 获取加密内容
      *
+     * @param request         request
      * @param servletResponse response
-     * @param publicKey       RSA公钥 (用于加密 AES 秘钥)
+     * @param privateKey       RSA私钥 (用于解密 AES 秘钥)
      * @param headerFlag      请求头标志
      * @return 加密内容
      * @throws IOException
      */
-    public String getEncryptContent(HttpServletResponse servletResponse, String publicKey, String headerFlag) throws IOException, NoSuchAlgorithmException {
-        //随机生成AES秘钥及向量
-        Map<String, byte[]> keyMap = EncryptUtil.generateAesKey();
-        byte[] aesKey = keyMap.get(EncryptUtil.PASSWORD);
-        byte[] aesIv = keyMap.get(EncryptUtil.SALT);
-        //将秘钥和向量进行RSA加密 且 加密结果为BASE64编码后的值
-        // Rsa 公钥加密 AES秘钥及向量 且值为 加密后并base64编码后 通过 : 拼接的值
-        String headerValue = EncryptUtil.aesByRsaBase64Header(aesKey,aesIv,publicKey);
+    public String getEncryptContent(HttpServletRequest request, HttpServletResponse servletResponse, String privateKey, String headerFlag) throws IOException, NoSuchAlgorithmException {
+
+        //从请求头获取秘钥  Rsa公钥加密 AES秘钥及向量 且值为 加密后并base64编码后 通过 : 拼接的值
+        String headerValue = request.getHeader(headerFlag);
         // 设置响应头
         servletResponse.setHeader(headerFlag, headerValue);
+        //获取AES秘钥及向量值
+        Map<String, byte[]> keyMap = EncryptUtil.parseHeaderAesWithRsa(headerValue,privateKey);
+        byte[] aesKey = keyMap.get(EncryptUtil.PASSWORD);
+        byte[] aesIv = keyMap.get(EncryptUtil.SALT);
         // 获取原始内容
         String originalBody = this.getContent();
         //仅对有用数据进行加密

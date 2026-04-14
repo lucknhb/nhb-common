@@ -11,10 +11,12 @@ import com.nhb.common.encrypt.properties.ApiEncryptProperties;
 import com.nhb.common.encrypt.utils.EncryptUtil;
 import com.nhb.common.encrypt.utils.HttpRequestUtil;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.Assert;
 
 import java.io.IOException;
+import java.rmi.ServerException;
 import java.util.Map;
 import java.util.Objects;
 
@@ -58,6 +60,9 @@ public class ApiEncryptSerializer extends StdSerializer<Object> {
             ApiEncryptProperties apiEncryptProperties = SpringContextUtil.getBean(ApiEncryptProperties.class);
             String header = HttpRequestUtil.getHeader(httpServletRequest, apiEncryptProperties.getHeaderFlag());
             Assert.hasLength(header,"无法加密响应值,请核实请求信息");
+            // 设置响应头
+            HttpServletResponse httpServletResponse = HttpRequestUtil.getResponse();
+            Objects.requireNonNull(httpServletResponse).setHeader(apiEncryptProperties.getHeaderFlag(), header);
             //每次加密请求都有调用方生成临时AES秘钥及向量
             Map<String, byte[]> keyMap = EncryptUtil.parseHeaderAesWithRsa(header, apiEncryptProperties.getPrivateKey());
             byte[]  aesKey = keyMap.get(EncryptUtil.PASSWORD);
@@ -66,7 +71,8 @@ public class ApiEncryptSerializer extends StdSerializer<Object> {
             //输出密文字符串
             jsonGenerator.writeString(data);
         } catch (Exception e) {
-            throw new IOException("Failed to encrypt field", e);
+            log.error(e.getMessage(), e);
+            throw new ServerException(e.getMessage());
         }
     }
 }

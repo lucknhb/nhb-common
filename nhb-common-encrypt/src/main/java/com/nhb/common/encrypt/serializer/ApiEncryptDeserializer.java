@@ -18,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.Assert;
 
 import java.io.IOException;
+import java.rmi.ServerException;
 import java.util.Map;
 import java.util.Objects;
 
@@ -75,7 +76,8 @@ public class ApiEncryptDeserializer extends StdDeserializer<Object> implements C
             //JSON 反序列化为目标类型对象
             return objectMapper.readValue(originalContent, targetType);
         } catch (Exception e) {
-            throw new IOException("Failed to decrypt field", e);
+            log.error(e.getMessage(), e);
+            throw new ServerException(e.getMessage());
         }
     }
 

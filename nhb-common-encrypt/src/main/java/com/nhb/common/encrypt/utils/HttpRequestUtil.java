@@ -16,8 +16,6 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerExecutionChain;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
 /**
@@ -55,7 +53,7 @@ public class HttpRequestUtil {
         if (StringUtils.isEmpty(value)) {
             return StringUtils.EMPTY;
         }
-        return URLDecoder.decode(value, StandardCharsets.UTF_8);
+        return value;
     }
 
     /**
@@ -70,7 +68,7 @@ public class HttpRequestUtil {
         if (StringUtils.isEmpty(value)) {
             return StringUtils.EMPTY;
         }
-        return URLDecoder.decode(value, StandardCharsets.UTF_8);
+        return value;
     }
 
     /**

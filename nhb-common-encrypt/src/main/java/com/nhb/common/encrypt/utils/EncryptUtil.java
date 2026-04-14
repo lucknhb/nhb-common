@@ -136,6 +136,9 @@ public class EncryptUtil {
         if (StrUtil.isBlank(headerValue)) {
             throw new ServiceException("无法获取秘钥");
         }
+        if (StrUtil.isBlank(privateKey)) {
+            throw new ServiceException("无法获取秘钥");
+        }
         String[] split = headerValue.split(StrPool.COLON);
         if (split.length != 2) {
             throw new ServiceException("非合法秘钥,请核实");

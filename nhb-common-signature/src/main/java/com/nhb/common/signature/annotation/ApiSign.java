@@ -12,4 +12,10 @@ import java.lang.annotation.*;
 @Target({ ElementType.METHOD })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ApiSign {
+
+    /**
+     * 时间间隔
+     * @return 默认10S
+     */
+    long timeRange() default 10000L;
 }

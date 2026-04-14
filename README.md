@@ -544,8 +544,8 @@ dubbo:
 
 1. @ApiEncrypt注解 用于接口及参数属性上  
 
-   参数加解密过程：<font color='red'>注意: 如果接口上存在加密处理注解，则请求/返回实体类中的注解则不会被处理</font>
-
+   参数加解密过程：<font color='red'>注意: 如果接口上存在加密处理注解，则请求/返回实体类中的注解则不会被处理,接口上的加密时请参考{"data":"加密数据""}</font>
+   
    ```mermaid
    graph TD
        Start([开始]) --> CheckAnnotation{是否存在ApiEncrypt注解}
@@ -578,7 +578,7 @@ dubbo:
      #默认公钥
      publicKey: #可使用默认值
      #默认私钥
-     privateKey: 可使用默认值
+     privateKey: #可使用默认值
    ```
 
    

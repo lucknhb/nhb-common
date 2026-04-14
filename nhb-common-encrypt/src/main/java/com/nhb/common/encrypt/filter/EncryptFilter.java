@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.Ordered;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
@@ -26,7 +27,7 @@ import java.nio.charset.StandardCharsets;
  */
 @Slf4j
 @RequiredArgsConstructor
-public class EncryptFilter implements Filter {
+public class EncryptFilter implements Filter, Ordered {
     private final ApiEncryptProperties apiEncryptProperties;
 
     @Override
@@ -104,5 +105,22 @@ public class EncryptFilter implements Filter {
 
     @Override
     public void destroy() {
+    }
+
+    /**
+     * Get the order value of this object.
+     * <p>Higher values are interpreted as lower priority. As a consequence,
+     * the object with the lowest value has the highest priority (somewhat
+     * analogous to Servlet {@code load-on-startup} values).
+     * <p>Same order values will result in arbitrary sort positions for the
+     * affected objects.
+     *
+     * @return the order value
+     * @see #HIGHEST_PRECEDENCE
+     * @see #LOWEST_PRECEDENCE
+     */
+    @Override
+    public int getOrder() {
+        return 1;
     }
 }

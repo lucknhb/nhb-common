@@ -7,6 +7,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.StreamUtils;
 
 import java.lang.invoke.SerializedLambda;
 import java.lang.reflect.Method;
@@ -25,7 +26,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class StreamUtil {
+public class StreamUtil extends StreamUtils {
     /**
      * 将collection过滤
      *

@@ -149,8 +149,8 @@ public class MapUtil {
      * @param parameterMap 请求参数Map
      * @return MultiValueMap
      */
-    public static MultiValueMap<String, String> getParameterMap(Map<String, String[]> parameterMap) {
-        Map<String, List<String>> transformValues = Maps.transformValues(parameterMap, Lists::newArrayList);
+    public static MultiValueMap<String, Object> getParameterMap(Map<String, String[]> parameterMap) {
+        Map<String, List<Object>> transformValues = Maps.transformValues(parameterMap, Lists::newArrayList);
         return new MultiValueMapAdapter<>(transformValues);
     }
 

@@ -1,6 +1,7 @@
 package com.nhb.common.signature.config;
 
 import com.nhb.common.signature.aspectj.ApiSignatureAspect;
+import com.nhb.common.signature.core.ApiSignFilter;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Bean;
 
@@ -14,7 +15,12 @@ import org.springframework.context.annotation.Bean;
 public class ApiSignatureAutoConfiguration {
 
     @Bean
-    public ApiSignatureAspect apiSignatureAop() {
+    public ApiSignatureAspect apiSignatureAspect() {
         return new ApiSignatureAspect();
+    }
+
+    @Bean
+    public ApiSignFilter apiSignFilter() {
+        return new ApiSignFilter();
     }
 }

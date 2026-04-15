@@ -1,4 +1,8 @@
-package com.nhb.common.signature.utils;/**
+package com.nhb.common.signature.utils;
+
+import java.nio.charset.StandardCharsets;
+
+/**
  * @author luck_nhb
  * @date 2026/4/14 15:58
  * @version 1.0
@@ -11,8 +15,8 @@ public class RequestBodyHolder {
         REQUEST_BODY.set(body);
     }
 
-    public static byte[] getBody() {
-        return REQUEST_BODY.get();
+    public static String getBody() {
+        return new String(REQUEST_BODY.get(), StandardCharsets.UTF_8);
     }
 
     public static void clear() {

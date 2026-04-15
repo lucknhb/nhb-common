@@ -1,6 +1,7 @@
 package com.nhb.common.signature.aspectj;
 
 import cn.hutool.core.collection.CollUtil;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.nhb.common.core.utils.JacksonUtil;
 import com.nhb.common.core.utils.MapUtil;
 import com.nhb.common.core.utils.SpringContextUtil;
@@ -11,7 +12,6 @@ import com.nhb.common.signature.utils.RequestBodyHolder;
 import com.nhb.common.signature.utils.SignatureUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ArrayUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -59,9 +59,9 @@ public class ApiSignatureAspect {
         if (CollUtil.isNotEmpty(parameterMap)) {
             return MapUtil.getParameterMap(parameterMap).toSingleValueMap();
         }
-        byte[] requestBody = RequestBodyHolder.getBody();
-        return ArrayUtils.isEmpty(requestBody) ? Collections.emptyMap()
-                : JacksonUtil.toMap(requestBody, String.class, Object.class);
+        String requestBody = RequestBodyHolder.getBody();
+        return StringUtil.isBlank(requestBody) ? Collections.emptyMap()
+                : JacksonUtil.parseObject(requestBody,new TypeReference<Map<String, Object>>() {});
     }
 
     @Around("@annotation(apiSign)")

@@ -89,7 +89,7 @@ public class EncryptFilter implements Filter, Ordered {
             try {
                 servletResponse.setCharacterEncoding(StandardCharsets.UTF_8.name());
                 encryptContent = responseBodyWrapper.getEncryptContent(servletRequest,
-                        servletResponse, apiEncryptProperties.getPublicKey(), apiEncryptProperties.getHeaderFlag());
+                        servletResponse, apiEncryptProperties.getPrivateKey(), apiEncryptProperties.getHeaderFlag());
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
                 HandlerExceptionResolver exceptionResolver = SpringContextUtil.getBean("handlerExceptionResolver", HandlerExceptionResolver.class);

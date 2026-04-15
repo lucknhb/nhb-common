@@ -1,5 +1,6 @@
 package com.nhb.common.signature.utils;
 
+import cn.hutool.core.codec.Base64Decoder;
 import cn.hutool.core.codec.Base64Encoder;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
@@ -98,7 +99,7 @@ public class SignatureUtil {
      * @return 生成的签名信息
      */
     public static String buildSignContent(Map<String, Object> map) {
-        if (CollUtil.isNotEmpty(map)) {
+        if (CollUtil.isEmpty(map)) {
             return StrUtil.EMPTY;
         }
         StringBuilder signContent = new StringBuilder();
@@ -137,14 +138,14 @@ public class SignatureUtil {
     /**
      * 使用公钥验证签名
      *
-     * @param originContent 未签名过的数据
-     * @param signContent   签名后的数据
+     * @param originContent 未签名过BASE64的数据
+     * @param signContent   签名后的BASE64数据
      * @param publicKey     公钥
      * @return
      */
     public static boolean verifySignature(String originContent, String signContent, String publicKey) {
         Sign sign = SecureUtil.sign(SignAlgorithm.SHA256withRSA, null, publicKey);
-        return sign.verify(originContent.getBytes(StandardCharsets.UTF_8), signContent.getBytes(StandardCharsets.UTF_8));
+        return sign.verify(originContent.getBytes(StandardCharsets.UTF_8), Base64Decoder.decode(signContent));
     }
 
 

@@ -586,3 +586,25 @@ dubbo:
 2. @FieldEncrypt注解 用于属性字段上
 
    数据库内容加解密 在mybatis模块已实现相应功能 若使用其他ORM框架 需自行实现功能
+
+
+
+### Signature模块
+
+依赖如下
+
+```xml
+<dependency>
+   <groupId>com.nhb</groupId>
+   <artifactId>nhb-common-signature</artifactId>
+   <version>${version}</version>
+</dependency>
+```
+
+签名生成方式使用SHA256withRSA算法，签名内容包含所有参数(参数为空的需要过滤掉)及请求头中的nonce/timestamp/clientId，按照参数名(key)的自然顺序排序使用&拼接 key=value，然后将拼接出来的字符串并SHA-256进行签名然后使用RSA秘钥进行加密。
+
+<font color='red'>如果如果同时使用的Encrypt模块，已明确Signature数据获取早于Encrypt，且Encrypt的加密数据不影响Signature验签(使用原始数据验签)</font>
+
+1. 在接口上使用@ApiSign 进行标识  可指定接口验签允许时间戳间隔 单位毫秒
+2. 提供SignatureUtil工具类 可生成秘钥对(RSA/ECB/PKCS1Padding 算法)/构建参数顺序/生成签名/验签函数
+

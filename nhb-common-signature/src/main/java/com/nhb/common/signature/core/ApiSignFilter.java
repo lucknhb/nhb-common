@@ -33,10 +33,10 @@ public class ApiSignFilter implements Filter, Ordered {
     }
 
     /**
-     * 该顺序需要在 {@link com.nhb.common.encrypt.filter.EncryptFilter} 之后处理
+     * 该顺序需要在 {@link com.nhb.common.encrypt.filter.EncryptFilter} 之前处理 获取未解密前的数据
      */
     @Override
     public int getOrder() {
-        return 6;
+        return 0;
     }
 }

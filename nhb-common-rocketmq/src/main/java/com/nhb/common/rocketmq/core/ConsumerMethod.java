@@ -15,7 +15,7 @@ import java.lang.reflect.Method;
 @Data
 @AllArgsConstructor
 public class ConsumerMethod {
-    Object bean;
-    Method method;
-    RocketMQConsumer annotation;
+    private Object bean;
+    private Method method;
+    private RocketMQConsumer annotation;
 }

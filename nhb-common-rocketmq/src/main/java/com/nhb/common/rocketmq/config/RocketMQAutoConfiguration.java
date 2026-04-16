@@ -4,6 +4,7 @@ import com.nhb.common.fory.factory.ForyFactory;
 import com.nhb.common.rocketmq.converter.MessageConverter;
 import com.nhb.common.rocketmq.converter.impl.ForyMessageConverter;
 import com.nhb.common.rocketmq.factory.RocketMQFactory;
+import com.nhb.common.rocketmq.hook.TopicSuffixRPCHook;
 import com.nhb.common.rocketmq.processor.ConsumerAnnotationBeanPostProcessor;
 import com.nhb.common.rocketmq.properties.RocketMQConfigProperties;
 import com.nhb.common.rocketmq.register.RocketMQConsumerRegistry;
@@ -24,13 +25,19 @@ import org.springframework.context.annotation.Bean;
 @EnableConfigurationProperties(RocketMQConfigProperties.class)
 public class RocketMQAutoConfiguration {
 
-    @Bean(initMethod = "start",destroyMethod = "shutdown")
-    public DefaultMQProducer defaultMQProducer(RocketMQConfigProperties rocketMQConfigProperties){
-        return RocketMQFactory.createNormalProducer(rocketMQConfigProperties.getProducer());
+    @Bean(initMethod = "start", destroyMethod = "shutdown")
+    public DefaultMQProducer defaultMQProducer(RocketMQConfigProperties rocketMQConfigProperties) {
+        if (Boolean.TRUE.equals(rocketMQConfigProperties.getProfileEnabled())) {
+            TopicSuffixRPCHook rpcHook = new TopicSuffixRPCHook();
+        }else {
+            DefaultMQProducer defaultMQProducer = RocketMQFactory.createNormalProducer(rocketMQConfigProperties.getProducer(),null);
+        }
+        return defaultMQProducer;
     }
 
     /**
      * fory序列化工具
+     *
      * @return fory实例
      */
     @Bean
@@ -46,13 +53,13 @@ public class RocketMQAutoConfiguration {
 
     @Bean
     public RocketMQConsumerRegistry rocketMQConsumerRegistry(MessageConverter messageConverter,
-                                                             RocketMQConfigProperties  rocketMQConfigProperties) {
-        return new RocketMQConsumerRegistry(messageConverter,rocketMQConfigProperties.getConsumer());
+                                                             RocketMQConfigProperties rocketMQConfigProperties) {
+        return new RocketMQConsumerRegistry(messageConverter, rocketMQConfigProperties.getConsumer());
     }
 
     @Bean
-    public ConsumerAnnotationBeanPostProcessor  consumerAnnotationBeanPostProcessor(ApplicationContext  applicationContext,
-                                                                                    RocketMQConsumerRegistry rocketMQConsumerRegistry) {
-        return new ConsumerAnnotationBeanPostProcessor(applicationContext,rocketMQConsumerRegistry);
+    public ConsumerAnnotationBeanPostProcessor consumerAnnotationBeanPostProcessor(ApplicationContext applicationContext,
+                                                                                   RocketMQConsumerRegistry rocketMQConsumerRegistry) {
+        return new ConsumerAnnotationBeanPostProcessor(applicationContext, rocketMQConsumerRegistry);
     }
 }

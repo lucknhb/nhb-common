@@ -8,6 +8,7 @@ import com.nhb.common.rocketmq.core.ConsumerMethodGroup;
 import com.nhb.common.rocketmq.enums.ConsumeMode;
 import com.nhb.common.rocketmq.factory.RocketMQFactory;
 import com.nhb.common.rocketmq.properties.RocketMQConfigProperties;
+import com.nhb.common.rocketmq.utils.TopicUtil;
 import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -53,20 +54,22 @@ public class RocketMQConsumerRegistry {
 
     /**
      * 注册被@RocketMQConsumer注解的方法
-     * @param bean          容器中Bean对象
-     * @param method        被@RocketMQConsumer注解的方法
-     * @param annotation    @RocketMQConsumer 注解
+     *
+     * @param bean       容器中Bean对象
+     * @param method     被@RocketMQConsumer注解的方法
+     * @param annotation @RocketMQConsumer 注解
      */
     public void registerConsumerMethod(Object bean, Method method, RocketMQConsumer annotation) {
         //当没有设置消费者组时，使用配置中的默认消费者组
-        String key = annotation.topic() + ":" + StringUtil.defaultIfBlank(annotation.consumerGroup(),consumerConfig.getConsumerGroup());
-        ConsumerMethodGroup group = groupMap.computeIfAbsent(key, k -> new ConsumerMethodGroup(annotation.topic(), StringUtil.defaultIfBlank(annotation.consumerGroup(),consumerConfig.getConsumerGroup())));
+        String key = TopicUtil.topicSuffix(annotation.topic()) + ":" + StringUtil.defaultIfBlank(annotation.consumerGroup(), consumerConfig.getConsumerGroup());
+        ConsumerMethodGroup group = groupMap.computeIfAbsent(key, k -> new ConsumerMethodGroup(TopicUtil.topicSuffix(annotation.topic()), StringUtil.defaultIfBlank(annotation.consumerGroup(), consumerConfig.getConsumerGroup())));
         group.addMethod(bean, method, annotation);
     }
 
     /**
      * 启动所有消费者（在ContextRefreshedEvent中调用）
-     * @throws MQClientException  异常信息
+     *
+     * @throws MQClientException 异常信息
      */
     public void startConsumers() throws MQClientException {
         for (ConsumerMethodGroup group : groupMap.values()) {
@@ -76,8 +79,9 @@ public class RocketMQConsumerRegistry {
 
     /**
      * 注册并且启动消费者
-     * @param group       实际注解方法
-     * @throws MQClientException   异常信息
+     *
+     * @param group 实际注解方法
+     * @throws MQClientException 异常信息
      */
     private void createAndStartConsumerForGroup(ConsumerMethodGroup group) throws MQClientException {
         //根据注解上的信息 生成消费者
@@ -103,7 +107,7 @@ public class RocketMQConsumerRegistry {
                     dispatchMessage(group, messages.getFirst());
                     return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
                 } catch (Exception e) {
-                    log.error("CONCURRENTLY RocketMQ Handle Fail.The Error Message Is:{}",e.getMessage(), e);
+                    log.error("CONCURRENTLY RocketMQ Handle Fail.The Error Message Is:{}", e.getMessage(), e);
                     // 可根据业务决定是否重试
                     return ConsumeConcurrentlyStatus.RECONSUME_LATER;
                 }
@@ -114,7 +118,7 @@ public class RocketMQConsumerRegistry {
                     dispatchMessage(group, messages.getFirst());
                     return ConsumeOrderlyStatus.SUCCESS;
                 } catch (Exception e) {
-                    log.error("ORDERLY RocketMQ Handle Fail.The Error Message Is:{}",e.getMessage(), e);
+                    log.error("ORDERLY RocketMQ Handle Fail.The Error Message Is:{}", e.getMessage(), e);
                     return ConsumeOrderlyStatus.SUSPEND_CURRENT_QUEUE_A_MOMENT;
                 }
             });
@@ -125,6 +129,7 @@ public class RocketMQConsumerRegistry {
 
     /**
      * 分发处理任务
+     *
      * @param group
      * @param msg
      * @throws Exception
@@ -145,8 +150,9 @@ public class RocketMQConsumerRegistry {
 
     /**
      * 执行处理方法
-     * @param method       需要执行的方法
-     * @param msg          rocketMQ推送多来的数据信息
+     *
+     * @param method 需要执行的方法
+     * @param msg    rocketMQ推送多来的数据信息
      * @throws Exception
      */
     private void invokeMethod(ConsumerMethod method, MessageExt msg) throws Exception {
@@ -158,6 +164,7 @@ public class RocketMQConsumerRegistry {
 
     /**
      * 转换参数
+     *
      * @param method
      * @param messageExt
      * @return

@@ -13,6 +13,9 @@ import org.apache.rocketmq.client.consumer.listener.MessageListenerOrderly;
 import org.apache.rocketmq.client.producer.DefaultMQProducer;
 import org.apache.rocketmq.client.producer.TransactionListener;
 import org.apache.rocketmq.client.producer.TransactionMQProducer;
+import org.apache.rocketmq.remoting.RPCHook;
+
+import java.util.Objects;
 
 /**
  * @author luck_nhb
@@ -25,9 +28,10 @@ public class RocketMQFactory {
 
     /**
      * 设置生产者属性
-     * @param producer         生产者
-     * @param producerConfig   属性
-     * @param <T>              配置后生产者
+     *
+     * @param producer       生产者
+     * @param producerConfig 属性
+     * @param <T>            配置后生产者
      */
     private static <T extends DefaultMQProducer> void setProducerProperties(T producer, RocketMQConfigProperties.ProducerConfig producerConfig) {
         producer.setNamesrvAddr(producerConfig.getNameServerAddress());
@@ -42,21 +46,29 @@ public class RocketMQFactory {
     }
 
     /**
-     *  DefaultMQProducer 生产者
-     * @param producerConfig  可用配置属性
-     * @return                生产者
+     * DefaultMQProducer 生产者
+     *
+     * @param producerConfig 可用配置属性
+     * @return 生产者
      */
-    public static DefaultMQProducer createNormalProducer(RocketMQConfigProperties.ProducerConfig producerConfig) {
-        DefaultMQProducer defaultMQProducer = new DefaultMQProducer(producerConfig.getProducerGroup());
+    public static DefaultMQProducer createNormalProducer(RocketMQConfigProperties.ProducerConfig producerConfig, RPCHook rpcHook) {
+        DefaultMQProducer defaultMQProducer = null;
+        if (Objects.isNull(rpcHook)) {
+            defaultMQProducer = new DefaultMQProducer(producerConfig.getProducerGroup());
+        } else {
+            defaultMQProducer = new DefaultMQProducer(producerConfig.getProducerGroup(), rpcHook);
+        }
+
         setProducerProperties(defaultMQProducer, producerConfig);
         return defaultMQProducer;
     }
 
     /**
      * 创建事务类型生产者
-     * @param producerConfig            可用配置属性
-     * @param transactionListener   事务监听器
-     * @return                      事务生产者
+     *
+     * @param producerConfig      可用配置属性
+     * @param transactionListener 事务监听器
+     * @return 事务生产者
      */
     public static TransactionMQProducer createTransactionProducer(RocketMQConfigProperties.ProducerConfig producerConfig, TransactionListener transactionListener) {
         TransactionMQProducer transactionMQProducer = new TransactionMQProducer(producerConfig.getProducerGroup());
@@ -69,7 +81,8 @@ public class RocketMQFactory {
 
     /**
      * 创建PULL消费者
-     * @param consumerConfig  PULL 消费者
+     *
+     * @param consumerConfig PULL 消费者
      * @return
      */
     public static DefaultLitePullConsumer createLitePullConsumer(RocketMQConfigProperties.ConsumerConfig consumerConfig) {
@@ -91,8 +104,9 @@ public class RocketMQFactory {
 
     /**
      * 创建PULL消费者
-     * @param consumerConfig         PULL 消费者
-     * @param messageQueueListener   监听器
+     *
+     * @param consumerConfig       PULL 消费者
+     * @param messageQueueListener 监听器
      * @return
      */
     public static DefaultLitePullConsumer createLitePullConsumer(RocketMQConfigProperties.ConsumerConfig consumerConfig, MessageQueueListener messageQueueListener) {
@@ -106,7 +120,8 @@ public class RocketMQFactory {
     /**
      * 创建PUSH 模式消费者<BR/>
      * ★★ 切记该方式创建出来的消费者未设置监听器 ★★
-     * @param consumerConfig   配置项
+     *
+     * @param consumerConfig 配置项
      * @return
      */
     public static DefaultMQPushConsumer createPushConsumer(RocketMQConfigProperties.ConsumerConfig consumerConfig) {
@@ -131,8 +146,9 @@ public class RocketMQFactory {
 
     /**
      * 创建PUSH 模式消费者<BR/>
-     * @param consumerConfig    配置项
-     * @param messageListener   监听器
+     *
+     * @param consumerConfig  配置项
+     * @param messageListener 监听器
      * @return
      */
     public static DefaultMQPushConsumer createPushConsumer(RocketMQConfigProperties.ConsumerConfig consumerConfig, MessageListener messageListener) {

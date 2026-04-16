@@ -1,6 +1,7 @@
 package com.nhb.common.excel.core;
 
 import cn.hutool.core.util.StrUtil;
+import lombok.Getter;
 import lombok.Setter;
 
 import java.util.ArrayList;
@@ -23,32 +24,28 @@ public class DefaultExcelResult<T> implements ExcelResult<T> {
     /**
      * 错误信息列表
      */
+    @Getter
     @Setter
-    private List<String> errorList;
+    private List<String> errorMessages;
 
     public DefaultExcelResult() {
         this.list = new ArrayList<>();
-        this.errorList = new ArrayList<>();
+        this.errorMessages = new ArrayList<>();
     }
 
-    public DefaultExcelResult(List<T> list, List<String> errorList) {
+    public DefaultExcelResult(List<T> list, List<String> errorMessages) {
         this.list = list;
-        this.errorList = errorList;
+        this.errorMessages = errorMessages;
     }
 
     public DefaultExcelResult(ExcelResult<T> excelResult) {
         this.list = excelResult.getList();
-        this.errorList = excelResult.getErrorList();
+        this.errorMessages = excelResult.getErrorMessages();
     }
 
     @Override
     public List<T> getList() {
         return list;
-    }
-
-    @Override
-    public List<String> getErrorList() {
-        return errorList;
     }
 
     /**
@@ -59,7 +56,7 @@ public class DefaultExcelResult<T> implements ExcelResult<T> {
     @Override
     public String getAnalysis() {
         int successCount = list.size();
-        int errorCount = errorList.size();
+        int errorCount = errorMessages.size();
         if (successCount == 0) {
             return "读取失败，未解析到数据";
         } else {

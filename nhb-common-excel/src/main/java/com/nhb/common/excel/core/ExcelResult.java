@@ -17,7 +17,7 @@ public interface ExcelResult<T> {
     /**
      * 错误列表
      */
-    List<String> getErrorList();
+    List<String> getErrorMessages();
 
     /**
      * 导入回执

@@ -23,7 +23,7 @@ import java.util.Set;
  */
 public class DefaultRocketMQTransactionListener implements TransactionListener {
     //用于存储事务ID
-    private Set<String> transactionSet = new HashSet<>();
+    private final Set<String> transactionSet = new HashSet<>();
 
     /**
      * 执行本地业务事务

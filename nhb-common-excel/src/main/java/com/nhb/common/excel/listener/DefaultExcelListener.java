@@ -76,7 +76,7 @@ public class DefaultExcelListener<T> extends AnalysisEventListener<T> implements
                 log.error(errMsg);
             }
         }
-        excelResult.getErrorList().add(errMsg);
+        excelResult.getErrorMessages().add(errMsg);
         throw new ExcelAnalysisException(errMsg);
     }
 

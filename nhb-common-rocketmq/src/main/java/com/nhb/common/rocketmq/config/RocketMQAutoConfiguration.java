@@ -27,10 +27,12 @@ public class RocketMQAutoConfiguration {
 
     @Bean(initMethod = "start", destroyMethod = "shutdown")
     public DefaultMQProducer defaultMQProducer(RocketMQConfigProperties rocketMQConfigProperties) {
+        DefaultMQProducer defaultMQProducer = null;
         if (Boolean.TRUE.equals(rocketMQConfigProperties.getProfileEnabled())) {
             TopicSuffixRPCHook rpcHook = new TopicSuffixRPCHook();
+            defaultMQProducer = RocketMQFactory.createNormalProducer(rocketMQConfigProperties.getProducer(),rpcHook);
         }else {
-            DefaultMQProducer defaultMQProducer = RocketMQFactory.createNormalProducer(rocketMQConfigProperties.getProducer(),null);
+            defaultMQProducer = RocketMQFactory.createNormalProducer(rocketMQConfigProperties.getProducer(),null);
         }
         return defaultMQProducer;
     }

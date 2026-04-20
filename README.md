@@ -1,4 +1,20 @@
+### BOM模块
 
+该模块为功能模块清单依赖管理，可通过引入该模块进行以下所有模块版本的管理
+
+```xml
+<dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.nhb</groupId>
+                <artifactId>nhb-common-bom</artifactId>
+                <version>实际版本号</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+```
 
 ### Core模块
 
@@ -8,7 +24,7 @@
 <dependency>
     <groupId>com.nhb</groupId>
     <artifactId>nhb-common-core</artifactId>
-    <version>${version}</version>
+    <version>${version}/使用引入BOM方式时无需填入版本号</version>
 </dependency>
 ```
 
@@ -229,7 +245,7 @@ Xss : 自定义xss校验注解 用于校验是否存在脚本注入风险
 <dependency>
     <groupId>com.nhb</groupId>
     <artifactId>nhb-common-api</artifactId>
-    <version>${version}</version>
+    <version>${version}/使用引入BOM方式时无需填入版本号</version>
 </dependency>
 ```
 
@@ -243,7 +259,7 @@ Xss : 自定义xss校验注解 用于校验是否存在脚本注入风险
 <dependency>
     <groupId>com.nhb</groupId>
     <artifactId>nhb-common-security</artifactId>
-    <version>${version}</version>
+    <version>${version}/使用引入BOM方式时无需填入版本号</version>
     <exclusions>
         <!--不需要redis依赖的情况下(不需要sa-token分布式会话功能) 可剔除该依赖-->
         <exclusion>
@@ -340,7 +356,7 @@ sa-token:
 <dependency>
     <groupId>com.nhb</groupId>
     <artifactId>nhb-common-generator</artifactId>
-    <version>${version}</version>
+    <version>${version}/使用引入BOM方式时无需填入版本号</version>
 </dependency>
 ```
 
@@ -392,7 +408,7 @@ mapStructPlusGenerator.generate(null);
 <dependency>
    <groupId>com.nhb</groupId>
    <artifactId>nhb-common-nacos</artifactId>
-   <version>${version}</version>
+   <version>${version}/使用引入BOM方式时无需填入版本号</version>
 </dependency>
 ```
 
@@ -463,7 +479,7 @@ spring:
 <dependency>
    <groupId>com.nhb</groupId>
    <artifactId>nhb-common-dubbo</artifactId>
-   <version>${version}</version>
+   <version>${version}/使用引入BOM方式时无需填入版本号</version>
 </dependency>
 ```
 
@@ -536,7 +552,7 @@ dubbo:
 <dependency>
    <groupId>com.nhb</groupId>
    <artifactId>nhb-common-encrypt</artifactId>
-   <version>${version}</version>
+   <version>${version}/使用引入BOM方式时无需填入版本号</version>
 </dependency>
 ```
 
@@ -597,7 +613,7 @@ dubbo:
 <dependency>
    <groupId>com.nhb</groupId>
    <artifactId>nhb-common-signature</artifactId>
-   <version>${version}</version>
+   <version>${version}/使用引入BOM方式时无需填入版本号</version>
 </dependency>
 ```
 

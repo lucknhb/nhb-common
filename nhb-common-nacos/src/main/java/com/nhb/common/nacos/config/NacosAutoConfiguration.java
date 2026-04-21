@@ -24,7 +24,7 @@ public class NacosAutoConfiguration {
 
     @Bean
     @Conditional(NotGatewayCondition.class)
-    @ConditionalOnBooleanProperty(value = "spring.cloud.nacos.router.generate-enabled",havingValue = false,matchIfMissing = true)
+    @ConditionalOnBooleanProperty(value = "spring.cloud.nacos.router.generate-enabled",havingValue = true,matchIfMissing = false)
     public RouteApplicationReadyEventListener routeApplicationReadyEventListener(Environment environment) {
         return new  RouteApplicationReadyEventListener(environment);
     }
@@ -37,7 +37,7 @@ public class NacosAutoConfiguration {
 
     @Bean
     @ConditionalOnBooleanProperty(value = "spring.cloud.nacos.discovery.register-enabled",havingValue = false,matchIfMissing = true)
-    public InstanceApplicationReadyEventListener newInstanceApplicationReadyEventListener() {
+    public InstanceApplicationReadyEventListener instanceApplicationReadyEventListener() {
         return new InstanceApplicationReadyEventListener();
     }
 }

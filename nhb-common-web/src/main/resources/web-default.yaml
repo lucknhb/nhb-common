@@ -1,4 +1,6 @@
 server:
+  #随机端口 防止端口重复
+  port: 0
   #开启优雅停机
   shutdown: graceful
   # undertow 配置

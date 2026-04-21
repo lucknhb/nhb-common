@@ -22,7 +22,7 @@ import org.springframework.cloud.loadbalancer.core.CachingServiceInstanceListSup
 @Slf4j
 public class NacosInstancesChangeEventListener extends Subscriber<InstancesChangeEvent> {
     @Resource
-    private LoadBalancerCacheManager defaultLoadBalancerCacheManager;
+    private LoadBalancerCacheManager caffeineLoadBalancerCacheManager;
 
     @PostConstruct
     public void init() {
@@ -38,7 +38,7 @@ public class NacosInstancesChangeEventListener extends Subscriber<InstancesChang
     @Override
     public void onEvent(InstancesChangeEvent event) {
         log.info("Spring Gateway Receive Service Instance Reflush Event ：{}, Start Reflush.", JacksonUtils.toJson(event));
-        Cache cache = defaultLoadBalancerCacheManager.getCache(CachingServiceInstanceListSupplier.SERVICE_INSTANCE_CACHE_NAME);
+        Cache cache = caffeineLoadBalancerCacheManager.getCache(CachingServiceInstanceListSupplier.SERVICE_INSTANCE_CACHE_NAME);
         if (cache != null) {
             cache.evict(event.getServiceName());
         }

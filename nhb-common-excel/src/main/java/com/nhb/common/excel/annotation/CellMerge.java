@@ -20,7 +20,7 @@ public @interface CellMerge {
     int index() default -1;
 
     /**
-     * 合并需要依赖的其他字段名称
+     * 合并需要依赖的其他字段名称 当指定字段的值相等时进行该注解上字段的合并
      */
-    String[] mergeFields() default {};
+    String[] mergeByField() default {};
 }

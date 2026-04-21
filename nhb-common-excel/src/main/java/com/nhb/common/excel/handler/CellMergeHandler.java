@@ -41,7 +41,7 @@ public class CellMergeHandler {
         }
 
         // 获取有合并注解的字段
-        Map<Field, FieldColumnIndex> mergeFields = getFieldColumnIndexMap(rows.get(0).getClass());
+        Map<Field, FieldColumnIndex> mergeFields = getFieldColumnIndexMap(rows.getFirst().getClass());
         // 如果没有需要合并的字段则返回空集
         if (CollUtil.isEmpty(mergeFields)) {
             return Collections.emptyList();
@@ -134,7 +134,7 @@ public class CellMergeHandler {
     }
 
     private boolean isMerge(Object currentRow, Object preRow, CellMerge cellMerge) {
-        final String[] mergeFields = cellMerge.mergeFields();
+        final String[] mergeFields = cellMerge.mergeByField();
         if (StrUtil.isAllNotBlank(mergeFields)) {
             // 比对当前行和上一行的各个属性值一一比对 如果全为真 则为真
             for (String fieldName : mergeFields) {

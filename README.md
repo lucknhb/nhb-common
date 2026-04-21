@@ -619,8 +619,57 @@ dubbo:
 
 签名生成方式使用SHA256withRSA算法，签名内容包含所有参数(参数为空的需要过滤掉)及请求头中的nonce/timestamp/clientId，按照参数名(key)的自然顺序排序使用&拼接 key=value，然后将拼接出来的字符串并SHA-256进行签名然后使用RSA秘钥进行加密。
 
-<font color='red'>如果如果同时使用的Encrypt模块，已明确Signature数据获取早于Encrypt，且Encrypt的加密数据不影响Signature验签(使用原始数据验签)</font>
+<font color='red'>如果同时使用的Encrypt模块，已明确Signature数据获取早于Encrypt，且Encrypt的加密数据不影响Signature验签(使用原始数据验签)</font>
 
 1. 在接口上使用@ApiSign 进行标识  可指定接口验签允许时间戳间隔 单位毫秒
 2. 提供SignatureUtil工具类 可生成秘钥对(RSA/ECB/PKCS1Padding 算法)/构建参数顺序/生成签名/验签函数
 
+### Excel模块
+
+依赖如下
+
+```xml
+<dependency>
+   <groupId>com.nhb</groupId>
+   <artifactId>nhb-common-excel</artifactId>
+   <version>${version}/使用引入BOM方式时无需填入版本号</version>
+</dependency>
+```
+
+注解
+
+1. @CellMerge 注解
+
+   该注解用于列数据相同情况下，合并单元格，index 指定具体需要合并的列序号(从0开始)，mergeByField 指定属性相同时，才进行合并单元格(依赖关系)
+
+2. @ExcelEnumFormat注解
+
+   该注解用于枚举翻译，enumClass 指定翻译的枚举
+
+   codeField  枚举类中对应的code属性名称，默认为code  翻译前的原始值
+
+   valueField 枚举类中对应的属性名称，默认为value  该属性指定为翻译后的值
+
+3. @ExcelNotation注解
+
+   该注解用于指定批注信息
+
+4. @ExcelRequired注解
+
+   该注解用于列表是否必填
+
+ExcelUtil工具类 包含Excel 导入/模板导出/实体类导出/多列表导出/多Sheet导出/表达式解析-反解析
+
+### Fory模块
+
+依赖如下
+
+```xml
+<dependency>
+   <groupId>com.nhb</groupId>
+   <artifactId>nhb-common-fory</artifactId>
+   <version>${version}/使用引入BOM方式时无需填入版本号</version>
+</dependency>
+```
+
+ForyFactory工厂类 提供序列化及反序列化函数

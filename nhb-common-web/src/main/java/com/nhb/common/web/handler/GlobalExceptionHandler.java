@@ -11,10 +11,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.context.MessageSourceResolvable;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.expression.ExpressionException;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.validation.BindException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -56,6 +58,30 @@ public class GlobalExceptionHandler {
     public ResultMessage<Void> handleServiceException(ServiceException e, HttpServletRequest request) {
         log.error(e.getMessage());
         return ObjectUtil.isNotNull(e.getCode()) ? ResultMessage.fail(e.getCode(), e.getMessage()) : ResultMessage.fail(e.getMessage());
+    }
+
+    /**
+     * 信息转换异常
+     * @param e
+     * @param request
+     * @return
+     */
+    @ExceptionHandler(HttpMessageNotWritableException.class)
+    public ResultMessage<Void> handleHttpMessageNotWritableException(HttpMessageNotWritableException e, HttpServletRequest request) {
+        String requestURI = request.getRequestURI();
+        String message = ExceptionUtils.getRootCause(e).getMessage();
+        log.error("请求地址'{}' 数据转换异常", requestURI, e);
+        return ResultMessage.fail(message);
+    }
+
+    /**
+     * 参数异常
+     */
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResultMessage<Void> handleIllegalArgumentException(IllegalArgumentException e, HttpServletRequest request) {
+        String requestURI = request.getRequestURI();
+        log.error("请求地址'{}'", requestURI, e);
+        return ResultMessage.fail(e.getMessage());
     }
 
     /**

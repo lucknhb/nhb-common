@@ -3,9 +3,11 @@ package com.nhb.common.encrypt.serializer;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
+import com.nhb.common.core.exception.ServiceException;
 import com.nhb.common.core.utils.JacksonUtil;
 import com.nhb.common.core.utils.ObjectSelfUtil;
 import com.nhb.common.core.utils.SpringContextUtil;
+import com.nhb.common.core.utils.StringUtil;
 import com.nhb.common.encrypt.annotation.ApiEncrypt;
 import com.nhb.common.encrypt.properties.ApiEncryptProperties;
 import com.nhb.common.encrypt.utils.EncryptUtil;
@@ -13,7 +15,6 @@ import com.nhb.common.encrypt.utils.HttpRequestUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.util.Assert;
 
 import java.io.IOException;
 import java.rmi.ServerException;
@@ -59,7 +60,9 @@ public class ApiEncryptSerializer extends StdSerializer<Object> {
             //从请求头中获取已经存在的加密头信息
             ApiEncryptProperties apiEncryptProperties = SpringContextUtil.getBean(ApiEncryptProperties.class);
             String header = HttpRequestUtil.getHeader(httpServletRequest, apiEncryptProperties.getHeaderFlag());
-            Assert.hasLength(header,"无法加密响应值,请核实请求信息");
+            if (StringUtil.isBlank(header)) {
+                throw new ServerException("无法加密响应值,请核实请求信息");
+            }
             // 设置响应头
             HttpServletResponse httpServletResponse = HttpRequestUtil.getResponse();
             Objects.requireNonNull(httpServletResponse).setHeader(apiEncryptProperties.getHeaderFlag(), header);
@@ -72,7 +75,7 @@ public class ApiEncryptSerializer extends StdSerializer<Object> {
             jsonGenerator.writeString(data);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            throw new ServerException(e.getMessage());
+            throw new ServiceException(e.getMessage());
         }
     }
 }

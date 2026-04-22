@@ -2,6 +2,7 @@ package com.nhb.common.web.handler;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.nhb.common.core.domain.ResultMessage;
+import com.nhb.common.core.utils.JacksonUtil;
 import io.micrometer.common.lang.Nullable;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.MethodParameter;
@@ -42,8 +43,9 @@ public class ResponseBodyHandler implements ResponseBodyAdvice<Object> {
                                   ServerHttpResponse response) {
         if (body instanceof ResultMessage<?> result) {
             return result;
-        }
-        if (ObjectUtil.isNull(body)) {
+        } else if (body instanceof String) {
+            return JacksonUtil.toJsonString(ResultMessage.ok(body));
+        } else if (ObjectUtil.isNull(body)) {
             return ResultMessage.ok();
         } else {
             return ResultMessage.ok(body);

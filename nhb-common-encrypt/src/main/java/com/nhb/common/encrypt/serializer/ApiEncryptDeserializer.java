@@ -6,6 +6,7 @@ import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.deser.ContextualDeserializer;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import com.nhb.common.core.exception.ServiceException;
 import com.nhb.common.core.utils.JacksonUtil;
 import com.nhb.common.core.utils.SpringContextUtil;
 import com.nhb.common.core.utils.StringUtil;
@@ -15,7 +16,6 @@ import com.nhb.common.encrypt.utils.EncryptUtil;
 import com.nhb.common.encrypt.utils.HttpRequestUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.util.Assert;
 
 import java.io.IOException;
 import java.rmi.ServerException;
@@ -69,7 +69,9 @@ public class ApiEncryptDeserializer extends StdDeserializer<Object> implements C
             // 从请求头获取RSA加密后的AES秘钥
             ApiEncryptProperties apiEncryptProperties = SpringContextUtil.getBean(ApiEncryptProperties.class);
             String headerAes = httpServletRequest.getHeader(apiEncryptProperties.getHeaderFlag());
-            Assert.hasLength(headerAes,"无法解析加密属性,请核实请求信息");
+            if (StringUtil.isBlank(headerAes)) {
+                throw new ServerException("无法解析加密属性,请核实请求信息");
+            }
             //使用RSA私钥解密 获取AES秘钥
             Map<String, byte[]> keyMap = EncryptUtil.parseHeaderAesWithRsa(headerAes, apiEncryptProperties.getPrivateKey());
             String originalContent = EncryptUtil.decryptByAes(content, keyMap.get(EncryptUtil.PASSWORD), keyMap.get(EncryptUtil.SALT));
@@ -77,7 +79,7 @@ public class ApiEncryptDeserializer extends StdDeserializer<Object> implements C
             return objectMapper.readValue(originalContent, targetType);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            throw new ServerException(e.getMessage());
+            throw new ServiceException(e.getMessage());
         }
     }
 

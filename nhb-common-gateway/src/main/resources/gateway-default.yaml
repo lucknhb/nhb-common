@@ -1,0 +1,5 @@
+sa-token:
+  #不打印sa-token logo
+  is-print: false
+  #开启该注解 需配合下游服务实例同时配置才能生效  生效后 无法绕过gateway直接请求实例
+  checkSameToken: true

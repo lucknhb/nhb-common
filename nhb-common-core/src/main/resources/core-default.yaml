@@ -1,4 +1,6 @@
 spring:
+  messages:
+    basename: i18n/messages
   #启动不校验模板位置 已知该告警提示 Cannot find template location: [classpath:/templates/]
   freemarker:
     check-template-location: false

@@ -7,8 +7,9 @@ import cn.hutool.crypto.SecureUtil;
 import com.nhb.common.core.constant.GlobalConstants;
 import com.nhb.common.core.domain.ResultMessage;
 import com.nhb.common.core.exception.ServiceException;
-import com.nhb.common.core.utils.JacksonUtil;
 import com.nhb.common.core.utils.I18MessageUtil;
+import com.nhb.common.core.utils.JacksonUtil;
+import com.nhb.common.core.utils.StringUtil;
 import com.nhb.common.idempotent.annotation.ApiRepeatSubmit;
 import com.nhb.common.redis.utils.RedissonUtil;
 import jakarta.servlet.http.HttpServletRequest;
@@ -58,7 +59,7 @@ public class ApiRepeatSubmitAspect {
         // 请求地址（作为存放cache的key值）
         String url = Objects.requireNonNull(request).getRequestURI();
         // 唯一值（没有消息头则使用请求地址）
-        String submitKey = StringUtils.trimToEmpty(request.getHeader(SaManager.getConfig().getTokenName()));
+        String submitKey = StringUtil.trimToEmpty(request.getHeader(SaManager.getConfig().getTokenName()));
         submitKey = SecureUtil.md5(submitKey + ":" + nowParams);
         // 唯一标识（指定key + url + 消息头）
         String cacheRepeatKey = GlobalConstants.REPEAT_SUBMIT_KEY + url + submitKey;

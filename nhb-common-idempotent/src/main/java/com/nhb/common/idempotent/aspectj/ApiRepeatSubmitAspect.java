@@ -62,7 +62,7 @@ public class ApiRepeatSubmitAspect {
         String submitKey = StringUtil.trimToEmpty(request.getHeader(SaManager.getConfig().getTokenName()));
         submitKey = SecureUtil.md5(submitKey + ":" + nowParams);
         // 唯一标识（指定key + url + 消息头）
-        String cacheRepeatKey = GlobalConstants.REPEAT_SUBMIT_KEY + url + submitKey;
+        String cacheRepeatKey = GlobalConstants.REPEAT_SUBMIT_KEY + url + "-" + submitKey;
         if (RedissonUtil.setObjectIfAbsent(cacheRepeatKey, "", Duration.of(interval, apiRepeatSubmit.timeUnit().toChronoUnit()))) {
             KEY_CACHE.set(cacheRepeatKey);
         } else {

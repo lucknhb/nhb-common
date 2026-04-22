@@ -17,7 +17,7 @@ public @interface ApiRepeatSubmit {
     /**
      * 间隔时间(ms)，小于此时间视为重复提交
      */
-    int interval() default 5000;
+    long interval() default 5000;
 
     TimeUnit timeUnit() default TimeUnit.MILLISECONDS;
 

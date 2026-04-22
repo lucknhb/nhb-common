@@ -697,3 +697,81 @@ sa-token:
   checkSameToken: true
 ```
 
+### Idempotent模块
+
+依赖如下
+
+```xml
+<dependency>
+   <groupId>com.nhb</groupId>
+   <artifactId>nhb-common-idempotent</artifactId>
+   <version>${version}/使用引入BOM方式时无需填入版本号</version>
+</dependency>
+```
+
+使用@ApiRepeatSubmit注解进行标识
+
+interval :  间隔时间(ms)，小于此时间视为重复提交  默认5000
+
+timeUnit :  时间单位 默认毫秒 TimeUnit.MILLISECONDS
+
+message ： 提示信息 支持国际化 格式为 {code} 
+
+```yaml
+#单实例配置
+#需要先配置好spring.data.redis下的配置项
+# 在配置完spring.data.redis后 再进行redisson 配置
+redisson:
+  # redis key前缀
+  keyPrefix:
+  # 线程池数量
+  threads: 4
+  # Netty线程池数量
+  nettyThreads: 8
+  # 单节点配置
+  singleServerConfig:
+    # 客户端名称
+    clientName: ${spring.application.name}
+    # 最小空闲连接数
+    connectionMinimumIdleSize: 8
+    # 连接池大小
+    connectionPoolSize: 32
+    # 连接空闲超时，单位：毫秒
+    idleConnectionTimeout: 10000
+    # 命令等待超时，单位：毫秒
+    timeout: 3000
+    # 发布和订阅连接池大小
+    subscriptionConnectionPoolSize: 50
+    
+#集群实例配置
+#需要先配置好spring.data.redis下的配置项
+#在配置完spring.data.redis后 再进行redisson 配置
+redisson:
+  # 线程池数量
+  threads: 16
+  # Netty线程池数量
+  nettyThreads: 32
+  # 集群配置
+  clusterServersConfig:
+    # 客户端名称
+    clientName: ${spring.application.name}
+    # master最小空闲连接数
+    masterConnectionMinimumIdleSize: 32
+    # master连接池大小
+    masterConnectionPoolSize: 64
+    # slave最小空闲连接数
+    slaveConnectionMinimumIdleSize: 32
+    # slave连接池大小
+    slaveConnectionPoolSize: 64
+    # 连接空闲超时，单位：毫秒
+    idleConnectionTimeout: 10000
+    # 命令等待超时，单位：毫秒
+    timeout: 3000
+    # 发布和订阅连接池大小
+    subscriptionConnectionPoolSize: 50
+    # 读取模式
+    readMode: "SLAVE"
+    # 订阅模式
+    subscriptionMode: "MASTER"
+```
+

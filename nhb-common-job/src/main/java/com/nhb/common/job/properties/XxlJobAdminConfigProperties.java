@@ -21,7 +21,7 @@ public class XxlJobAdminConfigProperties {
     /**
      * 执行器保存路径
      */
-    private String saveUri;
+    private String saveUri = "/jobgroup/save";
     /**
      * 查询执行器路径
      */

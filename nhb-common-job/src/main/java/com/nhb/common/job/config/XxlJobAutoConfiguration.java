@@ -30,10 +30,10 @@ import org.springframework.core.env.Environment;
 public class XxlJobAutoConfiguration {
     /**
      * SPRING 环境下注册该模块的执行器 并非 会直接在调度中心执行器管理中手动保存操作
-     * @param xxlJobConfigProperties
-     * @param environment
-     * @param inetUtils
-     * @return
+     * @param xxlJobConfigProperties        配置文件
+     * @param environment                   环境信息
+     * @param inetUtils                     网络工具
+     * @return                              执行器
      */
     @Bean
     public XxlJobSpringExecutor xxlJobExecutor(XxlJobConfigProperties xxlJobConfigProperties,
@@ -82,8 +82,8 @@ public class XxlJobAutoConfiguration {
 
     /**
      * 自动创建调度中心上的配置
-     * @param xxlJobConfigProperties
-     * @return
+     * @param xxlJobConfigProperties 配置文件
+     * @return   自动注册及设置应用信息
      */
     @Bean
     @ConditionalOnExpression("!'${xxl.job.admin.user-name:}'.isEmpty() && !'${xxl.job.admin.password:}'.isEmpty()")

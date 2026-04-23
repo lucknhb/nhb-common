@@ -777,7 +777,7 @@ redisson:
     subscriptionMode: "MASTER"
 ```
 
-### Ip2region
+### Ip2region模块
 
 依赖如下
 
@@ -794,5 +794,46 @@ redisson:
 ```java
 //可直接使用以下方式进行获取IP对应的地理地址
 String region = IpRegionUtil.getRegion(ServletUtil.getClientIP());
+```
+
+### Job模块
+
+依赖如下
+
+```xml
+<dependency>
+  <groupId>com.nhb</groupId>
+  <artifactId>nhb-common-job</artifactId>
+  <version>${version}/使用引入BOM方式时无需填入版本号</version>
+  <!-- 默认为3.X版本的XXL_JOB客户端 如果需要修改对应的版本请先剔除原依赖 然后手动添加新版本-->
+  <exclusions>
+    <exclusion>
+      <groupId>com.xuxueli</groupId>
+      <artifactId>xxl-job-core</artifactId>
+    </exclusion>
+  </exclusions>
+</dependency>
+```
+
+实现自动注册执行器默appName为 ${spring.application.name}_${spring.profiles.active} 且可自动在执行器管理里面添加执行器
+
+```yaml
+xxl:
+  job:
+    admin:
+      #调度中心地址
+      address: 
+      #调度中心登录路径  当前配置值为2.X版本
+      login-uri: /login
+      #执行器保存路径 当前配置值为2.X版本
+      save-uri: /jobgroup/save
+      #查询执行器路径 当前配置值为2.X版本
+      group-uri: /jobgroup/pageList
+      #调度中心通讯 token
+      access-token: 
+      #登录调度中心的账号
+      user-name: 
+      #登录调度中心的密码
+      password: 
 ```
 

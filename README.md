@@ -717,7 +717,7 @@ timeUnit :  时间单位 默认毫秒 TimeUnit.MILLISECONDS
 
 message ： 提示信息 支持国际化 格式为 {code} 
 
-<font color='red'>依赖Redis模块 需要配置其配置项</font>
+<font color='red'>注：依赖Redis模块 需要配置其配置项</font>
 
 ```yaml
 #单实例配置
@@ -837,3 +837,32 @@ xxl:
       password: 
 ```
 
+### Limiter模块
+
+依赖如下
+
+```xml
+<dependency>
+   <groupId>com.nhb</groupId>
+   <artifactId>nhb-common-limiter</artifactId>
+   <version>${version}/使用引入BOM方式时无需填入版本号</version>
+</dependency>
+```
+
+实现接口限流 使用@ApiRateLimiter
+
+key : 限流key,支持使用Spring el表达式来动态获取方法上的参数值  格式类似于  #code.id  #{#code}
+
+time :  限流时间,单位秒  默认60S
+
+count :  限流次数 上述时间内限制的次数 默认100
+
+limitType  :  限流类型 LimitType.DEFAULT(默认策略全局限流)   LimitType.IP(根据请求者IP进行限流)  LimitType.CLUSTER(实例限流-集群多后端实例)
+
+rateType :  限流配额类型 RateType.OVERALL(全局性 作用在所有的RRateLimiter实例 默认类型)  RateType.PER_CLIENT(作用在同一个Redisson实例创建的 RRateLimiter上面)
+
+message :  提示消息 支持国际化 格式为 {code}
+
+timeOut : 限流策略超时时间 默认一天(策略存活时间 会清除已存在的策略数据)
+
+<font color='red'>注：依赖Redis模块 需要配置其配置项</font>

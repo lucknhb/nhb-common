@@ -53,5 +53,5 @@ public @interface ApiRateLimiter {
     /**
      * 限流策略超时时间 默认一天(策略存活时间 会清除已存在的策略数据)
      */
-    int timeout() default 86400;
+    int timeOut() default 86400;
 }

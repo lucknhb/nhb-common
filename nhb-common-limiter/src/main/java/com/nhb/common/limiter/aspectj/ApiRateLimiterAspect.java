@@ -57,7 +57,7 @@ public class ApiRateLimiterAspect {
     public void doBefore(JoinPoint point, ApiRateLimiter apiRateLimiter) {
         int time = apiRateLimiter.time();
         int count = apiRateLimiter.count();
-        int timeout = apiRateLimiter.timeout();
+        int timeout = apiRateLimiter.timeOut();
         try {
             String combineKey = getCombineKey(apiRateLimiter, point);
             long number = RedissonUtil.rateLimiter(combineKey, apiRateLimiter.rateType(), count, time, timeout);

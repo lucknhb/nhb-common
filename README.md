@@ -717,6 +717,8 @@ timeUnit :  时间单位 默认毫秒 TimeUnit.MILLISECONDS
 
 message ： 提示信息 支持国际化 格式为 {code} 
 
+<font color='red'>依赖Redis模块 需要配置其配置项</font>
+
 ```yaml
 #单实例配置
 #需要先配置好spring.data.redis下的配置项
@@ -773,5 +775,24 @@ redisson:
     readMode: "SLAVE"
     # 订阅模式
     subscriptionMode: "MASTER"
+```
+
+### Ip2region
+
+依赖如下
+
+```xml
+<dependency>
+   <groupId>com.nhb</groupId>
+   <artifactId>nhb-common-ip2region</artifactId>
+   <version>${version}/使用引入BOM方式时无需填入版本号</version>
+</dependency>
+```
+
+该模块已经内嵌数据可直接使用无需导入xdb文件
+
+```java
+//可直接使用以下方式进行获取IP对应的地理地址
+String region = IpRegionUtil.getRegion(ServletUtil.getClientIP());
 ```
 

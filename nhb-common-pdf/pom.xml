@@ -18,6 +18,10 @@
             <version>${revision}</version>
         </dependency>
         <dependency>
+            <groupId>org.apache.pdfbox</groupId>
+            <artifactId>pdfbox</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.github.librepdf</groupId>
             <artifactId>openpdf</artifactId>
         </dependency>

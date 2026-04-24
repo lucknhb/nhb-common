@@ -866,3 +866,17 @@ message :  提示消息 支持国际化 格式为 {code}
 timeOut : 限流策略超时时间 默认一天(策略存活时间 会清除已存在的策略数据)
 
 <font color='red'>注：依赖Redis模块 需要配置其配置项</font>
+
+### PDF模块
+
+依赖如下
+
+```xml
+<dependency>
+   <groupId>com.nhb</groupId>
+   <artifactId>nhb-common-pdf</artifactId>
+   <version>${version}/使用引入BOM方式时无需填入版本号</version>
+</dependency>
+```
+
+底层依赖于openpdf /pdfbox提供了PDFTemplateRenderUtil工具类 实现模板渲染

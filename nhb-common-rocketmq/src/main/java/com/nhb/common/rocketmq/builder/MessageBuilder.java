@@ -3,6 +3,7 @@ package com.nhb.common.rocketmq.builder;
 import cn.hutool.core.collection.CollUtil;
 import com.nhb.common.core.utils.SpringContextUtil;
 import com.nhb.common.rocketmq.converter.MessageConverter;
+import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import org.apache.commons.lang3.StringUtils;
@@ -18,6 +19,7 @@ import java.util.Objects;
  * @description: 消息构建者
  */
 @Data
+@Builder
 @Accessors(chain = true)
 public class MessageBuilder {
     private String topic;

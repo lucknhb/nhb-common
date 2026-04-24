@@ -9,8 +9,11 @@ import org.apache.rocketmq.remoting.RPCHook;
 import org.apache.rocketmq.remoting.protocol.RemotingCommand;
 import org.apache.rocketmq.remoting.protocol.RequestCode;
 import org.apache.rocketmq.remoting.protocol.header.SendMessageRequestHeader;
+import org.apache.rocketmq.remoting.protocol.header.SendMessageRequestHeaderV2;
+import org.apache.rocketmq.remoting.rpc.TopicQueueRequestHeader;
 
 import java.lang.reflect.Method;
+import java.util.List;
 
 /**
  * @author luck_nhb
@@ -25,20 +28,23 @@ public class TopicSuffixRPCHook implements RPCHook {
     @Override
     public void doBeforeRequest(String remoteAddr, RemotingCommand request) {
         // 仅在发送消息的请求时进行处理
-        if (RequestCode.SEND_MESSAGE == request.getCode()) {
+        List<Integer> sendMessageCodes = List.of(RequestCode.SEND_MESSAGE, RequestCode.SEND_MESSAGE_V2, RequestCode.SEND_BATCH_MESSAGE);
+        if (sendMessageCodes.contains(request.getCode())) {
             CommandCustomHeader header = request.readCustomHeader();
-            if (header instanceof SendMessageRequestHeader sendHeader) {
-                String originalTopic = sendHeader.getTopic();
+            if (header instanceof SendMessageRequestHeader || header instanceof SendMessageRequestHeaderV2) {
+                TopicQueueRequestHeader topicQueueRequestHeader = (TopicQueueRequestHeader) header;
+                String originalTopic = topicQueueRequestHeader.getTopic();
                 String newTopic = TopicUtil.topicSuffix(originalTopic);
                 log.info("RocketMQ Send Message Topic Change From {}  To {}", originalTopic, newTopic);
                 // 更新请求头中的Topic名称
-                sendHeader.setTopic(newTopic);
+                topicQueueRequestHeader.setTopic(newTopic);
             }
         }
     }
 
     /**
      * 监听时候的TOPIC 已在 {@link RocketMQConsumerRegistry#registerConsumerMethod(Object, Method, RocketMQConsumer)} 设置
+     *
      * @param remoteAddr
      * @param request
      * @param response

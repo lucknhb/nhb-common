@@ -6,6 +6,7 @@ package com.nhb.common.rocketmq.converter;
  * @date 2026/3/17 8:53
  * @description: 消息转换器
  */
+
 public interface MessageConverter {
 
     /**

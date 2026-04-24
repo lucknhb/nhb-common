@@ -1,5 +1,6 @@
 package com.nhb.common.rocketmq.annotation;
 
+import com.nhb.common.rocketmq.constant.RocketMQConstants;
 import com.nhb.common.rocketmq.enums.ConsumeMode;
 
 import java.lang.annotation.*;
@@ -30,5 +31,5 @@ public @interface RocketMQConsumer {
     /**
      * 标识一类Consumer的集合名称
      */
-    String consumerGroup();
+    String consumerGroup() default RocketMQConstants.DEFAULT_CONSUMER_GROUP;
 }

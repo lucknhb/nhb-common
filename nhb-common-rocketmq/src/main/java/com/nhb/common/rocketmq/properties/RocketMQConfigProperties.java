@@ -1,5 +1,6 @@
 package com.nhb.common.rocketmq.properties;
 
+import com.nhb.common.rocketmq.ConverterType;
 import com.nhb.common.rocketmq.constant.RocketMQConstants;
 import lombok.Data;
 import org.apache.rocketmq.remoting.netty.TlsSystemConfig;
@@ -23,6 +24,10 @@ public class RocketMQConfigProperties {
      * 为true时  topic_dev/topic_test......
      */
     private Boolean profileEnabled = true;
+    /**
+     * 消息内容序列化方式
+     */
+    private ConverterType converterType = ConverterType.FORY;
 
     private ProducerConfig producer;
 
@@ -39,7 +44,7 @@ public class RocketMQConfigProperties {
          */
         private String nameServerAddress;
         /**
-         * 生产者默认消费组
+         * 生产者组
          */
         private String producerGroup = RocketMQConstants.DEFAULT_PRODUCER_GROUP;
         /**
@@ -83,7 +88,7 @@ public class RocketMQConfigProperties {
          */
         private String nameServerAddress;
         /**
-         * 消费者默认消费组
+         * 消费组
          */
         private String consumerGroup = RocketMQConstants.DEFAULT_CONSUMER_GROUP;
         /**
@@ -93,11 +98,11 @@ public class RocketMQConfigProperties {
         /**
          * 消费超时时间 minutes
          */
-        private Integer consumeTimeout = -1;
+        private Integer consumeTimeout = 15;
         /**
          * 最大重试次数 PUSH 模式下有效
          */
-        private Integer maxReconsumeTimes = 16;
+        private Integer maxReconsumeTimes = 3;
         /**
          * 消费模式,默认为集群模式
          */

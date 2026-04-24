@@ -24,6 +24,7 @@ import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -75,6 +76,10 @@ public class RocketMQConsumerRegistry {
         for (ConsumerMethodGroup group : groupMap.values()) {
             createAndStartConsumerForGroup(group);
         }
+        Set<String> topics = consumers.keySet();
+        for (String topic : topics) {
+            log.info("Started Consumer For Topic {}", topic);
+        }
     }
 
     /**
@@ -124,7 +129,7 @@ public class RocketMQConsumerRegistry {
             });
         }
         pushConsumer.start();
-        consumers.put(group.getTopic() + ":" + group.getConsumerGroup(), pushConsumer);
+        consumers.put(topic, pushConsumer);
     }
 
     /**

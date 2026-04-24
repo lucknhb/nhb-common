@@ -1,15 +1,19 @@
 package com.nhb.common.rocketmq.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhb.common.fory.factory.ForyFactory;
 import com.nhb.common.rocketmq.converter.MessageConverter;
 import com.nhb.common.rocketmq.converter.impl.ForyMessageConverter;
+import com.nhb.common.rocketmq.converter.impl.JacksonMessageConverter;
 import com.nhb.common.rocketmq.factory.RocketMQFactory;
 import com.nhb.common.rocketmq.hook.TopicSuffixRPCHook;
 import com.nhb.common.rocketmq.processor.ConsumerAnnotationBeanPostProcessor;
 import com.nhb.common.rocketmq.properties.RocketMQConfigProperties;
 import com.nhb.common.rocketmq.register.RocketMQConsumerRegistry;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.client.producer.DefaultMQProducer;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
@@ -21,6 +25,7 @@ import org.springframework.context.annotation.Bean;
  * @date 2026/3/13 9:53
  * @description:
  */
+@Slf4j
 @AutoConfiguration
 @EnableConfigurationProperties(RocketMQConfigProperties.class)
 public class RocketMQAutoConfiguration {
@@ -48,14 +53,23 @@ public class RocketMQAutoConfiguration {
     }
 
     @Bean
+    @ConditionalOnExpression("'${rocketmq.converter-type}' == 'FORY'")
     @ConditionalOnMissingBean(MessageConverter.class)
     public ForyMessageConverter foryMessageConverter(ForyFactory foryFactory) {
         return new ForyMessageConverter(foryFactory);
     }
 
     @Bean
+    @ConditionalOnExpression("'${rocketmq.converter-type}' == 'JACKSON'")
+    @ConditionalOnMissingBean(MessageConverter.class)
+    public JacksonMessageConverter jacksonMessageConverter(ObjectMapper  objectMapper) {
+        return new JacksonMessageConverter(objectMapper);
+    }
+
+    @Bean
     public RocketMQConsumerRegistry rocketMQConsumerRegistry(MessageConverter messageConverter,
                                                              RocketMQConfigProperties rocketMQConfigProperties) {
+        log.info("RocketMQ Convert Body With {}",messageConverter.getClass().getName());
         return new RocketMQConsumerRegistry(messageConverter, rocketMQConfigProperties.getConsumer());
     }
 

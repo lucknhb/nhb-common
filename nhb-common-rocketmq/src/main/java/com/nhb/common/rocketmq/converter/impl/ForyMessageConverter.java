@@ -22,6 +22,7 @@ public class ForyMessageConverter implements MessageConverter {
      */
     @Override
     public byte[] toByte(Object body) throws Exception {
+        foryFactory.register(body.getClass());
         return foryFactory.serialize(body);
     }
 
@@ -35,7 +36,7 @@ public class ForyMessageConverter implements MessageConverter {
      */
     @Override
     public <T> T fromMessage(byte[] body, Class<T> targetType) throws Exception {
-        foryFactory.register(targetType);
+//        foryFactory.register(targetType);
         return foryFactory.deserialize(body,targetType);
     }
 }

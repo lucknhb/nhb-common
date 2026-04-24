@@ -38,7 +38,7 @@ public class CacheAutoConfiguration {
      * 自定义缓存管理器 整合spring-cache
      */
     @Bean
-    public CacheManager cacheManager() {
+    public CacheManager springCachePlusManager() {
         return new SpringCachePlusManager();
     }
 }

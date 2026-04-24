@@ -1,6 +1,7 @@
 package com.nhb.common.redis.utils;
 
 import com.nhb.common.core.utils.SpringContextUtil;
+import com.nhb.common.redis.manager.SpringCachePlusManager;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +19,7 @@ import java.util.Objects;
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class CacheUtil {
-    private static final CacheManager CACHE_MANAGER = SpringContextUtil.getBean(CacheManager.class);
+    private static final CacheManager CACHE_MANAGER = SpringContextUtil.getBean(SpringCachePlusManager.class);
 
     /**
      * 获取缓存值

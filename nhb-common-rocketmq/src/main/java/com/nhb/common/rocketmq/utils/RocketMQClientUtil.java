@@ -36,10 +36,7 @@ public class RocketMQClientUtil {
      * @throws Exception 异常信息
      */
     public static SendResult sendMessage(Message message) throws Exception {
-        log.info("Send Message :{}", message);
-        SendResult sendResult = PRODUCER.send(message);
-        log.info("Send Message:{} Result :{}", message, sendResult);
-        return sendResult;
+        return PRODUCER.send(message);
     }
 
     /**
@@ -50,7 +47,6 @@ public class RocketMQClientUtil {
      * @throws Exception 异常信息
      */
     public static void sendMessage(Message message, SendCallback sendCallback) throws Exception {
-        log.info("Send Call Back Message :{}", message);
         PRODUCER.send(message, sendCallback);
     }
 
@@ -64,14 +60,12 @@ public class RocketMQClientUtil {
      * @throws Exception 异常信息
      */
     public static SendResult sendMessageOrderly(Message message, MessageQueueSelector messageQueueSelector, Object uniqueId) throws Exception {
-        log.info("Send Orderly Message :{} With {}", message, uniqueId);
         SendResult sendResult;
         if (Objects.isNull(messageQueueSelector)) {
             sendResult = PRODUCER.send(message, new SelectMessageQueueByHash(), uniqueId);
         } else {
             sendResult = PRODUCER.send(message, messageQueueSelector, uniqueId);
         }
-        log.info("Send Orderly Message:{} With {} Result :{}", message, uniqueId, sendResult);
         return sendResult;
     }
 
@@ -85,7 +79,6 @@ public class RocketMQClientUtil {
      * @throws Exception 异常信息
      */
     public static void sendMessageOrderly(Message message, MessageQueueSelector messageQueueSelector, Object uniqueId, SendCallback sendCallback) throws Exception {
-        log.info("Send Orderly Call Back Message :{} With {}", message, uniqueId);
         if (Objects.isNull(messageQueueSelector)) {
             PRODUCER.send(message, new SelectMessageQueueByHash(), uniqueId, sendCallback);
         } else {

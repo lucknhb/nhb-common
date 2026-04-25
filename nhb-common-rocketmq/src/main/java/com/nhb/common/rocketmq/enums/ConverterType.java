@@ -1,4 +1,4 @@
-package com.nhb.common.rocketmq;
+package com.nhb.common.rocketmq.enums;
 
 /**
  * @author luck_nhb

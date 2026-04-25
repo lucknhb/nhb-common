@@ -1,6 +1,6 @@
 package com.nhb.common.rocketmq.properties;
 
-import com.nhb.common.rocketmq.ConverterType;
+import com.nhb.common.rocketmq.enums.ConverterType;
 import com.nhb.common.rocketmq.constant.RocketMQConstants;
 import lombok.Data;
 import org.apache.rocketmq.remoting.netty.TlsSystemConfig;

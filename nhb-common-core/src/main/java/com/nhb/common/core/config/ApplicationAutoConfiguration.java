@@ -1,6 +1,8 @@
 package com.nhb.common.core.config;
 
+import com.nhb.common.core.listener.BannerPrinterListener;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.scheduling.annotation.EnableAsync;
 
@@ -14,4 +16,9 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @EnableAspectJAutoProxy
 @EnableAsync(proxyTargetClass = true)
 public class ApplicationAutoConfiguration {
+
+    @Bean
+    public BannerPrinterListener bannerPrinterListener(){
+        return new BannerPrinterListener();
+    }
 }

@@ -43,6 +43,7 @@
     <properties>
         <revision>1.0.0</revision>
         <java.version>21</java.version>
+        <oshi.version>6.10.0</oshi.version>
         <sms.version>3.3.5</sms.version>
         <pdfbox.version>3.0.7</pdfbox.version>
         <openpdf.version>3.0.3</openpdf.version>
@@ -419,6 +420,12 @@
                 <classifier>${os.detected.name}-${os.detected.arch}</classifier>
                 <version>${jlama.version}</version>
             </dependency>
+            <!-- 系统资源监控-->
+            <dependency>
+                <groupId>com.github.oshi</groupId>
+                <artifactId>oshi-core</artifactId>
+                <version>${oshi.version}</version>
+            </dependency>
 
         </dependencies>
     </dependencyManagement>
@@ -528,6 +535,7 @@
                     <include>application*</include>
                     <include>bootstrap*</include>
                     <include>logback*</include>
+                    <include>banner.txt</include>
                 </includes>
                 <!-- 启用过滤 即该资源中的变量将会被过滤器中的值替换 -->
                 <filtering>true</filtering>

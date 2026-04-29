@@ -560,8 +560,10 @@ dubbo:
 
 1. @ApiEncrypt注解 用于接口及参数属性上  
 
+   <font color='red'>RSA非对称加密使用的是 RSA/ECB/OAEPWithSHA-256AndMGF1Padding 算法   AES使用GCM模式 NoPadding 32位秘钥和12位向量值形式</font>
+
    参数加解密过程：<font color='red'>注意: 如果接口上存在加密处理注解，则请求/返回实体类中的注解则不会被处理,接口上的加密时请参考{"data":"加密数据""}</font>
-   
+
    ```mermaid
    graph TD
        Start([开始]) --> CheckAnnotation{是否存在ApiEncrypt注解}
@@ -571,13 +573,13 @@ dubbo:
        ParallelStart --> RequestBranch{request 属性是否为 true}
        ParallelStart --> ResponseBranch{response 属性是否为 true}
    
-       RequestBranch -- 是 --> GetHeader[从请求头获取 RSA加密并BASE64编码后的AES密钥及向量 格式 密钥:向量]
-       GetHeader --> DecryptKeyIV[分别使用 RSA 私钥解密得到 AES 密钥和向量 其中AES秘钥为32位 向量为12位]
+       RequestBranch -- 是 --> GetHeader[从请求头获取 RSA-RSA/ECB/OAEPWithSHA-256AndMGF1Padding加密并BASE64编码后的AES密钥及向量 格式 密钥:向量]
+       GetHeader --> DecryptKeyIV[分别使用 RSA-RSA/ECB/OAEPWithSHA-256AndMGF1Padding 私钥解密得到 AES 密钥和向量 其中AES秘钥为32位 向量为12位]
        DecryptKeyIV --> DecryptParams[使用解密后的 AES 密钥和向量对请求参数进行解密] --> RequestEnd[request处理完成]
        RequestBranch -- 否 --> RequestEnd
    
-       ResponseBranch -- 是 --> GenAES[从请求头获取 RSA加密并BASE64编码后的AES密钥及向量 格式 密钥:向量]
-       GenAES --> EncryptResponse[分别使用 RSA 私钥解密得到 AES 密钥和向量 其中AES秘钥为32位 向量为12位]
+       ResponseBranch -- 是 --> GenAES[从请求头获取 RSA-RSA/ECB/OAEPWithSHA-256AndMGF1Padding加密并BASE64编码后的AES密钥及向量 格式 密钥:向量]
+       GenAES --> EncryptResponse[分别使用 RSA-RSA/ECB/OAEPWithSHA-256AndMGF1Padding 私钥解密得到 AES 密钥和向量 其中AES秘钥为32位 向量为12位]
        EncryptResponse --> EncryptKeyIV[使用获取到的秘钥及向量加密响应结果值]
        EncryptKeyIV --> SetHeader[将请求头中的获取到的AES秘钥写入至响应头中] --> ResponseEnd[response处理完成]
        ResponseBranch -- 否 --> ResponseEnd
@@ -618,6 +620,8 @@ dubbo:
 ```
 
 签名生成方式使用SHA256withRSA算法，签名内容包含所有参数(参数为空的需要过滤掉)及请求头中的nonce/timestamp/clientId，按照参数名(key)的自然顺序排序使用&拼接 key=value，然后将拼接出来的字符串并SHA-256进行签名然后使用RSA秘钥进行加密。
+
+需要实现ApiSignRepository接口：根据clientId获取对应的公钥
 
 <font color='red'>如果同时使用的Encrypt模块，已明确Signature数据获取早于Encrypt，且Encrypt的加密数据不影响Signature验签(使用原始数据验签)</font>
 

@@ -1,11 +1,1 @@
-${AnsiColor.CYAN}PORT：${server.port}，PID：${PID}，ENV_ACTIVE：${spring.profiles.active}
-${AnsiColor.BRIGHT_RED}OS：${os.name}-${os.version}-${os.arch}
-${AnsiColor.BRIGHT_YELLOW}Java Version：${java.version} ${java.version.date}
-${java.runtime.name} ${java.vendor.version:} (build ${java.vm.version})
-${java.vm.name} ${java.vendor.version:} (build ${java.runtime.version}，${java.vm.info})
-${AnsiColor.BRIGHT_YELLOW}Java Class Version：${java.class.version}
-${AnsiColor.BRIGHT_MAGENTA}UTC：${user.timezone}，Language：${user.language}，Country：${user.country}，File_Encoding：${file.encoding}
-${AnsiColor.BLUE}JDK Home：${java.home}
-${AnsiColor.BRIGHT_CYAN}Project Home：${user.dir}
-${AnsiColor.DEFAULT}
-App Name：${spring.application.name}
+${AnsiColor.BRIGHT_CYAN}Thank You For Use The Common Service, Version With @revision@

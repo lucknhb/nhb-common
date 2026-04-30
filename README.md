@@ -701,27 +701,21 @@ sa-token:
   checkSameToken: true
 ```
 
-### Idempotent模块
+### Redis模块
 
 依赖如下
 
 ```xml
 <dependency>
    <groupId>com.nhb</groupId>
-   <artifactId>nhb-common-idempotent</artifactId>
+   <artifactId>nhb-common-redis</artifactId>
    <version>${version}/使用引入BOM方式时无需填入版本号</version>
 </dependency>
 ```
 
-使用@ApiRepeatSubmit注解进行标识
+底层依赖Redission开源版
 
-interval :  间隔时间(ms)，小于此时间视为重复提交  默认5000
-
-timeUnit :  时间单位 默认毫秒 TimeUnit.MILLISECONDS
-
-message ： 提示信息 支持国际化 格式为 {code} 
-
-<font color='red'>注：依赖Redis模块 需要配置其配置项</font>
+配置项如下
 
 ```yaml
 #单实例配置
@@ -780,6 +774,40 @@ redisson:
     # 订阅模式
     subscriptionMode: "MASTER"
 ```
+
+CacheUtil  
+
+操作的是Redission实现CacheManager的SpringCachePlusManager
+
+RedissonUtil
+
+直接操作Redis的工具类
+
+SequenceUtil
+
+序号工具，用于获取需要
+
+### Idempotent模块
+
+依赖如下
+
+```xml
+<dependency>
+   <groupId>com.nhb</groupId>
+   <artifactId>nhb-common-idempotent</artifactId>
+   <version>${version}/使用引入BOM方式时无需填入版本号</version>
+</dependency>
+```
+
+使用@ApiRepeatSubmit注解进行标识
+
+interval :  间隔时间(ms)，小于此时间视为重复提交  默认5000
+
+timeUnit :  时间单位 默认毫秒 TimeUnit.MILLISECONDS
+
+message ： 提示信息 支持国际化 格式为 {code} 
+
+<font color='red'>注：依赖Redis模块 需要配置其配置项  具体配置请参考Redis模块</font>
 
 ### Ip2region模块
 

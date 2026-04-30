@@ -89,7 +89,7 @@ public class BannerPrinterListener implements ApplicationListener<ApplicationRea
         String projectHome = System.getProperty("user.dir");
         String tempDir = System.getProperty("java.io.tmpdir");
         System.out.println("=============== Start Print Project Info ==============");
-        System.out.println(StrUtil.format("========= JDK Home:{}  Project Home:{} Temp Dir:{}=========", javaHome, projectHome, tempDir));
+        System.out.println(StrUtil.format("========= JDK Home:{}  Project Home:{} Temp Dir:{} =========", javaHome, projectHome, tempDir));
         System.out.println(StrUtil.format("========= JVM Message : {} {} (build {},{}) Java Class Version[{}] =========",
                 jvmName, javaVendorVersion, javaRuntimeVersion, jvmInfo, javaClassVersion));
         System.out.println(StrUtil.format("========= Application:{}  Active:{}  Port:{}", applicationName, active, port));

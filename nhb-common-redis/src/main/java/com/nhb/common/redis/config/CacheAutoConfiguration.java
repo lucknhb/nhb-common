@@ -4,6 +4,7 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.nhb.common.redis.manager.SpringCachePlusManager;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
@@ -23,6 +24,7 @@ public class CacheAutoConfiguration {
      * caffeine 本地缓存处理器
      */
     @Bean
+    @ConditionalOnMissingBean(name = {"caffeine"})
     public Cache<Object, Object> caffeine() {
         return Caffeine.newBuilder()
                 // 设置最后一次写入或访问后经过固定时间过期

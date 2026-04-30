@@ -38,6 +38,7 @@
         <module>nhb-common-word</module>
         <module>nhb-common-ai</module>
         <module>nhb-common-generator</module>
+        <module>nhb-common-lock</module>
     </modules>
 
     <properties>
@@ -52,7 +53,6 @@
         <tika.version>3.2.3</tika.version>
         <fory.version>0.15.0</fory.version>
         <sa-token.version>1.44.0</sa-token.version>
-        <lock4j.version>2.2.7</lock4j.version>
         <xxl-job.version>3.3.2</xxl-job.version>
         <rocketmq.version>5.4.0</rocketmq.version>
         <redisson.version>3.52.0</redisson.version>
@@ -270,11 +270,6 @@
                 <groupId>org.redisson</groupId>
                 <artifactId>redisson-spring-boot-starter</artifactId>
                 <version>${redisson.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.baomidou</groupId>
-                <artifactId>lock4j-redisson-spring-boot-starter</artifactId>
-                <version>${lock4j.version}</version>
             </dependency>
             <!--API文档相关-->
             <dependency>

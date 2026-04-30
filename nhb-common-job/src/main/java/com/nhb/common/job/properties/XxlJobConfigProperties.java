@@ -13,14 +13,14 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = XxlJobConfigProperties.PREFIX)
 public class XxlJobConfigProperties {
     /**
+     * 配置前缀
+     */
+    public static final String PREFIX = "xxl.job";
+    /**
      * 是否自动注册执行器<BR/>
      * 默认为 true
      */
     private Boolean enabled = true;
-    /**
-     * 配置前缀
-     */
-    public static final String PREFIX = "xxl.job";
     /**
      * 调度器相关配置
      */

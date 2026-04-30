@@ -1,18 +1,18 @@
 package com.nhb.common.sensitive.serializer;
 
-import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.extra.spring.SpringUtil;
+import cn.hutool.core.util.StrUtil;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.BeanProperty;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.ContextualSerializer;
+import com.nhb.common.core.utils.SpringContextUtil;
 import com.nhb.common.sensitive.annotation.Sensitive;
 import com.nhb.common.sensitive.service.SensitiveService;
 import com.nhb.common.sensitive.strategy.SensitiveStrategy;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeansException;
+import org.springframework.util.Assert;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -46,15 +46,14 @@ public class SensitiveSerializer extends JsonSerializer<String> implements Conte
 
     @Override
     public void serialize(String value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
-        try {
-            SensitiveService sensitiveService = SpringUtil.getBean(SensitiveService.class);
-            if (ObjectUtil.isNotNull(sensitiveService) && sensitiveService.isSensitive(roleKey, perms)) {
-                gen.writeString(strategy.desensitizer().apply(value));
-            } else {
-                gen.writeString(value);
-            }
-        } catch (BeansException e) {
-            log.error("脱敏实现不存在, 采用默认处理 => {}", e.getMessage());
+        Assert.notNull(strategy, StrUtil.format("Strategy is null for value:{}", value));
+        SensitiveService sensitiveService = SpringContextUtil.getBeanFactory()
+                .getBeanProvider(SensitiveService.class, true)
+                .getIfAvailable();
+        //SensitiveService为空 或者 有具体实现类时根据返回值判断
+        if (Objects.isNull(sensitiveService) || sensitiveService.isSensitive(roleKey, perms)) {
+            gen.writeString(strategy.desensitizer().apply(value));
+        } else {
             gen.writeString(value);
         }
     }

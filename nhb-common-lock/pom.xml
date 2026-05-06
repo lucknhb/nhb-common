@@ -16,12 +16,6 @@
             <groupId>com.nhb</groupId>
             <artifactId>nhb-common-redis</artifactId>
             <version>${revision}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.baomidou</groupId>
-                    <artifactId>lock4j-redisson-spring-boot-starter</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
     </dependencies>
 </project>

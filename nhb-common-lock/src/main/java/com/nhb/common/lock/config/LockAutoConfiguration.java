@@ -5,6 +5,7 @@ import com.nhb.common.lock.aspectj.LockInterceptor;
 import com.nhb.common.lock.core.*;
 import com.nhb.common.lock.executor.LockExecutor;
 import com.nhb.common.lock.executor.RedissonLockExecutor;
+import com.nhb.common.lock.handler.LockExceptionHandler;
 import com.nhb.common.lock.properties.LockConfigProperties;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
@@ -30,6 +31,21 @@ import java.util.List;
 @AutoConfigureAfter(RedisAutoConfiguration.class)
 @EnableConfigurationProperties(LockConfigProperties.class)
 public class LockAutoConfiguration {
+
+    /**
+     * 异常处理器
+     */
+    @Bean
+    public LockExceptionHandler redisExceptionHandler() {
+        return new LockExceptionHandler();
+    }
+
+    @Bean
+    @Order(100)
+    @ConditionalOnClass(Redisson.class)
+    public RedissonLockExecutor redissonLockExecutor(RedissonClient redissonClient) {
+        return new RedissonLockExecutor(redissonClient);
+    }
 
     @Bean
     @ConditionalOnMissingBean
@@ -65,11 +81,6 @@ public class LockAutoConfiguration {
         return new LockAnnotationAdvisor(lockInterceptor, Ordered.HIGHEST_PRECEDENCE);
     }
 
-    @Bean
-    @Order(100)
-    @ConditionalOnClass(Redisson.class)
-    public RedissonLockExecutor redissonLockExecutor(RedissonClient redissonClient) {
-        return new RedissonLockExecutor(redissonClient);
-    }
+
 
 }

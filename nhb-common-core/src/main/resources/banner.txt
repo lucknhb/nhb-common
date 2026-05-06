@@ -1,1 +1,1 @@
-${AnsiColor.BRIGHT_CYAN}Thank You For Use The Common Service, Version With @revision@
+${AnsiColor.BRIGHT_CYAN}Thank You For Use The Common Service, Version With @revision@  Author luck_nhb@163.com

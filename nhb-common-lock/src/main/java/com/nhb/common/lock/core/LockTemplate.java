@@ -57,7 +57,7 @@ public class LockTemplate implements InitializingBean {
         acquireTimeout = acquireTimeout < 0 ? lockConfigProperties.getAcquireTimeout() : acquireTimeout;
         long retryInterval = lockConfigProperties.getRetryInterval();
         LockExecutor lockExecutor = obtainExecutor(executor);
-        log.debug("Use lock class: {}", lockExecutor.getClass());
+        log.info("Use Lock Class: {}", lockExecutor.getClass());
         expire = !lockExecutor.renewal() && expire <= 0 ? lockConfigProperties.getExpire() : expire;
         int acquireCount = 0;
         String value = LockUtil.simpleUUID();
@@ -93,18 +93,18 @@ public class LockTemplate implements InitializingBean {
             return primaryExecutor;
         }
         final LockExecutor lockExecutor = executorMap.get(clazz);
-        Assert.notNull(lockExecutor, String.format("can not get bean type of %s", clazz));
+        Assert.notNull(lockExecutor, String.format("Can Not Get Bean Type Of %s", clazz));
         return lockExecutor;
     }
 
     @Override
     public void afterPropertiesSet() throws Exception {
 
-        Assert.isTrue(lockConfigProperties.getAcquireTimeout() >= 0, "tryTimeout must least 0");
-        Assert.isTrue(lockConfigProperties.getExpire() >= -1, "expireTime must lease -1");
-        Assert.isTrue(lockConfigProperties.getRetryInterval() >= 0, "retryInterval must more than 0");
-        Assert.hasText(lockConfigProperties.getLockKeyPrefix(), "lock key prefix must be not blank");
-        Assert.notEmpty(executors, "executors must have at least one");
+        Assert.isTrue(lockConfigProperties.getAcquireTimeout() >= 0, "TryTimeout Must Least 0");
+        Assert.isTrue(lockConfigProperties.getExpire() >= -1, "ExpireTime Must Least -1");
+        Assert.isTrue(lockConfigProperties.getRetryInterval() >= 0, "RetryInterval Must More Least 0");
+        Assert.hasText(lockConfigProperties.getLockKeyPrefix(), "Lock Key Prefix Must Be Not Blank");
+        Assert.notEmpty(executors, "Executors Must Have At Least One");
 
         for (LockExecutor executor : executors) {
             executorMap.put(executor.getClass(), executor);
@@ -115,7 +115,7 @@ public class LockTemplate implements InitializingBean {
             this.primaryExecutor = executors.getFirst();
         } else {
             this.primaryExecutor = executorMap.get(primaryExecutor);
-            Assert.notNull(this.primaryExecutor, "primaryExecutor must be not null");
+            Assert.notNull(this.primaryExecutor, "PrimaryExecutor Must Be Not Null");
         }
     }
 }

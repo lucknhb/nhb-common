@@ -4,7 +4,6 @@ import cn.hutool.core.util.ObjectUtil;
 import com.nhb.common.core.factory.YamlPropertySourceFactory;
 import com.nhb.common.core.utils.SpringContextUtil;
 import com.nhb.common.redis.handler.KeyPrefixHandler;
-import com.nhb.common.redis.handler.RedisExceptionHandler;
 import com.nhb.common.redis.properties.RedissonConfigProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.fory.logging.LoggerFactory;
@@ -76,13 +75,5 @@ public class RedissonAutoConfiguration {
             }
             log.info(">>>>>>>> End config redisson <<<<<<<<");
         };
-    }
-
-    /**
-     * 异常处理器
-     */
-    @Bean
-    public RedisExceptionHandler redisExceptionHandler() {
-        return new RedisExceptionHandler();
     }
 }

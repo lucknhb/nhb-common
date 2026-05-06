@@ -4,7 +4,6 @@ import com.nhb.common.lock.core.LockFailureStrategy;
 import com.nhb.common.lock.core.LockKeyBuilder;
 import com.nhb.common.lock.executor.LockExecutor;
 import com.nhb.common.lock.properties.LockConfigProperties;
-import org.springframework.core.Ordered;
 
 import java.lang.annotation.*;
 
@@ -14,20 +13,11 @@ import java.lang.annotation.*;
  * @date 2026/4/30 15:01
  * @description: 分布式锁注解
  */
-@Repeatable(Lock.List.class)
 @Target(value = {ElementType.METHOD, ElementType.ANNOTATION_TYPE})
 @Retention(value = RetentionPolicy.RUNTIME)
 @Inherited
 @Documented
 public @interface Lock {
-
-    /**
-     * 应用条件表达式，当执行结果为{@code true}或{@code 'true'}时，才会执行锁操作
-     *
-     * @return 名称
-     */
-    String condition() default "";
-
     /**
      * 用于多个方法锁同一把锁 可以理解为锁资源名称 为空则会使用 包名+类名+方法名
      *
@@ -83,20 +73,4 @@ public @interface Lock {
      * @return LockKeyBuilder
      */
     Class<? extends LockKeyBuilder> keyBuilderStrategy() default LockKeyBuilder.class;
-
-    /**
-     * 获取顺序，值越小越先执行
-     *
-     * @return 顺序值
-     */
-    int order() default Ordered.LOWEST_PRECEDENCE;
-
-
-    @Target(value = {ElementType.METHOD, ElementType.ANNOTATION_TYPE})
-    @Retention(value = RetentionPolicy.RUNTIME)
-    @Inherited
-    @Documented
-    @interface List {
-        Lock[] value();
-    }
 }

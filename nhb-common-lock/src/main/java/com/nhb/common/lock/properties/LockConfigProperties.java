@@ -38,7 +38,7 @@ public class LockConfigProperties {
     /**
      * 获取锁失败时重试时间间隔 单位：毫秒
      */
-    private Long retryInterval = 100L;
+    private Long retryInterval = 500L;
 
     /**
      * 默认执行器，不设置默认取容器第一个

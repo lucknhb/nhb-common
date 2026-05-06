@@ -31,7 +31,7 @@ public @interface Lock {
     Class<? extends LockExecutor> executor() default LockExecutor.class;
 
     /**
-     * support SPEL expresion 锁的key = name + keys
+     * 支持 SPEL 表达式 锁的key = name + keys
      *
      * @return KEY
      */
@@ -51,7 +51,7 @@ public @interface Lock {
      *     结合业务,建议该时间不宜设置过长,特别在并发高的情况下. 未设置则为默认时间3秒 默认值：{@link LockConfigProperties#acquireTimeout}
      * </pre>
      */
-    long acquireTimeout() default -1;
+    long acquireTimeout() default -1L;
 
     /**
      * 业务方法执行完后（方法内抛异常也算执行完）自动释放锁，如果为false，锁将不会自动释放直至到达过期时间才释放 {@link Lock#expire()}

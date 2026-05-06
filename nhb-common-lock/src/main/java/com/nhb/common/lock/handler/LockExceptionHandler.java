@@ -25,7 +25,7 @@ public class LockExceptionHandler {
     @ExceptionHandler(LockFailureException.class)
     public ResultMessage<Void> handleLockFailureException(LockFailureException e, HttpServletRequest request) {
         String requestURI = request.getRequestURI();
-        log.error("Acquire Lock Fail '{}',发生lock异常.", requestURI, e);
+        log.error("Acquire Lock Fail '{}'", requestURI, e);
         return ResultMessage.fail(HttpStatus.HTTP_UNAVAILABLE, "业务处理中，请稍后再试...");
     }
 
@@ -35,7 +35,7 @@ public class LockExceptionHandler {
     @ExceptionHandler(LockException.class)
     public ResultMessage<Void> handleLockException(LockException e, HttpServletRequest request) {
         String requestURI = request.getRequestURI();
-        log.error("Acquire Lock Fail '{}',发生lock异常.", requestURI, e);
+        log.error("Acquire Lock Fail '{}'", requestURI, e);
         return ResultMessage.fail(HttpStatus.HTTP_UNAVAILABLE, "业务处理中，请稍后再试...");
     }
 }

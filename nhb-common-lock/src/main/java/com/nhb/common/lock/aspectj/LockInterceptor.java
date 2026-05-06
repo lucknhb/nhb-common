@@ -75,7 +75,7 @@ public class LockInterceptor implements MethodInterceptor, InitializingBean {
             if (null != lockInfo && lock.autoRelease()) {
                 final boolean releaseLock = lockTemplate.releaseLock(lockInfo);
                 if (!releaseLock) {
-                    log.error("releaseLock fail,lockKey={},lockValue={}", lockInfo.getLockKey(),
+                    log.error("ReleaseLock Fail,LockKey={},LockValue={}", lockInfo.getLockKey(),
                             lockInfo.getLockValue());
                 }
             }

@@ -57,7 +57,7 @@ public class LockTemplate implements InitializingBean {
         acquireTimeout = acquireTimeout < 0 ? lockConfigProperties.getAcquireTimeout() : acquireTimeout;
         long retryInterval = lockConfigProperties.getRetryInterval();
         LockExecutor lockExecutor = obtainExecutor(executor);
-        log.info("Use Lock Class: {}", lockExecutor.getClass());
+        log.info("Use Lock Class: {} For Key:{}", lockExecutor.getClass(), key);
         expire = !lockExecutor.renewal() && expire <= 0 ? lockConfigProperties.getExpire() : expire;
         int acquireCount = 0;
         String value = LockUtil.simpleUUID();

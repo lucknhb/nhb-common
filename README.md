@@ -787,6 +787,52 @@ SequenceUtil
 
 序号工具，用于获取需要
 
+### Lock模块
+
+依赖如下
+
+```xml
+<dependency>
+   <groupId>com.nhb</groupId>
+   <artifactId>nhb-common-lock</artifactId>
+   <version>${version}/使用引入BOM方式时无需填入版本号</version>
+</dependency>
+```
+
+<font color='red'>底层依赖Redis模块 如果引用了该模块可不用显示依赖Redis 但是需要参考Redis模块进行配置</font>
+
+```yaml
+#以下仅为lock配置
+lock:
+  lockKeyPrefix: #锁名前缀
+  expire: #过期时间 单位：毫秒 默认30S
+  acquireTimeout: # 获取锁超时时间 单位：毫秒 默认3S
+  retryInterval: #获取锁失败时重试时间间隔 单位：毫秒  默认500毫秒
+  primaryExecutor: #指定执行器 默认为RedissionExecutor 或者自定义实现 LockExecutor
+  primaryFailureStrategy: #默认失败策略 默认为抛出异常 或者自定义实现  LockFailureStrategy
+  primaryKeyBuilder: #默认key生成策略 有默认方式 或者 自定义实现LockKeyBuilder
+```
+
+1. 提供@Lock注解 可用属性如下
+
+   name：用于多个方法锁同一把锁 可以理解为锁资源名称 为空则会使用 包名+类名+方法名
+
+   executor：lock 执行器
+
+   keys：支持 SPEL 表达式 锁的key = name + keys
+
+   expire：过期时间
+
+   acquireTimeout：获取锁超时时间
+
+   autoRelease：是否自动释放锁
+
+   failStrategy：失败策略
+
+   keyBuilderStrategy：key生成器策略
+
+2. 提供LockTemplate进行手动上锁/解锁
+
 ### Idempotent模块
 
 依赖如下

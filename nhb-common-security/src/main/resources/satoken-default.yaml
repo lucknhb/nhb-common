@@ -11,5 +11,11 @@ sa-token:
   is-read-header: true
   # 关闭 cookie 鉴权 从根源杜绝 csrf 漏洞风险
   is-read-cookie: false
+  #token 在请求头中的名称
+  token-name: Authorization
   # token前缀
   token-prefix: "Bearer"
+  #开启该注解 需网关-服务实例上下游同时配置才能生效  生效后 无法绕过gateway直接请求实例
+  check-same-token: true
+  #JWT秘钥
+  jwt-secret-key: luck_nhb@163.com

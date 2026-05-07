@@ -261,7 +261,7 @@ Xss : 自定义xss校验注解 用于校验是否存在脚本注入风险
     <artifactId>nhb-common-security</artifactId>
     <version>${version}/使用引入BOM方式时无需填入版本号</version>
     <exclusions>
-        <!--不需要redis依赖的情况下(不需要sa-token分布式会话功能) 可剔除该依赖-->
+        <!--不需要redis依赖的情况下(不需要sa-token分布式会话功能既单机版) 可剔除该依赖-->
         <exclusion>
            <groupId>com.nhb</groupId>
            <artifactId>nhb-common-redis</artifactId>
@@ -284,6 +284,8 @@ Xss : 自定义xss校验注解 用于校验是否存在脚本注入风险
 # 内置默认配置 写相同配置覆盖
 # Sa-Token配置
 sa-token:
+  #不打印logo
+  is-print: false
   # 允许动态设置 token 有效期
   dynamic-active-timeout: true
   # 允许从 请求参数 读取 token
@@ -292,9 +294,17 @@ sa-token:
   is-read-header: true
   # 关闭 cookie 鉴权 从根源杜绝 csrf 漏洞风险
   is-read-cookie: false
+  #token 在请求头中的名称
+  token-name: Authorization
   # token前缀
   token-prefix: "Bearer"
+  #开启该注解 需网关-服务实例上下游同时配置才能生效  生效后 无法绕过gateway直接请求实例
+  check-same-token: true
+  #JWT秘钥
+  jwt-secret-key: luck_nhb@163.com
 ```
+
+<font color='red'>使用了Redis模块作为共享数据 则需要按照redis模块所需参数进行配置</font>
 
 支持以下功能：
 
@@ -691,6 +701,21 @@ ForyFactory工厂类 提供序列化及反序列化函数
 ```
 
 已实现通过nacos进行动态感知实例上下线，减少网关层缓存导致一定时间的服务无法请求问题
+
+<font color='red'>gateway引用了security模块(需要配置Redis模块所需参数) 如果不需要使用的话(既不用验证路径白名单和校验是否登录)可剔除显示剔除依赖 如下</font>
+
+```xml
+<dependency>
+   <groupId>com.nhb</groupId>
+   <artifactId>nhb-common-gateway</artifactId>
+   <exclusions>
+       <exclusion>
+          <groupId>com.nhb</groupId>
+          <artifactId>nhb-common-security</artifactId>
+       </exclusion>
+    </exclusions>
+</dependency>
+```
 
 ```yaml
 #默认配置

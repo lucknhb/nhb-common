@@ -3,10 +3,9 @@ package com.nhb.common.sse.controller;
 import cn.dev33.satoken.stp.StpUtil;
 import com.nhb.common.core.domain.ResultMessage;
 import com.nhb.common.sse.core.SseEmitterManager;
-import com.nhb.common.sse.properties.SseConfigProperties;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBooleanProperty;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -19,7 +18,6 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
  */
 @RestController
 @RequiredArgsConstructor
-@ConditionalOnBooleanProperty(prefix = SseConfigProperties.PREFIX ,name = "enabled" ,havingValue = true ,matchIfMissing = true)
 public class SseController {
     private final SseEmitterManager sseEmitterManager;
 
@@ -39,7 +37,7 @@ public class SseController {
     /**
      * 关闭 SSE 连接
      */
-    @GetMapping(value = "${sse.path}/close")
+    @DeleteMapping(value = "${sse.path}/close")
     public ResultMessage<Void> close() {
         String tokenValue = StpUtil.getTokenValue();
         long userId = StpUtil.getLoginIdAsLong();

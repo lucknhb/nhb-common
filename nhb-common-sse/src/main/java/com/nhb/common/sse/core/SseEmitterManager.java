@@ -3,7 +3,9 @@ package com.nhb.common.sse.core;
 import cn.hutool.core.map.MapUtil;
 import com.nhb.common.core.utils.SpringContextUtil;
 import com.nhb.common.redis.utils.RedissonUtil;
-import com.nhb.common.sse.dto.SseMessageDto;
+import com.nhb.common.sse.bean.SseMessage;
+import com.nhb.common.sse.bean.SseMessageDetail;
+import com.nhb.common.sse.properties.SseConfigProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -25,14 +27,15 @@ public class SseEmitterManager {
     /**
      * 订阅的频道
      */
-    private final static String SSE_TOPIC = "global:sse";
+    private final SseConfigProperties sseConfigProperties;
 
     private final static Map<Long, Map<String, SseEmitter>> USER_TOKEN_EMITTERS = new ConcurrentHashMap<>();
 
-    public SseEmitterManager() {
+    public SseEmitterManager(SseConfigProperties sseConfigProperties) {
+        this.sseConfigProperties = sseConfigProperties;
         // 定时执行 SSE 心跳检测
         SpringContextUtil.getBean(ScheduledExecutorService.class)
-                .scheduleWithFixedDelay(this::sseMonitor, 60L, 60L, TimeUnit.SECONDS);
+                .scheduleWithFixedDelay(this::sseMonitor, sseConfigProperties.getHeartbeatInterval(), sseConfigProperties.getHeartbeatInterval(), TimeUnit.SECONDS);
     }
 
     /**
@@ -115,11 +118,11 @@ public class SseEmitterManager {
      * SSE心跳检测，关闭无效连接
      */
     public void sseMonitor() {
-        log.info("------ Start SSE Monitor ------");
         USER_TOKEN_EMITTERS.forEach((userId, map) ->
                 map.entrySet().removeIf(e -> {
                     try {
-                        e.getValue().send(SseEmitter.event().comment("heartbeat"));
+                        e.getValue().send(SseEmitter.event().comment("PING"));
+                        log.info("Send SSE PING To UserId[{}] Success", userId);
                         return false;
                     } catch (Exception ex) {
                         log.warn("Check heart fail，remove connect : userId={}, token={}", userId, e.getKey());
@@ -135,24 +138,25 @@ public class SseEmitterManager {
      *
      * @param consumer 处理SSE消息的消费者函数
      */
-    public void subscribeMessage(Consumer<SseMessageDto> consumer) {
-        RedissonUtil.subscribe(SSE_TOPIC, SseMessageDto.class, consumer);
+    public void subscribeMessage(Consumer<SseMessage> consumer) {
+        RedissonUtil.subscribe(this.sseConfigProperties.getSseTopic(), SseMessage.class, consumer);
     }
 
     /**
      * 向指定的用户会话发送消息
      *
-     * @param userId  要发送消息的用户id
-     * @param message 要发送的消息内容
+     * @param userId 要发送消息的用户id
+     * @param data   要发送的消息内容
      */
-    public void sendMessage(Long userId, String message) {
+    public void sendMessage(Long userId, SseMessageDetail data) {
         Map<String, SseEmitter> emitters = USER_TOKEN_EMITTERS.get(userId);
         if (MapUtil.isNotEmpty(emitters)) {
             for (Map.Entry<String, SseEmitter> entry : emitters.entrySet()) {
                 try {
                     entry.getValue().send(SseEmitter.event()
                             .name("message")
-                            .data(message));
+                            .data(data));
+                    log.info("Send SSE Message To UserId[{}] :{}", userId, data);
                 } catch (Exception e) {
                     SseEmitter remove = emitters.remove(entry.getKey());
                     if (remove != null) {
@@ -168,39 +172,48 @@ public class SseEmitterManager {
     /**
      * 本机全用户会话发送消息
      *
-     * @param message 要发送的消息内容
+     * @param data 要发送的消息内容
      */
-    public void sendMessage(String message) {
+    public void sendMessage(SseMessageDetail data) {
         for (Long userId : USER_TOKEN_EMITTERS.keySet()) {
-            sendMessage(userId, message);
+            sendMessage(userId, data);
         }
     }
 
     /**
      * 发布SSE订阅消息
      *
-     * @param sseMessageDto 要发布的SSE消息对象
+     * @param sseMessage 要发布的SSE消息对象
      */
-    public void publishMessage(SseMessageDto sseMessageDto) {
-        SseMessageDto broadcastMessage = new SseMessageDto();
-        broadcastMessage.setMessage(sseMessageDto.getMessage());
-        broadcastMessage.setUserIds(sseMessageDto.getUserIds());
-        RedissonUtil.publish(SSE_TOPIC, broadcastMessage, consumer -> {
-            log.info("SSE Send Topic:{} Session Keys:{} Message:{}",
-                    SSE_TOPIC, sseMessageDto.getUserIds(), sseMessageDto.getMessage());
-        });
+    public void publishMessage(SseMessage sseMessage) {
+        SseMessage broadcastMessage = new SseMessage();
+        broadcastMessage.setData(sseMessage.getData());
+        broadcastMessage.setUserIds(sseMessage.getUserIds());
+        RedissonUtil.publish(this.sseConfigProperties.getSseTopic(), broadcastMessage, consumer -> log.info("SSE Send Topic:{} Session Keys:{} Message:{}",
+                this.sseConfigProperties.getSseTopic(), sseMessage.getUserIds(), sseMessage.getData()));
     }
 
     /**
      * 向所有的用户发布订阅的消息(群发)
      *
-     * @param message 要发布的消息内容
+     * @param data 要发布的消息内容
      */
-    public void publishAll(String message) {
-        SseMessageDto broadcastMessage = new SseMessageDto();
-        broadcastMessage.setMessage(message);
-        RedissonUtil.publish(SSE_TOPIC, broadcastMessage, consumer -> {
-            log.info("SSE Send Topic:{} Message:{}", SSE_TOPIC, message);
+    public void publishAll(SseMessageDetail data) {
+        SseMessage broadcastMessage = new SseMessage();
+        broadcastMessage.setData(data);
+        RedissonUtil.publish(this.sseConfigProperties.getSseTopic(), broadcastMessage, consumer -> {
+            log.info("SSE Send Topic:{} Message:{}", this.sseConfigProperties.getSseTopic(), data);
         });
     }
+
+    /**
+     * 关闭所有连接（优雅停机用）
+     */
+    public void shutdown() {
+        log.info("Stopping SSE Connect");
+        USER_TOKEN_EMITTERS.forEach((userId, emitters) -> emitters.values().forEach(SseEmitter::complete));
+        USER_TOKEN_EMITTERS.clear();
+        log.info("End Stop SSE Connect");
+    }
+
 }

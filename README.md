@@ -1004,3 +1004,31 @@ roleKeys ： 角色标识符 (需要实现SensitiveService接口中的isSensitiv
 
 permissions ： 权限标识符 (需要实现SensitiveService接口中的isSensitive方法 返回true表示需要脱敏 false表示不需要脱敏)
 
+### SSE模块
+
+依赖如下
+
+```xml
+<dependency>
+   <groupId>com.nhb</groupId>
+   <artifactId>nhb-common-sse</artifactId>
+   <version>${version}/使用引入BOM方式时无需填入版本号</version>
+</dependency>
+```
+
+<font color='red'>依赖Redis进行数据发布订阅  则需要按照redis模块所需参数进行配置</font>
+
+<font color='red'>依赖Security模块进行鉴权(连接/关闭时会进行验证是否登录状态) 请按照security中的使用方法进行配置</font>
+
+```yaml
+#SSE模块提供配置项 以下为默认值
+sse:
+  #请求根地址 需要说明 连接时请求地址为此配置项 (GET) 断开连接为此配置项/close (DELETE)
+  path: /sse
+  #Redis发布订阅主题
+  sse-topic: global:sse
+  #心跳间隔时间 单位 S
+  heartbeat-interval: 60
+```
+
+此外提供了SseMessageUtil工具类 用于发送消息/发布消息

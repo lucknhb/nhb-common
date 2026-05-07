@@ -29,14 +29,12 @@ public class SseTopicListener implements ApplicationRunner, Ordered {
     @Override
     public void run(ApplicationArguments args) throws Exception {
         sseEmitterManager.subscribeMessage((message) -> {
-            log.info("SSE Topic Subscribe Receive The Message. The Session Keys={} Message={}", message.getUserIds(), message.getMessage());
+            log.info("SSE Topic Subscribe Receive The Message. The Session Keys={} Message={}", message.getUserIds(), message.getData());
             // 如果key不为空就按照key发消息 如果为空就群发
             if (CollUtil.isNotEmpty(message.getUserIds())) {
-                message.getUserIds().forEach(key -> {
-                    sseEmitterManager.sendMessage(key, message.getMessage());
-                });
+                message.getUserIds().forEach(key -> sseEmitterManager.sendMessage(key, message.getData()));
             } else {
-                sseEmitterManager.sendMessage(message.getMessage());
+                sseEmitterManager.sendMessage(message.getData());
             }
         });
         log.info(">>>> SSE init topic subscribe listener success <<<<");

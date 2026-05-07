@@ -1,0 +1,7 @@
+sse:
+  #请求根地址
+  path: /sse
+  #Redis发布订阅主题
+  sse-topic: global:sse
+  #心跳间隔时间
+  heartbeat-interval: 60

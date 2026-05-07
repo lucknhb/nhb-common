@@ -2,6 +2,7 @@ package com.nhb.common.websocket.properties;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 
 /**
  * @author luck_nhb
@@ -10,6 +11,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * @description:
  */
 @Data
+@RefreshScope
 @ConfigurationProperties(prefix = WebSocketConfigProperties.PREFIX)
 public class WebSocketConfigProperties {
     public static final String PREFIX = "websocket";

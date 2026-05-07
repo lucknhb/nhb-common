@@ -38,7 +38,7 @@ public class SseController {
      * 关闭 SSE 连接
      */
     @DeleteMapping(value = "${sse.path}/close")
-    public ResultMessage<Void> close() {
+    public ResultMessage<Void> closeConnect() {
         String tokenValue = StpUtil.getTokenValue();
         long userId = StpUtil.getLoginIdAsLong();
         sseEmitterManager.disconnect(userId, tokenValue);

@@ -53,9 +53,5 @@
             <artifactId>sa-token-spring-boot3-starter</artifactId>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-context</artifactId>
-        </dependency>
     </dependencies>
 </project>

@@ -2,6 +2,7 @@ package com.nhb.common.mybatis.properties;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 
 import java.util.List;
 
@@ -12,6 +13,7 @@ import java.util.List;
  * @description:
  */
 @Data
+@RefreshScope
 @ConfigurationProperties(prefix = TenantConfigProperties.PREFIX)
 public class TenantConfigProperties {
     public static final String PREFIX = "mybatis-plus.tenant";

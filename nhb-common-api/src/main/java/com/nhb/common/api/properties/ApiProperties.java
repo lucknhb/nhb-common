@@ -9,6 +9,7 @@ import io.swagger.v3.oas.models.tags.Tag;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 
 import java.util.List;
 
@@ -19,6 +20,7 @@ import java.util.List;
  * @description api 文档配置
  */
 @Data
+@RefreshScope
 @ConfigurationProperties(prefix = ApiProperties.PREFIX)
 public class ApiProperties {
     /**

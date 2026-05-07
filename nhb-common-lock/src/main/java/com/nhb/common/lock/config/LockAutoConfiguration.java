@@ -10,6 +10,7 @@ import com.nhb.common.lock.properties.LockConfigProperties;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -17,6 +18,7 @@ import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.context.annotation.Role;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 
@@ -28,6 +30,7 @@ import java.util.List;
  * @date 2026/4/30 15:49
  * @description:
  */
+@Role(BeanDefinition.ROLE_INFRASTRUCTURE)
 @AutoConfigureAfter(RedisAutoConfiguration.class)
 @EnableConfigurationProperties(LockConfigProperties.class)
 public class LockAutoConfiguration {
@@ -58,18 +61,21 @@ public class LockAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
+    @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
     public LockKeyBuilder lockKeyBuilder(BeanFactory beanFactory) {
         return new DefaultLockKeyBuilder(beanFactory);
     }
 
     @Bean
     @ConditionalOnMissingBean
+    @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
     public LockFailureStrategy lockFailureStrategy() {
         return new DefaultLockFailureStrategy();
     }
 
     @Bean
     @ConditionalOnMissingBean
+    @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
     public LockInterceptor lockInterceptor(@Lazy LockTemplate lockTemplate, List<LockKeyBuilder> keyBuilders,
                                            List<LockFailureStrategy> failureStrategies, LockConfigProperties lockConfigProperties) {
         return new LockInterceptor(lockTemplate, keyBuilders, failureStrategies, lockConfigProperties);
@@ -77,6 +83,7 @@ public class LockAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
+    @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
     public LockAnnotationAdvisor lockAnnotationAdvisor(LockInterceptor lockInterceptor) {
         return new LockAnnotationAdvisor(lockInterceptor, Ordered.HIGHEST_PRECEDENCE);
     }

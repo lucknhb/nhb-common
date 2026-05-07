@@ -4,6 +4,7 @@ import com.nhb.common.encrypt.enums.AlgorithmType;
 import com.nhb.common.encrypt.enums.EncodeType;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 
 /**
  * @author luck_nhb
@@ -12,6 +13,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * @description:
  */
 @Data
+@RefreshScope
 @ConfigurationProperties(prefix = FieldEncryptorConfigProperties.PREFIX)
 public class FieldEncryptorConfigProperties {
     public static final String PREFIX = "mybatis-plus.field-encryptor";

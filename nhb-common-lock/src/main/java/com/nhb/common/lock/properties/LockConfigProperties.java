@@ -4,8 +4,10 @@ import com.nhb.common.lock.core.LockFailureStrategy;
 import com.nhb.common.lock.core.LockKeyBuilder;
 import com.nhb.common.lock.executor.LockExecutor;
 import lombok.Data;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
+import org.springframework.context.annotation.Role;
 
 /**
  * @author luck_nhb
@@ -15,6 +17,7 @@ import org.springframework.cloud.context.config.annotation.RefreshScope;
  */
 @Data
 @RefreshScope
+@Role(BeanDefinition.ROLE_INFRASTRUCTURE)
 @ConfigurationProperties(prefix = LockConfigProperties.PREFIX)
 public class LockConfigProperties {
 

@@ -9,7 +9,7 @@ import lombok.Data;
  * @description: 基础信息类
  */
 @Data
-public abstract class WebSocketReceiveMessage {
+public class WebSocketReceiveMessage {
     /**
      * 消息类型
      */

@@ -1,7 +1,7 @@
 package com.nhb.common.websocket.listener;
 
 import cn.hutool.core.collection.CollUtil;
-import com.nhb.common.websocket.holder.WebSocketSessionHolder;
+import com.nhb.common.websocket.holder.WebSocketChannelHolder;
 import com.nhb.common.websocket.utils.WebSocketUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
@@ -30,12 +30,12 @@ public class WebSocketTopicListener implements ApplicationRunner, Ordered {
             // 如果key不为空就按照key发消息 如果为空就群发
             if (CollUtil.isNotEmpty(message.getUserIds())) {
                 message.getUserIds().forEach(userId -> {
-                    if (WebSocketSessionHolder.existSession(userId)) {
+                    if (WebSocketChannelHolder.existChannel(userId)) {
                         WebSocketUtil.sendMessage(userId,message.getData());
                     }
                 });
             } else {
-                WebSocketSessionHolder.getSessionsAll().forEach(key -> WebSocketUtil.sendMessage(key, message.getData()));
+                WebSocketChannelHolder.getChannelUserIds().forEach(key -> WebSocketUtil.sendMessage(key, message.getData()));
             }
         });
         log.info("Initializing The WebSocket Topic Subscription Listener Is Successful");

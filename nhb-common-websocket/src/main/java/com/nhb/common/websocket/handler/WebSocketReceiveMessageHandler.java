@@ -8,7 +8,7 @@ import org.springframework.web.socket.WebSocketSession;
  * @date 2026/3/18 10:52
  * @description: 消息处理器
  */
-public interface MessageHandler {
+public interface WebSocketReceiveMessageHandler {
 
     /**
      * 是否支持当前请求类型

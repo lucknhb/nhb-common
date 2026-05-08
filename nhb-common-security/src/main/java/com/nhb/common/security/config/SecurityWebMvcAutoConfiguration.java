@@ -38,11 +38,11 @@ public class SecurityWebMvcAutoConfiguration implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         // 注册Sa-Token的路由拦截器，并排除登录接口或其他可匿名访问的接口地址 (与注解拦截器无关)
         //gateway 进行放行后 此处也需要配置放行的话是否拦截
-        log.info("Security ignoreUrl list ：{}",securityConfigProperties.getPaths());
+        log.info("Security ignoreUrl list ：{}", securityConfigProperties.getPaths());
         registry.addInterceptor(new SaInterceptor(handle -> StpUtil.checkLogin()))
                 .addPathPatterns("/**")
                 .excludePathPatterns(securityConfigProperties.getPaths())
-                .excludePathPatterns("/favicon.ico", "/actuator", "/actuator/**", "/sse","/v3/api-docs");
+                .excludePathPatterns("/favicon.ico", "/actuator", "/actuator/**", "/sse", "/v3/api-docs", "/ws");
     }
 
     /**

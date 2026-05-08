@@ -33,7 +33,7 @@ public class WebSocketInterceptor implements HandshakeInterceptor {
         try {
             //先判断是否登录 未登录 则不允许连接
             if (StpUtil.isLogin()) {
-                Long userId = (Long) StpUtil.getLoginId();
+                Long userId = StpUtil.getLoginIdAsLong();
                 attributes.put(WebSocketConstants.USER_ID, userId);
                 return true;
             }

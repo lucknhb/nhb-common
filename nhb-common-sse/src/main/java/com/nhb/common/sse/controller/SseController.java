@@ -4,6 +4,7 @@ import cn.dev33.satoken.stp.StpUtil;
 import com.nhb.common.core.domain.ResultMessage;
 import com.nhb.common.sse.core.SseEmitterManager;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +17,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
  * @date 2026/3/9 8:42
  * @description: SSE 请求地址
  */
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 public class SseController {
@@ -31,6 +33,7 @@ public class SseController {
         }
         String tokenValue = StpUtil.getTokenValue();
         long userId = StpUtil.getLoginIdAsLong();
+        log.info("UserId[{}] Start Connect SSE", userId);
         return sseEmitterManager.connect(userId, tokenValue);
     }
 
@@ -42,6 +45,7 @@ public class SseController {
         String tokenValue = StpUtil.getTokenValue();
         long userId = StpUtil.getLoginIdAsLong();
         sseEmitterManager.disconnect(userId, tokenValue);
+        log.info("UserId[{}] Close Connect SSE", userId);
         return ResultMessage.ok();
     }
 

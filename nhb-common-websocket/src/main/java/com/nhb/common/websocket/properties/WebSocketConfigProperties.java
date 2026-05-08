@@ -16,10 +16,6 @@ import org.springframework.cloud.context.config.annotation.RefreshScope;
 public class WebSocketConfigProperties {
     public static final String PREFIX = "websocket";
     /**
-     * 默认开启
-     */
-    private Boolean enabled = true;
-    /**
      * 路径
      */
     private String path;

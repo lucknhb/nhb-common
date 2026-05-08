@@ -4,6 +4,7 @@ import com.alibaba.cloud.nacos.NacosConfigManager;
 import com.nhb.common.core.factory.YamlPropertySourceFactory;
 import com.nhb.common.gateway.filter.ForwardAuthFilter;
 import com.nhb.common.gateway.filter.WebCorsFilter;
+import com.nhb.common.gateway.filter.WebFluxCacheRequestFilter;
 import com.nhb.common.gateway.handler.GatewayExceptionHandler;
 import com.nhb.common.gateway.listeners.NacosInstancesChangeEventListener;
 import com.nhb.common.gateway.listeners.NacosRouteDefinitionLocatorListener;
@@ -32,6 +33,11 @@ public class GatewayAutoConfiguration {
     @Bean
     public ForwardAuthFilter forwardAuthFilter() {
         return new ForwardAuthFilter();
+    }
+
+    @Bean
+    public WebFluxCacheRequestFilter webFluxCacheRequestFilter(){
+        return new WebFluxCacheRequestFilter();
     }
 
     @Bean

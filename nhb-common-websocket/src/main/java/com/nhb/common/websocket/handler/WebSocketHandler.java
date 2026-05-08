@@ -1,20 +1,25 @@
 package com.nhb.common.websocket.handler;
 
 import cn.hutool.core.util.ObjectUtil;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nhb.common.core.utils.JacksonUtil;
+import com.nhb.common.core.utils.StringUtil;
 import com.nhb.common.websocket.constant.WebSocketConstants;
-import com.nhb.common.websocket.core.Message;
+import com.nhb.common.websocket.core.WebSocketReceiveMessage;
 import com.nhb.common.websocket.holder.WebSocketSessionHolder;
 import com.nhb.common.websocket.utils.WebSocketUtil;
 import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.util.Assert;
 import org.springframework.web.socket.*;
 import org.springframework.web.socket.handler.AbstractWebSocketHandler;
 import org.springframework.web.socket.handler.ConcurrentWebSocketSessionDecorator;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author luck_nhb
@@ -25,10 +30,9 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 public class WebSocketHandler extends AbstractWebSocketHandler {
+
     @Resource
-    private ObjectMapper objectMapper;
-    @Resource
-    private List<MessageHandler> messageHandlers;
+    private ObjectProvider<WebSocketReceiveMessageHandler> objectProvider;
 
     /**
      * 连接成功后
@@ -58,10 +62,14 @@ public class WebSocketHandler extends AbstractWebSocketHandler {
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         String content = message.getPayload();
-        Message receiveMessage = objectMapper.readValue(content, Message.class);
-        for (MessageHandler messageHandler : messageHandlers) {
-            if (messageHandler.support(receiveMessage.getType())) {
-                messageHandler.handleMessage(session, content);
+        log.info("[WebSocket] Receive Message:{}", content);
+        WebSocketReceiveMessage webSocketReceiveMessage = JacksonUtil.parseObject(content, WebSocketReceiveMessage.class);
+        Assert.notNull(objectProvider,"Not Found WebSocketReceiveMessageHandler");
+        Set<WebSocketReceiveMessageHandler> webSocketReceiveMessageHandlers = objectProvider.orderedStream().collect(Collectors.toSet());
+        for (WebSocketReceiveMessageHandler webSocketReceiveMessageHandler : webSocketReceiveMessageHandlers) {
+            Assert.isTrue(Objects.nonNull(webSocketReceiveMessage) && StringUtil.isNotBlank(webSocketReceiveMessage.getType()),"Receive Message Type Is Null");
+            if (webSocketReceiveMessageHandler.support(webSocketReceiveMessage.getType())) {
+                webSocketReceiveMessageHandler.handleMessage(session, webSocketReceiveMessage.getMessage());
             }
         }
     }

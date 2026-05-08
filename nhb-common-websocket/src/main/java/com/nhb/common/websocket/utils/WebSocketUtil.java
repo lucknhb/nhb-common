@@ -1,9 +1,10 @@
 package com.nhb.common.websocket.utils;
 
 import cn.hutool.core.collection.CollUtil;
+import com.nhb.common.core.utils.JacksonUtil;
 import com.nhb.common.redis.utils.RedissonUtil;
 import com.nhb.common.websocket.constant.WebSocketConstants;
-import com.nhb.common.websocket.core.WebSocketUserMessage;
+import com.nhb.common.websocket.core.WebSocketSendMessage;
 import com.nhb.common.websocket.holder.WebSocketSessionHolder;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RList;
@@ -16,6 +17,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 /**
@@ -40,10 +42,10 @@ public class WebSocketUtil {
      * 向指定的WebSocket会话发送文本消息
      *
      * @param session WebSocket会话
-     * @param message 要发送的文本消息内容
+     * @param data   要发送的文本消息内容
      */
-    public static void sendMessage(WebSocketSession session, String message) {
-        sendMessage(session, new TextMessage(message));
+    public static void sendMessage(WebSocketSession session, WebSocketSendMessage.MessageDetail data) {
+        sendMessage(session, new TextMessage(Objects.requireNonNull(JacksonUtil.toJsonString(data))));
     }
 
     /**
@@ -54,12 +56,12 @@ public class WebSocketUtil {
      */
     private static void sendMessage(WebSocketSession session, WebSocketMessage<?> message) {
         if (session == null || !session.isOpen()) {
-            log.warn("[send] session会话已经关闭");
+            log.warn("[Send] session会话已经关闭");
         } else {
             try {
                 session.sendMessage(message);
             } catch (IOException e) {
-                log.error("[send] session({}) 发送消息({}) 异常", session, message, e);
+                log.error("[Send] session({}) 发送消息({}) 异常", session, message, e);
             }
         }
     }
@@ -68,11 +70,11 @@ public class WebSocketUtil {
      * 向指定的WebSocket会话发送消息
      *
      * @param userId 要发送消息的用户id
-     * @param message    要发送的消息内容
+     * @param data    要发送的消息内容
      */
-    public static void sendMessage(Long userId, String message) {
+    public static void sendMessage(Long userId, WebSocketSendMessage.MessageDetail data) {
         WebSocketSession session = WebSocketSessionHolder.getSession(userId);
-        sendMessage(session, message);
+        sendMessage(session, data);
     }
 
     /**
@@ -80,8 +82,8 @@ public class WebSocketUtil {
      *
      * @param consumer 处理WebSocket消息的消费者函数
      */
-    public static void subscribeMessage(Consumer<WebSocketUserMessage> consumer) {
-        RedissonUtil.subscribe(WebSocketConstants.WEB_SOCKET_TOPIC, WebSocketUserMessage.class, consumer);
+    public static void subscribeMessage(Consumer<WebSocketSendMessage> consumer) {
+        RedissonUtil.subscribe(WebSocketConstants.WEB_SOCKET_TOPIC, WebSocketSendMessage.class, consumer);
     }
 
     /**
@@ -89,37 +91,37 @@ public class WebSocketUtil {
      *
      * @param webSocketMessage 要发布的WebSocket消息对象
      */
-    public static void publishMessage(WebSocketUserMessage webSocketMessage) {
+    public static void publishMessage(WebSocketSendMessage webSocketMessage) {
         List<Long> userIds = new ArrayList<>();
         // 当前服务内session,直接发送消息
         for (Long userId : webSocketMessage.getUserIds()) {
             if (WebSocketSessionHolder.existSession(userId)) {
-                sendMessage(userId, webSocketMessage.getMessage());
+                sendMessage(userId, webSocketMessage.getData());
                 continue;
             }
             userIds.add(userId);
         }
         // 不在线的用户进行数据订阅 其他实例中可能存在该用户
         if (CollUtil.isNotEmpty(userIds)) {
-            WebSocketUserMessage broadcastMessage = new WebSocketUserMessage();
-            broadcastMessage.setMessage(webSocketMessage.getMessage());
+            WebSocketSendMessage broadcastMessage = new WebSocketSendMessage();
+            broadcastMessage.setData(webSocketMessage.getData());
             broadcastMessage.setUserIds(userIds);
             RedissonUtil.publish(WebSocketConstants.WEB_SOCKET_TOPIC, broadcastMessage,
-                    consumer -> log.info("WebSocket Send TopicSubscription Message Topic:{} Session Keys:{} Message:{}",
-                    WebSocketConstants.WEB_SOCKET_TOPIC, userIds, webSocketMessage.getMessage()));
+                    consumer -> log.info("WebSocket Send TopicSubscription WebSocketReceiveMessage Topic:{} Session Keys:{} WebSocketSendMessage:{}",
+                    WebSocketConstants.WEB_SOCKET_TOPIC, userIds, webSocketMessage.getData()));
         }
     }
 
     /**
      * 向所有的WebSocket会话发布订阅的消息(群发)
      *
-     * @param message 要发布的消息内容
+     * @param data 要发布的消息内容
      */
-    public static void publishAll(String message) {
-        WebSocketUserMessage broadcastMessage = new WebSocketUserMessage();
-        broadcastMessage.setMessage(message);
+    public static void publishAll(WebSocketSendMessage.MessageDetail data) {
+        WebSocketSendMessage broadcastMessage = new WebSocketSendMessage();
+        broadcastMessage.setData(data);
         RedissonUtil.publish(WebSocketConstants.WEB_SOCKET_TOPIC, broadcastMessage,
-                consumer -> log.info("WebSocket Send TopicSubscription Message Topic:{} Message:{}", WebSocketConstants.WEB_SOCKET_TOPIC, message));
+                consumer -> log.info("WebSocket Send TopicSubscription WebSocketReceiveMessage Topic:{} WebSocketReceiveMessage:{}", WebSocketConstants.WEB_SOCKET_TOPIC, data));
     }
 
     /**
@@ -134,13 +136,13 @@ public class WebSocketUtil {
     /**
      * 存储离线信息至缓存中
      * @param userId     用户ID
-     * @param message   具体信息
+     * @param data   具体信息
      */
-    public static void saveOfflineMessage(Long userId,String message) {
+    public static void saveOfflineMessage(Long userId,WebSocketSendMessage.MessageDetail data) {
         //需要先将未推送数据存起来 推送后删除
         String key = WebSocketConstants.WEB_SOCKET_OFFLINE_MESSAGE + userId;
-        RList<String> offlineMessage = RedissonUtil.getClient().getList(key);
-        offlineMessage.add(message);
+        RList<WebSocketSendMessage.MessageDetail> offlineMessage = RedissonUtil.getClient().getList(key);
+        offlineMessage.add(data);
         //设置3天超时时间
         offlineMessage.expire(Duration.ofDays(3));
     }
@@ -152,12 +154,12 @@ public class WebSocketUtil {
     public static void sendOfflineMessage(Long userId){
         // 从 Redis 中拉取该用户的所有离线消息并推送
         String offlineKey = WebSocketConstants.WEB_SOCKET_OFFLINE_MESSAGE + userId;
-        RList<String> offlineList = RedissonUtil.getClient().getList(offlineKey);
+        RList<WebSocketSendMessage.MessageDetail> offlineList = RedissonUtil.getClient().getList(offlineKey);
         // 获取所有消息
-        List<String> messages = offlineList.readAll();
+        List<WebSocketSendMessage.MessageDetail> messages = offlineList.readAll();
         if (!messages.isEmpty()) {
             // 推送所有消息给用户（可以按顺序推送）
-            for (String message : messages) {
+            for (WebSocketSendMessage.MessageDetail message : messages) {
                 sendMessage(userId, message);
             }
             // 推送后删除离线列表

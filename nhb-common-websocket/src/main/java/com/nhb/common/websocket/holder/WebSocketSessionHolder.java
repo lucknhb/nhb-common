@@ -7,6 +7,7 @@ import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -39,6 +40,9 @@ public class WebSocketSessionHolder {
      */
     public static void removeSession(Long userId) {
         WebSocketSession session = USER_SESSION.remove(userId);
+        if (Objects.isNull(session)) {
+            return;
+        }
         try {
             session.close(CloseStatus.BAD_DATA);
         } catch (Exception ignored) {

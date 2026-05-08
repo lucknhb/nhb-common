@@ -26,16 +26,16 @@ public class WebSocketTopicListener implements ApplicationRunner, Ordered {
     public void run(ApplicationArguments args) throws Exception {
         // 订阅WebSocket消息
         WebSocketUtil.subscribeMessage((message) -> {
-            log.info("WebSocket Receive TopicSubscription UserIds={} Message={}", message.getUserIds(), message.getMessage());
+            log.info("WebSocket Receive TopicSubscription UserIds={} WebSocketReceiveMessage={}", message.getUserIds(), message.getData());
             // 如果key不为空就按照key发消息 如果为空就群发
             if (CollUtil.isNotEmpty(message.getUserIds())) {
                 message.getUserIds().forEach(userId -> {
                     if (WebSocketSessionHolder.existSession(userId)) {
-                        WebSocketUtil.sendMessage(userId,message.getMessage());
+                        WebSocketUtil.sendMessage(userId,message.getData());
                     }
                 });
             } else {
-                WebSocketSessionHolder.getSessionsAll().forEach(key -> WebSocketUtil.sendMessage(key, message.getMessage()));
+                WebSocketSessionHolder.getSessionsAll().forEach(key -> WebSocketUtil.sendMessage(key, message.getData()));
             }
         });
         log.info("Initializing The WebSocket Topic Subscription Listener Is Successful");

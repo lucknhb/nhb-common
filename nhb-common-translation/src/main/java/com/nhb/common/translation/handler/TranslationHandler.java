@@ -47,7 +47,7 @@ public class TranslationHandler extends JsonSerializer<Object> implements Contex
 
     @Override
     public void serialize(Object value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
-        TranslationInterface<?> trans = TRANSLATION_MAPPER.get(translation.type());
+        TranslationInterface<?> trans = TRANSLATION_MAPPER.get(Objects.requireNonNull(translation).type());
         if (ObjectUtil.isNotNull(trans)) {
             // 如果映射字段不为空 则取映射字段的值
             if (StringUtil.isNotBlank(translation.mapper())) {

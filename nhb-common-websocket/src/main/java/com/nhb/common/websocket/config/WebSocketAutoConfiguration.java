@@ -6,9 +6,9 @@ import com.nhb.common.websocket.interceptor.WebSocketInterceptor;
 import com.nhb.common.websocket.listener.WebSocketTopicListener;
 import com.nhb.common.websocket.properties.WebSocketConfigProperties;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBooleanProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 
 /**
@@ -17,9 +17,9 @@ import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
  * @date 2026/3/17 15:33
  * @description:
  */
+@EnableWebSocket
 @AutoConfiguration
 @EnableConfigurationProperties(WebSocketConfigProperties.class)
-@ConditionalOnBooleanProperty(prefix = WebSocketConfigProperties.PREFIX, name = "enabled", havingValue = true, matchIfMissing = true)
 public class WebSocketAutoConfiguration {
 
     @Bean

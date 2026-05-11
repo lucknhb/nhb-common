@@ -13,6 +13,7 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.util.Assert;
 
 import java.io.InputStream;
+import java.util.Objects;
 
 /**
  * @author luck_nhb
@@ -22,6 +23,8 @@ import java.io.InputStream;
  */
 @Slf4j
 public class SslContextFactory {
+    private static SslContext sslContext = null;
+
     /**
      * 创建SSL上下文
      *
@@ -81,14 +84,19 @@ public class SslContextFactory {
      * @throws Exception 异常信息
      */
     private static SslContext createFromGenerated(WebSocketConfigProperties webSocketConfigProperties) throws Exception {
+        //重复使用已存在的证书信息
+        if (Objects.nonNull(sslContext)) {
+            return sslContext;
+        }
         WebSocketConfigProperties.Ssl ssl = webSocketConfigProperties.getSsl();
         Assert.hasLength(ssl.getGenerateCertDomain(), "SSL Certificate Domain Is Not Supported");
         // 使用临时目录（应用重启后自动删除）
         SelfSignedCertificate ssc = new SelfSignedCertificate(ssl.getGenerateCertDomain());
-        log.info("The Self-Signed Certificate Has Been Generated In The Temporary Directory");
         SslContextBuilder builder = SslContextBuilder.forServer(ssc.certificate(), ssc.privateKey());
         applySettings(builder, ssl);
-        return builder.build();
+        //用于重复使用已创建好的SSL上下文
+        sslContext = builder.build();
+        return sslContext;
     }
 
     /**
@@ -106,7 +114,7 @@ public class SslContextFactory {
             builder.sslProvider(SslProvider.JDK);
         }
         // 协议版本
-        if (ssl.getProtocols() != null && !ssl.getProtocols().isEmpty()) {
+        if (StringUtil.isNotBlank(ssl.getProtocols())) {
             builder.protocols(ssl.getProtocols().split(StrPool.COMMA));
         }
     }

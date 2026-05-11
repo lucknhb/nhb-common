@@ -1,6 +1,5 @@
 package com.nhb.common.websocket.config;
 
-import cn.dev33.satoken.config.SaTokenConfig;
 import com.nhb.common.core.factory.YamlPropertySourceFactory;
 import com.nhb.common.security.config.SaTokenAutoConfiguration;
 import com.nhb.common.websocket.auth.DefaultWebSocketAuthService;
@@ -13,6 +12,7 @@ import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.io.ResourceLoader;
 
 /**
  * @author luck_nhb
@@ -27,13 +27,15 @@ public class WebSocketAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean(WebSocketAuthService.class)
-    public DefaultWebSocketAuthService  defaultWebSocketAuthService(){
+    public DefaultWebSocketAuthService defaultWebSocketAuthService() {
         return new DefaultWebSocketAuthService();
     }
+
     @Bean(initMethod = "start", destroyMethod = "stop")
     public WebSocketServer webSocketServer(WebSocketConfigProperties webSocketConfigProperties,
-                                           WebSocketAuthService authService) {
-        return new WebSocketServer(webSocketConfigProperties, authService);
+                                           WebSocketAuthService authService,
+                                           ResourceLoader resourceLoader) {
+        return new WebSocketServer(webSocketConfigProperties, authService, resourceLoader);
     }
 
 

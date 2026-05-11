@@ -11,6 +11,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.ResourceLoader;
 
 /**
  * @author luck_nhb
@@ -23,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 public class WebSocketServer {
     private final WebSocketConfigProperties webSocketConfigProperties;
     private final WebSocketAuthService authService;
+    private final ResourceLoader resourceLoader;
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
     private Channel serverChannel;
@@ -37,7 +39,7 @@ public class WebSocketServer {
             ServerBootstrap b = new ServerBootstrap();
             b.group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
-                    .childHandler(new WebSocketChannelInitializer(webSocketConfigProperties, authService))
+                    .childHandler(new WebSocketChannelInitializer(webSocketConfigProperties, authService, resourceLoader))
                     .option(ChannelOption.SO_BACKLOG, 128)
                     .childOption(ChannelOption.SO_KEEPALIVE, true);
             ChannelFuture f = b.bind(webSocketConfigProperties.getPort()).sync();

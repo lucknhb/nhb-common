@@ -4,7 +4,6 @@ import com.nhb.common.core.utils.JacksonUtil;
 import com.nhb.common.core.utils.StringUtil;
 import com.nhb.common.websocket.core.WebSocketReceiveMessage;
 import com.nhb.common.websocket.holder.WebSocketChannelHolder;
-import com.nhb.common.websocket.utils.WebSocketUtil;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.websocketx.*;
@@ -76,17 +75,6 @@ public class WebSocketFrameHandler extends SimpleChannelInboundHandler<WebSocket
             WebSocketChannelHolder.removeChannel(userId, ctx.channel());
             ctx.close();
             log.error("Client DisConnect WebSocket UserId[{}]", userId);
-        }
-    }
-
-    @Override
-    public void channelActive(ChannelHandlerContext ctx) {
-        Long userId = ctx.channel().attr(WebSocketAuthHandler.USER_ID_KEY).get();
-        if (userId != null) {
-            WebSocketChannelHolder.addChannel(userId, ctx.channel());
-            log.info("Client Connect WebSocket: UserId[{}], channelId[{}]", userId, ctx.channel().id());
-            //推送离线时未读消息
-            WebSocketUtil.sendOfflineMessage(userId);
         }
     }
 

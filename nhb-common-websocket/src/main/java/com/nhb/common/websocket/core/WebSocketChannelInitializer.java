@@ -4,6 +4,7 @@ import com.nhb.common.websocket.auth.WebSocketAuthService;
 import com.nhb.common.websocket.handler.WebSocketAuthHandler;
 import com.nhb.common.websocket.handler.WebSocketFrameHandler;
 import com.nhb.common.websocket.properties.WebSocketConfigProperties;
+import com.nhb.common.websocket.ssl.SslContextFactory;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.http.HttpMethod;
@@ -13,10 +14,14 @@ import io.netty.handler.codec.http.cors.CorsConfig;
 import io.netty.handler.codec.http.cors.CorsConfigBuilder;
 import io.netty.handler.codec.http.cors.CorsHandler;
 import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
+import io.netty.handler.ssl.SslContext;
 import io.netty.handler.stream.ChunkedWriteHandler;
 import io.netty.handler.timeout.IdleStateHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.ResourceLoader;
+
+import java.util.Objects;
 
 /**
  * @author luck_nhb
@@ -29,6 +34,20 @@ import lombok.extern.slf4j.Slf4j;
 public class WebSocketChannelInitializer extends ChannelInitializer<SocketChannel> {
     private final WebSocketConfigProperties webSocketConfigProperties;
     private final WebSocketAuthService webSocketAuthService;
+    private  final ResourceLoader resourceLoader;
+
+    /**
+     * 初始化SSL上下文
+     * @param resourceLoader  加载器
+     * @return                SSL上下文
+     */
+    private SslContext initSslContext(ResourceLoader resourceLoader) {
+        try {
+            return SslContextFactory.create(webSocketConfigProperties, resourceLoader);
+        } catch (Exception e) {
+            throw new RuntimeException("SSL Context Initialization Fails And The WSS Service Cannot Be Started", e);
+        }
+    }
 
     @Override
     protected void initChannel(SocketChannel ch) {
@@ -41,7 +60,11 @@ public class WebSocketChannelInitializer extends ChannelInitializer<SocketChanne
         } else {
             corsConfig = corsConfigBuilder.build();
         }
-
+        //设置SSL功能
+        SslContext sslContext = initSslContext(resourceLoader);
+        if (Objects.nonNull(sslContext)) {
+            ch.pipeline().addLast(sslContext.newHandler(ch.alloc()));
+        }
         ch.pipeline().addLast(new IdleStateHandler(
                         webSocketConfigProperties.getReaderIdleTimeSeconds(),
                         webSocketConfigProperties.getWriterIdleTimeSeconds(),

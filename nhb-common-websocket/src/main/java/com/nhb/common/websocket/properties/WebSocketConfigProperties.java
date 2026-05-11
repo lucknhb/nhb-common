@@ -61,4 +61,45 @@ public class WebSocketConfigProperties {
      * 设置允许访问的请求头
      */
     private List<String> allowedHeaders;
+
+    private Ssl ssl = new Ssl();
+
+    /**
+     * 内部类：SSL/TLS
+     */
+    @Data
+    public static class Ssl {
+        /**
+         * 是否启用 WSS
+         */
+        private Boolean enabled = false;
+        /**
+         * 证书文件路径（支持 classpath: 或 file:）
+         */
+        private String certFilePath;
+        /**
+         * 私钥文件路径
+         */
+        private String keyFilePath;
+        /**
+         * 私钥密码（无密码则留空）
+         */
+        private String keyPassword;
+        /**
+         * 使用哪种 SSL 提供者：JDK 或 OPENSSL
+         */
+        private String provider = "OPENSSL";
+        /**
+         * 支持的 SSL 协议版本，多个用逗号分隔
+         */
+        private String protocols = "TLSv1.2,TLSv1.3";
+        /**
+         * 是否自动生成证书
+         */
+        private Boolean autoGenerateEnabled = false;
+        /**
+         * 证书域名
+         */
+        private String generateCertDomain = "localhost";
+    }
 }

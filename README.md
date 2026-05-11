@@ -1032,3 +1032,66 @@ sse:
 ```
 
 此外提供了SseMessageUtil工具类 用于发送消息/发布消息
+
+### WebSocket模块
+
+依赖如下
+
+```xml
+<dependency>
+   <groupId>com.nhb</groupId>
+   <artifactId>nhb-common-websocket</artifactId>
+   <version>${version}/使用引入BOM方式时无需填入版本号</version>
+</dependency>
+```
+
+<font color='red'>依赖Redis进行数据发布订阅  则需要按照redis模块所需参数进行配置</font>
+
+<font color='red'>依赖Security模块进行鉴权(连接/关闭时会进行验证是否登录状态) 请按照security中的使用方法进行配置</font>
+
+```yaml
+#配置可选项如下
+websocket:
+  #端口
+  port: 6666
+  path: /ws
+  #读空闲超时 秒（0禁用）
+  reader-idle-time-seconds: 60
+  #写空闲超时 秒
+  writer-idle-time-seconds: 0
+  #全空闲超时 秒
+  all-idle-time-seconds: 0
+  #最大帧载荷
+  max-frame-size: 65536
+  #Redisson主题名称
+  cluster-topic: "global:ws:message"
+  #离线用户信息主题名称
+  offline-message-topic: "global:ws:offline-message:"
+  #跨域请求是否允许携带或暴露凭证信息
+  allow-credentials: true
+  #允许访问源地址
+  allowed-origins:
+    - "*"
+  #设置允许访问的请求头
+  allowed-headers:
+    - "*"
+  ssl:
+    #是否开启SSL功能 如果开启则连接为WSS
+    enabled: false
+    #证书文件路径 支持 classpath: 或 file:
+    cert-file-path:
+    #私钥文件路径 支持 classpath: 或 file:
+    key-file-path:
+    #私钥密码（无密码则留空）
+    key-password:
+    #SSL 提供者：JDK 或 OPENSSL
+    provider: "OPENSSL"
+    #支持的 SSL 协议版本，多个用逗号分隔
+    protocols: "TLSv1.2,TLSv1.3"
+    #是否自动生成证书 默认一年时间 注意有些客户端是不支持自生成证书验证
+    auto-generate-enabled: false
+    #域名
+    generate-cert-domain:
+```
+
+提供WebSocketUtil工具类进行消息发送 且提供WebSocketReceiveMessageHandler接口进行接收消息处理 如有此类需要请自行实现并注入IOC容器中即可

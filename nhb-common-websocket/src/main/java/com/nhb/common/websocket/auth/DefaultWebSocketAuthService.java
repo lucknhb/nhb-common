@@ -31,27 +31,28 @@ public class DefaultWebSocketAuthService implements WebSocketAuthService {
      */
     @Override
     public Long authenticate(Channel channel, FullHttpRequest request) {
-        // 优先自动获取登录信息
-        String token = extractToken(request);
-        if (StringUtil.isNotBlank(token)) {
-            String tokenPrefix = SaManager.getConfig().getTokenPrefix();
-            token = token.replaceAll(tokenPrefix, "").trim();
-            return Long.valueOf(StpUtil.getLoginIdByToken(token).toString());
-        } else {
-            //从请求参数中获取
-            QueryStringDecoder decoder = new QueryStringDecoder(request.uri());
-            Map<String, List<String>> params = decoder.parameters();
-            //仅获取第一个参数值
-            List<String> uids = params.get("token");
-            if (CollUtil.isNotEmpty(uids)) {
-                long userId = Long.valueOf(StpUtil.getLoginIdByToken(uids.getFirst()).toString());
-                //依然需要判断用户是否登录状态
-                if (StpUtil.isLogin(userId)) {
-                    return userId;
+        try {
+            // 优先自动获取登录信息
+            String token = extractToken(request);
+            if (StringUtil.isNotBlank(token)) {
+                String tokenPrefix = SaManager.getConfig().getTokenPrefix();
+                token = token.replaceAll(tokenPrefix, "").trim();
+                return Long.valueOf(StpUtil.getLoginIdByToken(token).toString());
+            } else {
+                //从请求参数中获取
+                QueryStringDecoder decoder = new QueryStringDecoder(request.uri());
+                Map<String, List<String>> params = decoder.parameters();
+                //仅获取第一个参数值
+                List<String> uids = params.get("token");
+                if (CollUtil.isNotEmpty(uids)) {
+                    return Long.valueOf(StpUtil.getLoginIdByToken(uids.getFirst()).toString());
                 }
             }
+            log.error("Not Login User To Connect WebSocket Server");
+        } catch (Exception e) {
+            log.error("Not Login User To Connect WebSocket Server", e);
+            return null;
         }
-        log.error("Not Login User To Connect WebSocket Server");
         // 认证失败
         return null;
     }

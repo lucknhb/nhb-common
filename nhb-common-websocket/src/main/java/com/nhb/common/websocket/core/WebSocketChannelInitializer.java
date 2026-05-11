@@ -73,7 +73,7 @@ public class WebSocketChannelInitializer extends ChannelInitializer<SocketChanne
                 .addLast(new ChunkedWriteHandler())
                 .addLast(new HttpObjectAggregator(webSocketConfigProperties.getMaxFrameSize()))
                 .addLast(new CorsHandler(corsConfig))
-                .addLast(new WebSocketAuthHandler(webSocketAuthService))
+                .addLast(new WebSocketAuthHandler(webSocketAuthService, webSocketConfigProperties))
                 .addLast(new WebSocketServerProtocolHandler(webSocketConfigProperties.getPath(), null, true, webSocketConfigProperties.getMaxFrameSize()))
                 .addLast(new WebSocketFrameHandler());
     }

@@ -70,7 +70,12 @@ public class SslContextFactory {
         Resource keyResource = resourceLoader.getResource(ssl.getKeyFilePath());
         try (InputStream certIs = certResource.getInputStream();
              InputStream keyIs = keyResource.getInputStream()) {
-            SslContextBuilder builder = SslContextBuilder.forServer(certIs, keyIs, ssl.getKeyPassword());
+            SslContextBuilder builder = null;
+            if (StringUtil.isNotBlank(ssl.getKeyPassword())) {
+                builder = SslContextBuilder.forServer(certIs, keyIs, ssl.getKeyPassword());
+            } else {
+                builder = SslContextBuilder.forServer(certIs, keyIs);
+            }
             applySettings(builder, ssl);
             return builder.build();
         }

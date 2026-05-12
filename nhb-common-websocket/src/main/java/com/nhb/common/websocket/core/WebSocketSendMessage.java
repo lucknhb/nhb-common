@@ -1,7 +1,7 @@
 package com.nhb.common.websocket.core;
 
 import com.nhb.common.core.utils.JacksonUtil;
-import com.nhb.common.websocket.WebSocketMessageLevel;
+import com.nhb.common.websocket.enums.WebSocketMessageLevel;
 import lombok.Data;
 
 import java.io.Serializable;

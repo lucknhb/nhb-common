@@ -1,4 +1,4 @@
-package com.nhb.common.websocket;
+package com.nhb.common.websocket.enums;
 
 /**
  * @author luck_nhb

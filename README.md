@@ -718,7 +718,18 @@ ForyFactory工厂类 提供序列化及反序列化函数
 ```
 
 ```yaml
-#默认配置
+spring:
+  cloud:
+    gateway:
+      #自定义SSL相关
+      ssl:
+        #是否使用自动生成的证书  该功能仅建议开发/测试使用临时性证书  此处开启时 server.ssl.enabled必须设置为false
+        auto-generate-cert-enabled: false
+        #支持的 SSL 协议版本，多个用逗号分隔
+        protocols: "TLSv1.2,TLSv1.3"
+        #域名
+        generate-cert-domain: "localhost"
+
 sa-token:
   #不打印sa-token logo
   is-print: false

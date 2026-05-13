@@ -2,8 +2,7 @@ package com.nhb.common.sse.utils;
 
 import com.nhb.common.core.utils.SpringContextUtil;
 import com.nhb.common.sse.bean.SseMessage;
-import com.nhb.common.sse.bean.SseMessageDetail;
-import com.nhb.common.sse.core.SseEmitterManager;
+import com.nhb.common.sse.core.SseChannelHolder;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class SseMessageUtil {
-    private static final SseEmitterManager MANAGER = SpringContextUtil.getBean(SseEmitterManager.class);
+    private static final SseChannelHolder MANAGER = SpringContextUtil.getBean(SseChannelHolder.class);
 
     /**
      * 向指定的SSE会话发送消息
@@ -25,7 +24,7 @@ public class SseMessageUtil {
      * @param userId  要发送消息的用户id
      * @param data 要发送的消息内容
      */
-    public static void sendMessage(Long userId, SseMessageDetail data) {
+    public static void sendMessage(Long userId, SseMessage.SseMessageDetail data) {
         MANAGER.sendMessage(userId, data);
     }
 
@@ -34,7 +33,7 @@ public class SseMessageUtil {
      *
      * @param data 要发送的消息内容
      */
-    public static void sendMessage(SseMessageDetail data) {
+    public static void sendMessage(SseMessage.SseMessageDetail data) {
         MANAGER.sendMessage(data);
     }
 
@@ -52,7 +51,7 @@ public class SseMessageUtil {
      *
      * @param data 要发布的消息内容
      */
-    public static void publishAll(SseMessageDetail data) {
+    public static void publishAll(SseMessage.SseMessageDetail data) {
         MANAGER.publishAll(data);
     }
 

@@ -1,6 +1,7 @@
 websocket:
   #端口
   port: 6666
+  #请求路径
   path: /ws
   #读空闲超时 秒（0禁用）
   reader-idle-time-seconds: 60

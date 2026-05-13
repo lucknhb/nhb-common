@@ -61,7 +61,9 @@ public class WebSocketConfigProperties {
      * 设置允许访问的请求头
      */
     private List<String> allowedHeaders;
-
+    /**
+     * SSL配置
+     */
     private Ssl ssl = new Ssl();
 
     /**

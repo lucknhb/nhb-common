@@ -1032,14 +1032,40 @@ permissions ： 权限标识符 (需要实现SensitiveService接口中的isSensi
 <font color='red'>依赖Security模块进行鉴权(连接/关闭时会进行验证是否登录状态) 请按照security中的使用方法进行配置</font>
 
 ```yaml
-#SSE模块提供配置项 以下为默认值
 sse:
-  #请求根地址 需要说明 连接时请求地址为此配置项 (GET) 断开连接为此配置项/close (DELETE)
+  #端口
+  port: 7777
+  #请求路径
   path: /sse
-  #Redis发布订阅主题
-  sse-topic: global:sse
-  #心跳间隔时间 单位 S
-  heartbeat-interval: 60
+  #最大帧载荷
+  max-frame-size: 65536
+  #Redisson主题名称
+  sse-topic: "global:sse:message"
+  #跨域请求是否允许携带或暴露凭证信息
+  allow-credentials: true
+  #允许访问源地址
+  allowed-origins:
+    - "*"
+  #设置允许访问的请求头
+  allowed-headers:
+    - "*"
+  ssl:
+    #是否开启SSL功能 如果开启则连接为https
+    enabled: false
+    #证书文件路径 支持 classpath: 或 file:
+    cert-file-path:
+    #私钥文件路径 支持 classpath: 或 file:
+    key-file-path:
+    #私钥密码（无密码则留空）
+    key-password:
+    #SSL 提供者：JDK 或 OPENSSL
+    provider: "OPENSSL"
+    #支持的 SSL 协议版本，多个用逗号分隔
+    protocols: "TLSv1.2,TLSv1.3"
+    #是否自动生成证书 默认一年时间
+    auto-generate-enabled: false
+    #域名
+    generate-cert-domain: "localhost"
 ```
 
 此外提供了SseMessageUtil工具类 用于发送消息/发布消息
@@ -1106,3 +1132,5 @@ websocket:
 ```
 
 提供WebSocketUtil工具类进行消息发送 且提供WebSocketReceiveMessageHandler接口进行接收消息处理 如有此类需要请自行实现并注入IOC容器中即可
+
+对于连接认证提供两种方式 一种是请求头Authorization/一种是参数token=XXXX

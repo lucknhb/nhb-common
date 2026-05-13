@@ -54,6 +54,7 @@ public class SseServerInitializer extends ChannelInitializer<SocketChannel> {
     protected void initChannel(SocketChannel ch) {
         ChannelPipeline p = ch.pipeline();
         CorsConfigBuilder corsConfigBuilder = CorsConfigBuilder.forOrigins(sseConfigProperties.getAllowedOrigins().toArray(new String[0]))
+                .shortCircuit()
                 .allowedRequestHeaders(sseConfigProperties.getAllowedHeaders().toArray(new String[0]))
                 .allowedRequestMethods(HttpMethod.DELETE, HttpMethod.POST, HttpMethod.PUT, HttpMethod.GET);
         CorsConfig corsConfig = null;

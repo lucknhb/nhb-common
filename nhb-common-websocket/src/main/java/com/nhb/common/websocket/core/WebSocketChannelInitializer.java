@@ -52,6 +52,7 @@ public class WebSocketChannelInitializer extends ChannelInitializer<SocketChanne
     @Override
     protected void initChannel(SocketChannel ch) {
         CorsConfigBuilder corsConfigBuilder = CorsConfigBuilder.forOrigins(webSocketConfigProperties.getAllowedOrigins().toArray(new String[0]))
+                .shortCircuit()
                 .allowedRequestHeaders(webSocketConfigProperties.getAllowedHeaders().toArray(new String[0]))
                 .allowedRequestMethods(HttpMethod.DELETE, HttpMethod.POST, HttpMethod.PUT, HttpMethod.GET);
         CorsConfig corsConfig = null;

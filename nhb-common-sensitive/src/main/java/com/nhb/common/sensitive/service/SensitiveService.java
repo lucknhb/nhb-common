@@ -12,6 +12,7 @@ package com.nhb.common.sensitive.service;
 public interface SensitiveService {
     /**
      * 是否脱敏
+     * 返回结果为true 则代表需要脱敏 false 不需要脱敏
      */
     boolean isSensitive(String[] roleKey, String[] perms);
 }

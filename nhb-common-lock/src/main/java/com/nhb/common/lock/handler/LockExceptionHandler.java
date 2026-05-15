@@ -1,8 +1,9 @@
-package com.nhb.common.redis.handler;
+package com.nhb.common.lock.handler;
 
 import cn.hutool.http.HttpStatus;
-import com.baomidou.lock.exception.LockFailureException;
 import com.nhb.common.core.domain.ResultMessage;
+import com.nhb.common.lock.exception.LockException;
+import com.nhb.common.lock.exception.LockFailureException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -16,14 +17,25 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
  */
 @Slf4j
 @RestControllerAdvice
-public class RedisExceptionHandler {
+public class LockExceptionHandler {
+
     /**
-     * 分布式锁Lock4j异常
+     * 分布式锁lock异常
      */
     @ExceptionHandler(LockFailureException.class)
     public ResultMessage<Void> handleLockFailureException(LockFailureException e, HttpServletRequest request) {
         String requestURI = request.getRequestURI();
-        log.error("获取锁失败了'{}',发生Lock4j异常.", requestURI, e);
+        log.error("Acquire Lock Fail '{}'", requestURI, e);
+        return ResultMessage.fail(HttpStatus.HTTP_UNAVAILABLE, "业务处理中，请稍后再试...");
+    }
+
+    /**
+     * 分布式锁lock异常
+     */
+    @ExceptionHandler(LockException.class)
+    public ResultMessage<Void> handleLockException(LockException e, HttpServletRequest request) {
+        String requestURI = request.getRequestURI();
+        log.error("Acquire Lock Fail '{}'", requestURI, e);
         return ResultMessage.fail(HttpStatus.HTTP_UNAVAILABLE, "业务处理中，请稍后再试...");
     }
 }

@@ -11,12 +11,4 @@ public interface WebSocketConstants {
      * 用户ID
      */
     String USER_ID = "USER_ID";
-    /**
-     * 未推送消息key
-     */
-    String WEB_SOCKET_OFFLINE_MESSAGE = "global:ws:offline-message:";
-    /**
-     * 订阅的频道
-     */
-    String WEB_SOCKET_TOPIC = "global:ws:topic";
 }

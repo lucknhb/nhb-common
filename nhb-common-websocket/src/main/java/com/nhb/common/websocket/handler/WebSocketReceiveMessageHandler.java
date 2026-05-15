@@ -1,6 +1,6 @@
 package com.nhb.common.websocket.handler;
 
-import org.springframework.web.socket.WebSocketSession;
+import io.netty.channel.ChannelHandlerContext;
 
 /**
  * @author luck_nhb
@@ -8,7 +8,7 @@ import org.springframework.web.socket.WebSocketSession;
  * @date 2026/3/18 10:52
  * @description: 消息处理器
  */
-public interface MessageHandler {
+public interface WebSocketReceiveMessageHandler {
 
     /**
      * 是否支持当前请求类型
@@ -18,10 +18,10 @@ public interface MessageHandler {
     boolean support(String type);
 
     /**
-     * 实际处理实现 需自行转换需要处理的数据类型 该数据为原始数据(包含请求类型)
-     * @param session          当前会话
+     * 实际处理实现 需自行转换需要处理的数据类型 该数据为原始数据(不包含请求类型)
+     * @param channelHandlerContext 当前会话通道上下文
      * @param receiveMessage   接收到的信息
      * @throws Exception       抛出的异常
      */
-    void handleMessage(WebSocketSession session, String receiveMessage) throws Exception;
+    void handleMessage(ChannelHandlerContext channelHandlerContext, String receiveMessage) throws Exception;
 }

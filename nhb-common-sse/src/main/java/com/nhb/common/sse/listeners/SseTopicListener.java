@@ -1,7 +1,7 @@
 package com.nhb.common.sse.listeners;
 
 import cn.hutool.core.collection.CollUtil;
-import com.nhb.common.sse.core.SseEmitterManager;
+import com.nhb.common.sse.core.SseChannelHolder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
@@ -18,7 +18,7 @@ import org.springframework.core.Ordered;
 @RequiredArgsConstructor
 public class SseTopicListener implements ApplicationRunner, Ordered {
 
-    private final SseEmitterManager sseEmitterManager;
+    private final SseChannelHolder sseChannelHolder;
 
     /**
      * 在Spring Boot应用程序启动时初始化SSE主题订阅监听器
@@ -28,15 +28,13 @@ public class SseTopicListener implements ApplicationRunner, Ordered {
      */
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        sseEmitterManager.subscribeMessage((message) -> {
-            log.info("SSE Topic Subscribe Receive The Message. The Session Keys={} Message={}", message.getUserIds(), message.getMessage());
+        sseChannelHolder.subscribeMessage((message) -> {
+            log.info("SSE Topic Subscribe Receive The Message. The Session Keys={} Message={}", message.getUserIds(), message.getData());
             // 如果key不为空就按照key发消息 如果为空就群发
             if (CollUtil.isNotEmpty(message.getUserIds())) {
-                message.getUserIds().forEach(key -> {
-                    sseEmitterManager.sendMessage(key, message.getMessage());
-                });
+                message.getUserIds().forEach(key -> sseChannelHolder.sendMessage(key, message.getData()));
             } else {
-                sseEmitterManager.sendMessage(message.getMessage());
+                sseChannelHolder.sendMessage(message.getData());
             }
         });
         log.info(">>>> SSE init topic subscribe listener success <<<<");

@@ -3,6 +3,7 @@ package com.nhb.common.dubbo.processor;
 import com.nhb.common.core.utils.StringUtil;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.core.env.Environment;
+import org.springframework.util.Assert;
 
 /**
  * @author luck_nhb
@@ -17,6 +18,7 @@ public class CustomDubboProjectNameEnvironmentAware implements EnvironmentAware 
         // 如果系统属性 project.name 未设置，则使用 spring.application.name 的值
         if (StringUtil.isBlank(System.getProperty("project.name"))) {
             String applicationName = environment.getProperty("spring.application.name");
+            Assert.hasLength(applicationName,"spring.application.name is blank");
             System.setProperty("project.name", applicationName);
         }
     }

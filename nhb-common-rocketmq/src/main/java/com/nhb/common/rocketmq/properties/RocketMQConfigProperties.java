@@ -6,6 +6,7 @@ import lombok.Data;
 import org.apache.rocketmq.remoting.netty.TlsSystemConfig;
 import org.apache.rocketmq.remoting.protocol.heartbeat.MessageModel;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 
 import static org.apache.rocketmq.client.ClientConfig.SEND_MESSAGE_WITH_VIP_CHANNEL_PROPERTY;
 
@@ -16,6 +17,7 @@ import static org.apache.rocketmq.client.ClientConfig.SEND_MESSAGE_WITH_VIP_CHAN
  * @description: RocketMQ配置
  */
 @Data
+@RefreshScope
 @ConfigurationProperties(prefix = RocketMQConfigProperties.PREFIX)
 public class RocketMQConfigProperties {
     public static final String PREFIX = "rocketmq";

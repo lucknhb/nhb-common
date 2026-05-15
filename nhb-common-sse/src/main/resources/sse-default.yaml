@@ -1,0 +1,34 @@
+sse:
+  #端口
+  port: 7777
+  #请求路径
+  path: /sse
+  #最大帧载荷
+  max-frame-size: 65536
+  #Redisson主题名称
+  sse-topic: "global:sse:message"
+  #跨域请求是否允许携带或暴露凭证信息
+  allow-credentials: true
+  #允许访问源地址
+  allowed-origins:
+    - "*"
+  #设置允许访问的请求头
+  allowed-headers:
+    - "*"
+  ssl:
+    #是否开启SSL功能 如果开启则连接为https
+    enabled: false
+    #证书文件路径 支持 classpath: 或 file:
+    cert-file-path:
+    #私钥文件路径 支持 classpath: 或 file:
+    key-file-path:
+    #私钥密码（无密码则留空）
+    key-password:
+    #SSL 提供者：JDK 或 OPENSSL
+    provider: "OPENSSL"
+    #支持的 SSL 协议版本，多个用逗号分隔
+    protocols: "TLSv1.2,TLSv1.3"
+    #是否自动生成证书 默认一年时间
+    auto-generate-enabled: false
+    #域名
+    generate-cert-domain: "localhost"

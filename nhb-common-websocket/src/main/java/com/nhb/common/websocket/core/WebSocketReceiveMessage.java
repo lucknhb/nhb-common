@@ -2,8 +2,6 @@ package com.nhb.common.websocket.core;
 
 import lombok.Data;
 
-import java.time.LocalDateTime;
-
 /**
  * @author luck_nhb
  * @version 1.0
@@ -11,17 +9,14 @@ import java.time.LocalDateTime;
  * @description: 基础信息类
  */
 @Data
-public abstract class Message {
-    /**
-     * 消息ID
-     */
-    private String id;
+public class WebSocketReceiveMessage {
     /**
      * 消息类型
      */
     private String type;
+
     /**
-     * 消息创建时间
+     * 接收到信息
      */
-    private LocalDateTime createTime;
+    private String message;
 }

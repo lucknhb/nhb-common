@@ -20,7 +20,7 @@ import java.time.temporal.TemporalAccessor;
  * @author luck_nhb
  * @version 1.0
  * @date 2026/2/26 16:58
- * @description:
+ * @description: 序号工具类
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class SequenceUtil {
@@ -144,17 +144,6 @@ public class SequenceUtil {
      */
     public static String getPaddedNextIdString(String key, Duration expireTime, Integer width) {
         return StringUtils.leftPad(getNextIdString(key, expireTime), width, '0');
-    }
-
-    /**
-     * 获取 yyyyMMdd 格式的唯一id
-     *
-     * @return 唯一id
-     * @deprecated 请使用 {@link #getDateId(String)} 或 {@link #getDateId(String, boolean)}、{@link #getDateId(String, boolean, int)}，确保不同业务的ID连续性
-     */
-    @Deprecated
-    public static String getDateId() {
-        return getDateId("");
     }
 
     /**

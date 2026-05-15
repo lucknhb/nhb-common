@@ -81,6 +81,11 @@
             </dependency>
             <dependency>
                 <groupId>com.nhb</groupId>
+                <artifactId>nhb-common-lock</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.nhb</groupId>
                 <artifactId>nhb-common-mybatis</artifactId>
                 <version>${revision}</version>
             </dependency>

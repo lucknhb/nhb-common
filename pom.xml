@@ -38,11 +38,13 @@
         <module>nhb-common-word</module>
         <module>nhb-common-ai</module>
         <module>nhb-common-generator</module>
+        <module>nhb-common-lock</module>
     </modules>
 
     <properties>
         <revision>1.0.0</revision>
         <java.version>21</java.version>
+        <oshi.version>6.10.0</oshi.version>
         <sms.version>3.3.5</sms.version>
         <pdfbox.version>3.0.7</pdfbox.version>
         <openpdf.version>3.0.3</openpdf.version>
@@ -51,7 +53,6 @@
         <tika.version>3.2.3</tika.version>
         <fory.version>0.15.0</fory.version>
         <sa-token.version>1.44.0</sa-token.version>
-        <lock4j.version>2.2.7</lock4j.version>
         <xxl-job.version>3.3.2</xxl-job.version>
         <rocketmq.version>5.4.0</rocketmq.version>
         <redisson.version>3.52.0</redisson.version>
@@ -270,11 +271,6 @@
                 <artifactId>redisson-spring-boot-starter</artifactId>
                 <version>${redisson.version}</version>
             </dependency>
-            <dependency>
-                <groupId>com.baomidou</groupId>
-                <artifactId>lock4j-redisson-spring-boot-starter</artifactId>
-                <version>${lock4j.version}</version>
-            </dependency>
             <!--API文档相关-->
             <dependency>
                 <groupId>io.swagger.core.v3</groupId>
@@ -419,6 +415,12 @@
                 <classifier>${os.detected.name}-${os.detected.arch}</classifier>
                 <version>${jlama.version}</version>
             </dependency>
+            <!-- 系统资源监控-->
+            <dependency>
+                <groupId>com.github.oshi</groupId>
+                <artifactId>oshi-core</artifactId>
+                <version>${oshi.version}</version>
+            </dependency>
 
         </dependencies>
     </dependencyManagement>
@@ -528,6 +530,7 @@
                     <include>application*</include>
                     <include>bootstrap*</include>
                     <include>logback*</include>
+                    <include>banner.txt</include>
                 </includes>
                 <!-- 启用过滤 即该资源中的变量将会被过滤器中的值替换 -->
                 <filtering>true</filtering>

@@ -1218,3 +1218,45 @@ rocketmq:
 提供了TopicUtil工具类 可获取发送的真实topic是什么
 
 另外提供了MessageBuilder用于构建发送消息所需要的Message对象(toMessage方法) 
+
+### ID模块
+
+依赖如下
+
+```xml
+<dependency>
+   <groupId>com.nhb</groupId>
+   <artifactId>nhb-common-id</artifactId>
+   <version>${version}/使用引入BOM方式时无需填入版本号</version>
+</dependency>
+```
+
+主要是为了解决在K8S/容器环境下 雪花算法ID重复问题 使用了百度的UID-Generator的核心算法-环形缓冲区 提供三种方式
+
+POD : 使用容器主机名进行hash计算workerId
+
+DB: 使用数据持久化工作节点 需要引入JDBC依赖
+
+Redis：使用redis进行缓存工作节点信息  需要引入Redisson依赖
+
+使用的话推荐 从IOC容器中获取  CachedIdGenerator 
+
+```yaml
+#默认配置如下
+id-generator:
+  #workId/MachineId生成方式
+  machine-id-generator-type: POD
+  #纪元年月日 格式例如： 2026-05-19
+  epoch-date: "2026-05-19"
+  #时间戳占用的位数
+  timestamp-bits: 41
+  #工作节点ID占用的位数
+  worker-id-bits: 10
+  #序列号占用的位数
+  sequence-bits: 12
+  #百分比值 (0-100)，当剩余ID低于此百分比时触发填充
+  padding-factor: 50
+  #定时填充间隔（秒），若为空则使用惰性填充（仅在阈值触发时填充）
+  schedule-interval: 0
+```
+

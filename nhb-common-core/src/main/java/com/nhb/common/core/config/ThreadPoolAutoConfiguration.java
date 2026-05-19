@@ -22,9 +22,9 @@ import java.util.concurrent.*;
 @AutoConfiguration
 public class ThreadPoolAutoConfiguration {
     /**
-     * 核心线程数 = cpu 核心数 + 1
+     * 核心线程数 = cpu 核心数 * 2
      */
-    private final int core = Runtime.getRuntime().availableProcessors() + 1;
+    private final int core = Runtime.getRuntime().availableProcessors() * 2;
 
     private ScheduledExecutorService scheduledExecutorService;
 

@@ -39,6 +39,7 @@
         <module>nhb-common-ai</module>
         <module>nhb-common-generator</module>
         <module>nhb-common-lock</module>
+        <module>nhb-common-id</module>
     </modules>
 
     <properties>

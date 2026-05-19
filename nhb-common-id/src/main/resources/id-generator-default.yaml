@@ -1,0 +1,15 @@
+id-generator:
+  #workId/MachineId生成方式
+  machine-id-generator-type: POD
+  #纪元年月日 格式例如： 2026-05-19
+  epoch-date: "2026-05-19"
+  #时间戳占用的位数
+  timestamp-bits: 41
+  #工作节点ID占用的位数
+  worker-id-bits: 10
+  #序列号占用的位数
+  sequence-bits: 12
+  #百分比值 (0-100)，当剩余ID低于此百分比时触发填充
+  padding-factor: 50
+  #定时填充间隔（秒），若为空则使用惰性填充（仅在阈值触发时填充）
+  schedule-interval: 0

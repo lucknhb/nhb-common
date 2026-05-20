@@ -30,6 +30,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.servlet.NoHandlerFoundException;
 
 import java.io.IOException;
+import java.sql.SQLSyntaxErrorException;
 
 /**
  * @author luck_nhb
@@ -40,12 +41,17 @@ import java.io.IOException;
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(SQLSyntaxErrorException.class)
+    public ResultMessage<Void> handleSQLSyntaxErrorException(SQLSyntaxErrorException sqlSyntaxErrorException){
+        log.error("SQL Syntax Error:{}", sqlSyntaxErrorException.getMessage(),sqlSyntaxErrorException);
+        return ResultMessage.fail("操作异常,请联系管理员");
+    }
     /**
      * 请求方式不支持
      */
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
-    public ResultMessage<Void> handleHttpRequestMethodNotSupported(HttpRequestMethodNotSupportedException e,
-                                                                   HttpServletRequest request) {
+    public ResultMessage<Void> handleHttpRequestMethodNotSupported(HttpRequestMethodNotSupportedException e, HttpServletRequest request) {
         String requestURI = request.getRequestURI();
         log.error("请求地址'{}',不支持'{}'请求", requestURI, e.getMethod());
         return ResultMessage.fail(HttpStatus.HTTP_BAD_METHOD, e.getMessage());

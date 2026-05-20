@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.sql.DataSource;
 import java.sql.*;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 /**
  * @author luck_nhb
@@ -37,13 +38,13 @@ public class DbWorkerNodeRepository implements WorkerNodeRepository {
      */
     private static final String CHECK_TABLE_EXISTS_SQL =
             "SELECT COUNT(*) FROM information_schema.TABLES " +
-                    "WHERE TABLE_SCHEMA = ? AND TABLE_NAME = 'WORKER_NODE'";
+                    "WHERE TABLE_SCHEMA = ? AND TABLE_NAME = 'worker_node'";
 
     /**
      * 建表 SQL
      */
     private static final String CREATE_TABLE_SQL =
-            "CREATE TABLE IF NOT EXISTS `WORKER_NODE` (" +
+            "CREATE TABLE IF NOT EXISTS `worker_node` (" +
                     "  `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '自增主键，同时也是 WorkerId'," +
                     "  `host_name` VARCHAR(64) NOT NULL COMMENT '主机名（K8S 下为 Pod 名称）'," +
                     "  `port` VARCHAR(64) NOT NULL COMMENT '端口号'," +
@@ -51,7 +52,7 @@ public class DbWorkerNodeRepository implements WorkerNodeRepository {
                     "  `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '最后修改时间（心跳时间）'," +
                     "  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间'," +
                     "  PRIMARY KEY (`ID`)," +
-                    "  UNIQUE KEY `UK_HOST_PORT` (`HOST_NAME`, `PORT`)," +
+                    "  UNIQUE KEY `UK_HOST_PORT` (`host_name`, `port`)" +
                     ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci " +
                     "  COMMENT='WorkerNode 分配表 - 用于 IdGenerator 的 WorkerId 分配'";
 
@@ -60,21 +61,19 @@ public class DbWorkerNodeRepository implements WorkerNodeRepository {
      */
     private static final String GET_WORKER_NODE_BY_HOST_PORT_SQL =
             "SELECT id, host_name, port, launch_time, update_time, create_time " +
-                    "FROM WORKER_NODE " +
-                    "WHERE HOST_NAME = ? AND PORT = ?";
+                    "FROM worker_node " +
+                    "WHERE host_name = ? AND port = ?";
 
     /**
      * 插入新的 WorkerNode 记录
      */
-    private static final String ADD_WORKER_NODE_SQL =
-            "INSERT INTO WORKER_NODE (host_name, port, launch_time, update_time, create_time) " +
+    private static final String ADD_WORKER_NODE_SQL = "INSERT INTO worker_node (host_name, port, launch_time, update_time, create_time) " +
                     "VALUES (?, ?, ?, NOW(), NOW())";
 
     /**
      * 更新 WorkerNode 的 MODIFIED 时间（心跳续期）
      */
-    private static final String UPDATE_WORKER_NODE_HEARTBEAT_SQL =
-            "UPDATE WORKER_NODE SET update_time = NOW() WHERE ID = ?";
+    private static final String UPDATE_WORKER_NODE_HEARTBEAT_SQL = "UPDATE worker_node SET update_time = NOW() WHERE id = ?";
 
     /**
      * 最大重试次数
@@ -227,9 +226,10 @@ public class DbWorkerNodeRepository implements WorkerNodeRepository {
                 if (affectedRows > 0 && keyHolder.getKey() != null) {
                     long workerId = keyHolder.getKey().longValue();
                     //进行循环使用
-                    workerId = workerId << idGeneratorConfigProperties.getWorkerIdBits();
+                    workerId = workerId %  (1L << idGeneratorConfigProperties.getWorkerIdBits());
                     entity.setId(workerId);
                     log.info("Successful assignment WorkerNode: id={}, host={}, port={}", workerId, entity.getHostName(), entity.getPort());
+                    break;
                 }
             } catch (DataAccessException e) {
                 if (isDuplicateKeyException(e)) {
@@ -248,7 +248,9 @@ public class DbWorkerNodeRepository implements WorkerNodeRepository {
                 throw new IdGeneratorException("INSERTION WorkerNode failure", e);
             }
         }
-        throw new IdGeneratorException("INSERT WorkerNode failed，retry " + MAX_RETRY_TIMES + " after that it still failed");
+        if (Objects.isNull(entity.getId())) {
+            throw new IdGeneratorException("INSERT WorkerNode failed，retry " + MAX_RETRY_TIMES + " after that it still failed");
+        }
     }
 
     /**

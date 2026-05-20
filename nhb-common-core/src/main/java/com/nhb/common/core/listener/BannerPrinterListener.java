@@ -9,6 +9,7 @@ import org.springframework.core.env.ConfigurableEnvironment;
 import oshi.hardware.GlobalMemory;
 import oshi.hardware.NetworkIF;
 import oshi.software.os.FileSystem;
+import oshi.software.os.NetworkParams;
 import oshi.software.os.OSFileStore;
 import oshi.software.os.OperatingSystem;
 import oshi.util.FormatUtil;
@@ -49,6 +50,9 @@ public class BannerPrinterListener implements ApplicationListener<ApplicationRea
         //磁盘信息
         FileSystem fileSystem = operatingSystem.getFileSystem();
         List<OSFileStore> fileStores = fileSystem.getFileStores();
+        //主机名
+        NetworkParams networkParams = operatingSystem.getNetworkParams();
+        String hostName = networkParams.getHostName();
         System.out.println("========================= Start Print Application Info ========================");
         //先打印系统信息 操作系统 CPU CPU正常运行时间 进程和线程 内存 核数 IP地址
         System.out.println(StrUtil.format("========= OS[{}]  BitNess[{}]  PID[{}]  ProcessName[{}] =========",
@@ -60,7 +64,7 @@ public class BannerPrinterListener implements ApplicationListener<ApplicationRea
         //网络信息
         System.out.println("=============== Start Print NetWork Info ==============");
         for (NetworkIF networkIF : networkIFs) {
-            if (0 == networkIF.getIPv4addr().length){
+            if (0 == networkIF.getIPv4addr().length) {
                 continue;
             }
             System.out.println(StrUtil.format("=========   NetWorkDisPlayName[{}]  IPV4[{}]  IPV6[{}] ==============",
@@ -92,7 +96,7 @@ public class BannerPrinterListener implements ApplicationListener<ApplicationRea
         System.out.println(StrUtil.format("========= JDK Home:{}  Project Home:{} Temp Dir:{} =========", javaHome, projectHome, tempDir));
         System.out.println(StrUtil.format("========= JVM Message : {} {} (build {},{}) Java Class Version[{}] =========",
                 jvmName, javaVendorVersion, javaRuntimeVersion, jvmInfo, javaClassVersion));
-        System.out.println(StrUtil.format("========= Application:{}  Active:{}  Port:{}", applicationName, active, port));
+        System.out.println(StrUtil.format("========= Application:{}  Active:{}  Port:{}  HostName:{} =========", applicationName, active, port, hostName));
         System.out.println("=============== End  Print  Project Info ==============");
         System.out.println("========================= End Print PrintApplication Info ========================");
     }

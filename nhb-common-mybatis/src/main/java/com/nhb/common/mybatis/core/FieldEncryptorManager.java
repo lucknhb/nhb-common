@@ -13,6 +13,7 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.core.type.ClassMetadata;
 import org.springframework.core.type.classreading.CachingMetadataReaderFactory;
+import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 import java.lang.reflect.Field;
@@ -57,6 +58,7 @@ public class FieldEncryptorManager extends EncryptorManager {
      * 通过 typeAliasesPackage 设置的扫描包 扫描缓存实体
      */
     private void scanEncryptClasses(String typeAliasesPackage) {
+        Assert.hasLength(typeAliasesPackage, "[mybatis-plus.type-aliases-package] must not be empty");
         PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
         CachingMetadataReaderFactory factory = new CachingMetadataReaderFactory();
         String[] packagePatternArray = StringUtils.splitPreserveAllTokens(typeAliasesPackage, ConfigurableApplicationContext.CONFIG_LOCATION_DELIMITERS);

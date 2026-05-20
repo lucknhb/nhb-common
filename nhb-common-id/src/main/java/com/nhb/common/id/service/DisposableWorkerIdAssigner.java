@@ -1,5 +1,6 @@
 package com.nhb.common.id.service;
 
+import cn.hutool.system.oshi.OshiUtil;
 import com.nhb.common.core.utils.ContainerUtil;
 import com.nhb.common.core.utils.IpUtil;
 import com.nhb.common.core.utils.SpringContextUtil;
@@ -8,6 +9,8 @@ import com.nhb.common.id.core.WorkerNodeRepository;
 import com.nhb.common.id.entity.WorkerNode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import oshi.software.os.NetworkParams;
+import oshi.software.os.OperatingSystem;
 
 import java.security.SecureRandom;
 
@@ -68,11 +71,13 @@ public class DisposableWorkerIdAssigner implements WorkerIdAssigner {
      */
     private WorkerNode buildWorkerNode() {
         WorkerNode workerNode = new WorkerNode();
-
+        OperatingSystem operatingSystem = OshiUtil.getOs();
+        NetworkParams networkParams = operatingSystem.getNetworkParams();
+        String hostName = networkParams.getHostName();
         // 检测是否为容器环境
         if (ContainerUtil.isRunningInsideContainer()) {
             // 获取容器 Host
-            workerNode.setHostName(IpUtil.getLocalHostName());
+            workerNode.setHostName(hostName);
             String port = SpringContextUtil.getProperty("local.server.port", "");
             // 获取容器 Port
             workerNode.setPort(port);

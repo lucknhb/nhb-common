@@ -39,7 +39,7 @@ public class ContainerUtil {
                 return true;
             }
         } catch (IOException e) {
-            log.error(e.getMessage(), e);
+            log.warn("Failed to read container cgroup:{}",e.getMessage());
         }
         // 4. 检查环境变量（Podman 特有）
         try {
@@ -48,7 +48,7 @@ public class ContainerUtil {
                 return true;
             }
         } catch (IOException e) {
-            log.error(e.getMessage());
+            log.warn("Failed to read container environ:{}",e.getMessage());
         }
         return false;
     }

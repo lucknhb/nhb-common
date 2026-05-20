@@ -140,20 +140,20 @@ public class MyBatisPlusAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnBooleanProperty(prefix = FieldEncryptorConfigProperties.PREFIX, name = "enabled", matchIfMissing = true)
+    @ConditionalOnBooleanProperty(prefix = FieldEncryptorConfigProperties.PREFIX, name = "enabled")
     public FieldEncryptorManager fieldEncryptorManager(MybatisPlusProperties mybatisPlusProperties) {
         return new FieldEncryptorManager(mybatisPlusProperties.getTypeAliasesPackage());
     }
 
     @Bean
-    @ConditionalOnBooleanProperty(prefix = FieldEncryptorConfigProperties.PREFIX, name = "enabled", matchIfMissing = true)
+    @ConditionalOnBooleanProperty(prefix = FieldEncryptorConfigProperties.PREFIX, name = "enabled")
     public MybatisPlusEncryptInterceptor mybatisEncryptInterceptor(FieldEncryptorManager fieldEncryptorManager,
                                                                    FieldEncryptorConfigProperties fieldEncryptorConfigProperties) {
         return new MybatisPlusEncryptInterceptor(fieldEncryptorManager, fieldEncryptorConfigProperties);
     }
 
     @Bean
-    @ConditionalOnBooleanProperty(prefix = FieldEncryptorConfigProperties.PREFIX, name = "enabled", matchIfMissing = true)
+    @ConditionalOnBooleanProperty(prefix = FieldEncryptorConfigProperties.PREFIX, name = "enabled")
     public MybatisPlusDecryptInterceptor mybatisDecryptInterceptor(FieldEncryptorManager fieldEncryptorManager,
                                                                    FieldEncryptorConfigProperties fieldEncryptorConfigProperties) {
         return new MybatisPlusDecryptInterceptor(fieldEncryptorManager, fieldEncryptorConfigProperties);

@@ -5,14 +5,17 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.autoconfigure.MybatisPlusProperties;
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import com.baomidou.mybatisplus.core.handlers.PostInitTableInfoHandler;
+import com.baomidou.mybatisplus.core.incrementer.IdentifierGenerator;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.OptimisticLockerInnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.TenantLineInnerInterceptor;
 import com.nhb.common.core.utils.ReflectSelfUtil;
 import com.nhb.common.core.utils.SpringContextUtil;
+import com.nhb.common.id.service.CachedIdGenerator;
 import com.nhb.common.mybatis.aspectj.DataPermissionPointcutAdvisorAspect;
 import com.nhb.common.mybatis.core.FieldEncryptorManager;
+import com.nhb.common.mybatis.core.NhbIdentifierGenerator;
 import com.nhb.common.mybatis.core.TenantSaTokenDao;
 import com.nhb.common.mybatis.handler.*;
 import com.nhb.common.mybatis.interceptor.DataPermissionInterceptor;
@@ -31,6 +34,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBooleanProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -52,6 +56,13 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @MapperScan("${mybatis-plus.mapperPackage}")
 @EnableConfigurationProperties({FieldEncryptorConfigProperties.class, TenantConfigProperties.class, MybatisPlusProperties.class})
 public class MyBatisPlusAutoConfiguration {
+
+    @Bean
+    @ConditionalOnBean(CachedIdGenerator.class)
+    @ConditionalOnBooleanProperty(name = "mybatis-plus.global-config.id-generator-flag",havingValue = true)
+    public IdentifierGenerator identifierGenerator(CachedIdGenerator  cachedIdGenerator) {
+        return new NhbIdentifierGenerator(cachedIdGenerator);
+    }
 
     @Bean
     public MybatisPlusInterceptor mybatisPlusInterceptor() {

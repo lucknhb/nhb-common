@@ -29,6 +29,12 @@
             <version>${revision}</version>
         </dependency>
         <dependency>
+            <groupId>com.nhb</groupId>
+            <artifactId>nhb-common-id</artifactId>
+            <version>${revision}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-jsqlparser</artifactId>
         </dependency>

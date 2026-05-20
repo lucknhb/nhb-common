@@ -16,6 +16,8 @@ mybatis-plus:
     # 默认日志输出 org.apache.ibatis.logging.slf4j.Slf4jImpl
     logImpl: org.apache.ibatis.logging.nologging.NoLoggingImpl
   global-config:
+    #是否使用 nhb-common-id中的ID生成逻辑来作为雪花算法的替代  为true则替换
+    id-generator-flag: false
     sequence:
       # 忽略回环网卡
       ignored-interfaces: lo
